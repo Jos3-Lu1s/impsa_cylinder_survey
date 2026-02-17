@@ -12,7 +12,7 @@
                 <field name="work_order" optional="show"/>
                 <field name="description" optional="hide"/>
                 <field name="cylinder_type" optional="show"/>
-                <!-- <field name="activity_ids" widget="list_activity"/> -->
+                <field name="activity_ids" widget="list_activity"/>
             </list>
         </field>
     </record>
@@ -64,11 +64,11 @@
                         </page>
                     </notebook>
                 </sheet>
-                <!-- <chatter>
+                <chatter>
                     <field name="message_follower_ids"/>
                     <field name="activity_ids"/>
                     <field name="message_ids"/>
-                </chatter> -->
+                </chatter>
             </form>
         </field>
     </record>
