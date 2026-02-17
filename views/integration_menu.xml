@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_impsa_cylinder_survey" model="ir.actions.act_window">
+            <field name="name">Levantamientos de Cilindros</field>
+            <field name="res_model">impsa.cylinder.survey</field>
+            <field name="view_mode">list,form</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Crear nuevo formato de levantamiento (F-05-01)
+              </p>
+              <p>
+                Utilice este módulo para registrar las medidas y trabajos requeridos
+                antes de generar la cotización en el CRM.
+              </p>
+            </field>
+        </record>
+
+        <menuitem 
+            id="menu_crm_cylinder_survey"
+            name="Levantamientos (Taller)"
+            parent="crm.crm_menu_root"
+            action="action_impsa_cylinder_survey"
+            sequence="15"/>
+
+        </data>
+</odoo>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_impsa_cylinder_survey_tree" model="ir.ui.view">
+        <field name="name">impsa.cylinder.survey.tree</field>
+        <field name="model">impsa.cylinder.survey</field>
+        <field name="arch" type="xml">
+            <list string="Levantamientos" decoration-info="name == 'Nuevo'">
+                <field name="name" decoration-bf="1"/>
+                <field name="date"/>
+                <field name="partner_id" widget="many2one_avatar"/>
+                <field name="work_order" optional="show"/>
+                <field name="description" optional="hide"/>
+                <field name="cylinder_type" optional="show"/>
+                <!-- <field name="activity_ids" widget="list_activity"/> -->
+            </list>
+        </field>
+    </record>
+
+    <record id="view_impsa_cylinder_survey_form" model="ir.ui.view">
+        <field name="name">impsa.cylinder.survey.form</field>
+        <field name="model">impsa.cylinder.survey</field>
+        <field name="arch" type="xml">
+            <form string="Levantamiento de Cilindro">
+                <header>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="Referencia"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id" widget="res_partner_many2one"/>
+                            <field name="date"/>
+                            <field name="work_order"/>
+                        </group>
+                        <group>
+                            <field name="cylinder_type"/>
+                            <field name="description"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Especificaciones Técnicas" name="specs">
+                            <group>
+                                <group string="Dimensiones">
+                                    <field name="diameter_sleeve"/>
+                                    <field name="diameter_rod"/>
+                                    <field name="stroke"/>
+                                </group>
+                                <group string="Identificación">
+                                    <field name="serial_number"/>
+                                    <field name="part_number"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Notas Internas" name="notes">
+                            <div class="text-muted">
+                                Use la sección de la derecha (chatter) para adjuntar fotos del estado del cilindro.
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+                <!-- <chatter>
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </chatter> -->
+            </form>
+        </field>
+    </record>
+
+    <record id="view_impsa_cylinder_survey_search" model="ir.ui.view">
+        <field name="name">impsa.cylinder.survey.search</field>
+        <field name="model">impsa.cylinder.survey</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Levantamiento">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="work_order"/>
+                <field name="serial_number"/>
+                <filter string="Fecha" name="date" date="date"/>
+                <group>
+                    <filter string="Fecha" name="group_date" context="{'group_by': 'date'}"/>
+                    <filter string="Cliente" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_impsa_cylinder_survey" model="ir.actions.act_window">
+        <field name="name">Levantamiento de Cilindros</field>
+        <field name="res_model">impsa.cylinder.survey</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear un nuevo levantamiento técnico
+            </p>
+            <p>
+                Gestiona las inspecciones y dimensiones de los cilindros hidráulicos.
+            </p>
+        </field>
+    </record>
+</odoo>
