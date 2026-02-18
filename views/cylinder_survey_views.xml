@@ -38,7 +38,7 @@
                             <field name="work_order"/>
                         </group>
                         <group>
-                            <field name="cylinder_type"/>
+                            <field name="cylinder_type" placeholder='Ej. Castillos, Elevador...'/>
                             <field name="description"/>
                         </group>
                     </group>
@@ -58,9 +58,7 @@
                             </group>
                         </page>
                         <page string="Notas Internas" name="notes">
-                            <div class="text-muted">
-                                Use la sección de la derecha (chatter) para adjuntar fotos del estado del cilindro.
-                            </div>
+                            <field name="internal_notes" placeholder="Escribe tus notas aquí..." nolabel="1"/>
                         </page>
                     </notebook>
                 </sheet>

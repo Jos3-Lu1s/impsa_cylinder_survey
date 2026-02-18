@@ -15,10 +15,15 @@ class CylinderSurvey(models.Model):
     description = fields.Char(string='Descripción', default='Cilindro Hidráulico')
     diameter_rod = fields.Char(string='Ø Vástago')
     work_order = fields.Char(string='Orden de Trabajo')
-    cylinder_type = fields.Char(string='Cilindro de', placeholder='Ej. Castillos, Elevador...')
+    cylinder_type = fields.Char(string='Cilindro de')
     stroke = fields.Float(string='Carrera')
     serial_number = fields.Char(string='No. Serie')
     part_number = fields.Char(string='No. Parte')
+
+    internal_notes = fields.Html(
+        string="Notas Internas",
+        help="Espacio para notas detalladas sobre este registro."
+    )
 
     @api.model_create_multi
     def create(self, vals_list):

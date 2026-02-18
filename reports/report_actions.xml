@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_cylinder_survey" model="ir.actions.report">
+        <field name="name">Levantamiento de Cilindros (F-05-01)</field>
+        <field name="model">impsa.cylinder.survey</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">impsa_cylinder_survey.report_cylinder_survey_document</field>
+        <field name="report_file">impsa_cylinder_survey.report_cylinder_survey_document</field>
+        <field name="print_report_name">'Levantamiento - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_impsa_cylinder_survey"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="impsa_cylinder_survey.paperformat_cylinder_survey_landscape"/>
+    </record>
+</odoo>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_cylinder_survey_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+
+                    <table class="table table-sm mb-0">
+                        <tbody>
+                            <tr>
+                                <td rowspan="2" width="160">
+                                    <img width="150" t-if="o.env.company.logo" t-att-src="image_data_uri(o.env.company.logo)" class="img-fluid" alt="Logo"/>
+                                </td>
+                                <td width="120" class="ps-3">
+                                    <h5 class="m-0 fw-bold">Proceso</h5>
+                                </td>
+                                <td>
+                                    <h5 class="m-0 text-muted">Control operacional</h5>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="ps-3">
+                                    <h5 class="m-0 fw-bold">Formato para levantamiento de cilindros</h5>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-sm mt-3 lh-sm">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="fw-bold">CLIENTE:</span>
+                                    <span t-field="o.partner_id" class="ms-2"/>
+                                </td>
+                                <td>
+                                    <span class="fw-bold">Ø CAMISA:</span>
+                                    <span t-field="o.diameter_sleeve" class="ms-2"/>
+                                </td>
+                                <td colspan="2">
+                                    <span class="fw-bold">FECHA:</span>
+                                    <span t-field="o.date" class="ms-2"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="fw-bold">DESCRIPCIÓN:</span>
+                                    <span t-field="o.description" class="ms-2"/>
+                                </td>
+                                <td>
+                                    <span class="fw-bold">Ø VÁSTAGO:</span>
+                                    <span t-field="o.diameter_rod" class="ms-2"/>
+                                </td>
+                                <td colspan="2">
+                                    <span class="fw-bold">O. TRABAJO:</span>
+                                    <span t-field="o.work_order" class="ms-2"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="fw-bold">CILINDRO DE:</span>
+                                    <span t-field="o.cylinder_type" class="ms-2"/>
+                                </td>
+                                <td>
+                                    <span class="fw-bold">CARRERA:</span>
+                                    <span t-field="o.stroke" class="ms-2"/>
+                                </td>
+                                <td>
+                                    <span class="fw-bold">No. SERIE:</span>
+                                    <span t-field="o.serial_number" class="ms-2"/>
+                                </td>
+                                <td>
+                                    <span class="fw-bold">No. PARTE:</span>
+                                    <span t-field="o.part_number" class="ms-2"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="row">
+                        <div class="col-5">
+                            <div class="border border-dark p-3 mt-4" style="min-height: 300px;">
+                                <p class="text-muted small mb-0">
+                                Espacio para esquema / dibujo...
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-7">
+                            <div class="border border-dark p-3 mt-4" style="min-height: 300px;">
+                                <p class="text-muted small mb-0">
+                                Espacio para esquema / dibujo...
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
