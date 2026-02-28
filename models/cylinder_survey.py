@@ -18,7 +18,7 @@ class CylinderSurvey(models.Model):
     )
     diameter_sleeve = fields.Char(string="Ø Camisa")
     date = fields.Date(string="Fecha", default=fields.Date.context_today)
-    description = fields.Char(string="Descripción", default="Cilindro Hidráulico")
+    description = fields.Char(string="Descripción")
     diameter_rod = fields.Char(string="Ø Vástago")
     work_order = fields.Char(string="Orden de Trabajo")
     cylinder_type = fields.Char(string="Cilindro de")
