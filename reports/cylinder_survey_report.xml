@@ -79,22 +79,60 @@
 
                     <div class="row">
                         <div class="col-5">
-                            <div class="border border-dark p-3 mt-4" style="min-height: 300px;">
-                                <p class="text-muted small mb-0">
-                                Espacio para esquema / dibujo...
-                                </p>
-                            </div>
+                            <table class="table table-sm">
+                                <tr>
+                                    <th style="border:1px solid black;">HRS</th>
+                                    <th style="border:1px solid black;">TRABAJOS A REALIZAR</th>
+                                    <th style="border:1px solid black;">OBS</th>
+                                </tr>
+                                <t t-foreach="o.operational_record_ids" t-as="line">
+                                    <tr>
+                                        <td style="border:1px solid black; text-align: center;">
+                                            <span t-esc="line.hr" t-options='{"widget": "float_time"}'/>
+                                        </td>
+                                        <td style="border:1px solid black; padding-left: 4px;">
+                                            <span t-esc="line.work_to_do"/>
+                                        </td>
+                                        <td style="border:1px solid black; padding-left: 4px;">
+                                            <span t-esc="line.obs"/>
+                                        </td>
+                                    </tr>
+                                </t>
+
+                                <t t-set="total_lines" t-value="len(o.operational_record_ids)"/>
+                                <t t-set="empty_lines" t-value="18 - total_lines"/>
+
+                                <t t-if="empty_lines > 0">
+                                    <t t-foreach="range(empty_lines)" t-as="i">
+                                        <tr>
+                                            <td style="border:1px solid black;">&#160;</td>
+                                            <td style="border:1px solid black;">&#160;</td>
+                                            <td style="border:1px solid black;">&#160;</td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </table>
                         </div>
-                        <div class="col-7">
-                            <div class="border border-dark p-3 mt-4" style="min-height: 300px;">
-                                <p class="text-muted small mb-0">
-                                Espacio para esquema / dibujo...
-                                </p>
-                            </div>
+
+                        <div class="col-7 border">
+                            <img src="/impsa_cylinder_survey/static/src/img/esquema_base.png" class="img-fluid"/>
                         </div>
                     </div>
 
-
+                    <div class="row mt-4">
+                        <div class="col-2">
+                            <span class="text-muted small">Código:  F-05-01</span>
+                        </div>
+                        <div class="col-5">
+                            <span class="text-muted small">Nombre: F-05-01-Formato para levantamiento de cilindros</span>
+                        </div>
+                        <div class="col-4">
+                            <span class="text-muted small">Fecha de revisión: 31 de marzo 2023</span>
+                        </div>
+                        <div class="col-1">
+                            <span class="text-muted small">Versión: 01 </span>
+                        </div>
+                    </div>
                 </t>
             </t>
         </t>

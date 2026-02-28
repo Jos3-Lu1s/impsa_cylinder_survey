@@ -57,6 +57,16 @@
                                 </group>
                             </group>
                         </page>
+                        <page string="Registro Operativo" name="operational_record">
+                            <field name="operational_record_ids">
+                                <list editable="bottom">
+                                    <field name="work_to_do"/>
+                                    <field name="obs"/>
+                                    <field name="hr" widget="float_time"/>
+                                </list>
+                            </field>
+                        </page>
+
                         <page string="Notas Internas" name="notes">
                             <field name="internal_notes" placeholder="Escribe tus notas aquí..." nolabel="1"/>
                         </page>
