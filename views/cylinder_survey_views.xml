@@ -32,17 +32,41 @@
                             <field name="name" placeholder="Referencia"/>
                         </h1>
                     </div>
-                    <group>
-                        <group>
-                            <field name="partner_id" widget="res_partner_many2one"/>
-                            <field name="date"/>
-                            <field name="work_order"/>
-                        </group>
-                        <group>
-                            <field name="cylinder_type" placeholder='Ej. Castillos, Elevador...'/>
-                            <field name="description" placeholder="Cilindro Hidráulico"/>
-                        </group>
-                    </group>
+                    <div class="row">
+                        <div class="col-12 col-md-6 border-end">
+                            <group mt-0="1">
+                                <field name="partner_id" widget="res_partner_many2one"/>
+                                <field name="date"/>
+                                <field name="work_order"/>
+                            </group>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="row g-2 mb-3 ms-md-2">
+                                <div class="col-6">
+                                    <div class="card shadow-sm border-0 bg-primary-light text-center p-2">
+                                        <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.7rem;">Total Tareas</div>
+                                        <div class="h4 mb-0 text-primary">
+                                            <field name="total_tasks" readonly="1" nolabel="1"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="card shadow-sm border-0 bg-success-light text-center p-2">
+                                        <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.7rem;">Tiempo Estimado</div>
+                                        <div class="h4 mb-0 text-success">
+                                            <field name="total_hours" widget="float_time" readonly="1" nolabel="1"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <group mt-0="1" class="ms-md-2">
+                                <field name="cylinder_type" placeholder='Ej. Castillos, Elevador...'/>
+                                <field name="description" placeholder="Cilindro Hidráulico"/>
+                            </group>
+                        </div>
+                    </div>
 
                     <notebook>
                         <page string="Especificaciones Técnicas" name="specs">
@@ -61,9 +85,9 @@
                         <page string="Registro Operativo" name="operational_record">
                             <field name="operational_record_ids">
                                 <list editable="bottom">
-                                    <field name="work_to_do"/>
-                                    <field name="obs"/>
-                                    <field name="hr" widget="float_time"/>
+                                    <field name="work_to_do" optional="show"/>
+                                    <field name="obs" optional="show"/>
+                                    <field name="hr" widget="float_time" optional="show"/>
                                 </list>
                             </field>
                         </page>

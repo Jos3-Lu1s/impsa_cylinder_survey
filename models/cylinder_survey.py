@@ -37,6 +37,29 @@ class CylinderSurvey(models.Model):
         string="Registro Operativo",
     )
 
+    total_tasks = fields.Integer(
+        string='Total de Tareas',
+        compute='_compute_operational_totals',
+        store=True,
+        help="Suma total de líneas en el registro operativo.",
+        readonly=True
+    )
+    total_hours = fields.Float(
+        string='Total de Horas',
+        compute='_compute_operational_totals',
+        store=True,
+        help="Suma total de horas de todas las tareas.",
+        readonly=True
+    )
+
+    @api.depends('operational_record_ids.hr', 'operational_record_ids.work_to_do')
+    def _compute_operational_totals(self):
+        for record in self:
+            # Cantidad de registros y suma de horas
+            lines = record.operational_record_ids
+            record.total_tasks = len(lines)
+            record.total_hours = sum(line.hr for line in lines)
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
