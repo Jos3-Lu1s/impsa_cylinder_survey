@@ -6,7 +6,7 @@
                 <t t-call="web.basic_layout">
 
                     <t t-set="record_count" t-value="len(o.operational_record_ids)"/>
-                    <t t-set="batches" t-value="range(0, record_count, 18) if record_count > 0 else [0]"/>
+                    <t t-set="batches" t-value="range(0, record_count, 19) if record_count > 0 else [0]"/>
 
                     <t t-foreach="batches" t-as="batch_start">
 
@@ -94,7 +94,7 @@
                                             <th class="fw-bold" style="border:1px solid black;">OBS</th>
                                         </tr>
 
-                                        <t t-set="batch_records" t-value="o.operational_record_ids[batch_start:batch_start+18]"/>
+                                        <t t-set="batch_records" t-value="o.operational_record_ids[batch_start:batch_start+19]"/>
 
                                         <t t-foreach="batch_records" t-as="line">
                                             <tr>
@@ -110,7 +110,7 @@
                                             </tr>
                                         </t>
 
-                                        <t t-set="empty_lines" t-value="18 - len(batch_records)"/>
+                                        <t t-set="empty_lines" t-value="19 - len(batch_records)"/>
 
                                         <t t-if="empty_lines > 0">
                                             <t t-foreach="range(empty_lines)" t-as="i">
@@ -124,7 +124,7 @@
                                     </table>
                                 </div>
 
-                                <div class="col-7 border">
+                                <div class="col-7 border p-1">
                                     <img src="/impsa_cylinder_survey/static/src/img/esquema_base.png" class="img-fluid"/>
                                 </div>
                             </div>
