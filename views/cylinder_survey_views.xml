@@ -5,13 +5,18 @@
         <field name="name">impsa.cylinder.survey.tree</field>
         <field name="model">impsa.cylinder.survey</field>
         <field name="arch" type="xml">
-            <list string="Levantamientos" decoration-info="name == 'Nuevo'">
+            <list string="Levantamientos">
                 <field name="name" decoration-bf="1"/>
                 <field name="date"/>
                 <field name="partner_id" widget="many2one_avatar"/>
                 <field name="work_order" optional="show"/>
                 <field name="description" optional="hide"/>
                 <field name="cylinder_type" optional="show"/>
+                <field name="state" 
+                   widget="badge" 
+                   decoration-info="state == 'draft'" 
+                   decoration-success="state == 'confirmed'" 
+                   decoration-danger="state == 'cancel'"/>
                 <field name="activity_ids" string="Actividades" widget="list_activity"/>
             </list>
         </field>
@@ -24,6 +29,24 @@
             <form string="Levantamiento de Cilindro">
                 <header>
                     <button name="%(action_report_cylinder_survey)d" string="Generar Formato" type="action" class="oe_highlight" icon="fa-print"/>
+                    <button name="action_confirm" 
+                            string="Confirmar Levantamiento" 
+                            type="object" 
+                            class="oe_highlight" 
+                            invisible="state != 'draft'"/>
+                    
+                    <button name="action_cancel" 
+                            string="Cancelar" 
+                            type="object" 
+                            invisible="state not in ['draft', 'confirmed']"
+                            confirm="¿Está seguro de que desea cancelar este registro?"/>
+
+                    <button name="action_set_draft" 
+                            string="Volver a Levantamiento" 
+                            type="object" 
+                            invisible="state != 'cancel'"/>
+
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
                 </header>
                 <sheet>
                     <div class="oe_title">

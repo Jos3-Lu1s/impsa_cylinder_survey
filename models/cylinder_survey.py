@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 class CylinderSurvey(models.Model):
     _name = "impsa.cylinder.survey"
@@ -49,6 +50,26 @@ class CylinderSurvey(models.Model):
         help="Suma total de horas de todas las tareas.",
         readonly=True
     )
+    state = fields.Selection([
+        ('draft', 'Levantamiento'),
+        ('confirmed', 'Orden de Trabajo'),
+        ('cancel', 'Cancelado'),
+    ], string='Estado', default='draft', tracking=True, copy=False)
+
+    def action_confirm(self):
+        """Pasa de Levantamiento a Orden de Trabajo"""
+        for record in self:
+            if not record.operational_record_ids:
+                raise ValidationError("No puedes confirmar una Orden de Trabajo sin líneas de registro operativo.")
+            record.state = 'confirmed'
+
+    def action_set_draft(self):
+        """Permite regresar a borrador si es necesario"""
+        self.write({'state': 'draft'})
+
+    def action_cancel(self):
+        """Cancela el registro"""
+        self.write({'state': 'cancel'})
 
     @api.depends('operational_record_ids.hr', 'operational_record_ids.work_to_do')
     def _compute_operational_totals(self):
