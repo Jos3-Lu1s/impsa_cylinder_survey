@@ -5,146 +5,154 @@
             <t t-foreach="docs" t-as="o">
                 <t t-call="web.basic_layout">
 
-                    <t t-set="record_count" t-value="len(o.operational_record_ids)"/>
-                    <t t-set="batches" t-value="range(0, record_count, 19) if record_count > 0 else [0]"/>
+                    <div class="header" style="position: relative; width: 100%;">
+                        <table class="table table-sm mb-0">
+                            <tbody>
+                                <tr>
+                                    <td rowspan="2" width="160">
+                                        <img width="150" t-if="o.env.company.logo" t-att-src="image_data_uri(o.env.company.logo)" class="img-fluid" alt="Logo"/>
+                                    </td>
+                                    <td width="120" class="ps-3">
+                                        <h5 class="m-0 fw-bold">Proceso</h5>
+                                    </td>
+                                    <td>
+                                        <h5 class="m-0 text-muted">Control operacional</h5>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="ps-3">
+                                        <h5 class="m-0 fw-bold">Formato para levantamiento de cilindros</h5>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-                    <t t-foreach="batches" t-as="batch_start">
+                        <table class="table table-sm mt-2 lh-sm">
+                            <tbody>
+                                <tr>
+                                    <td width="25%">
+                                        <span class="fw-bold">CLIENTE:</span>
+                                        <span t-field="o.partner_id" class="ms-2"/>
+                                    </td>
+                                    <td width="25%">
+                                        <span class="fw-bold">Ø CAMISA:</span>
+                                        <span t-field="o.diameter_sleeve" class="ms-2"/>
+                                    </td>
+                                    <td colspan="2">
+                                        <span class="fw-bold">FECHA:</span>
+                                        <span t-field="o.date" class="ms-2"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold">DESCRIPCIÓN:</span>
+                                        <span t-field="o.description" class="ms-2"/>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">Ø VÁSTAGO:</span>
+                                        <span t-field="o.diameter_rod" class="ms-2"/>
+                                    </td>
+                                    <td colspan="2">
+                                        <span class="fw-bold">O. TRABAJO:</span>
+                                        <span t-field="o.work_order" class="ms-2"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold">CILINDRO DE:</span>
+                                        <span t-field="o.cylinder_type" class="ms-2"/>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">CARRERA:</span>
+                                        <span t-field="o.stroke" class="ms-2"/>
+                                    </td>
+                                    <td width="25%">
+                                        <span class="fw-bold">No. SERIE:</span>
+                                        <span t-field="o.serial_number" class="ms-2"/>
+                                    </td>
+                                    <td width="25%">
+                                        <span class="fw-bold">No. PARTE:</span>
+                                        <span t-field="o.part_number" class="ms-2"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
 
-                        <div t-if="not batch_start_first" style="page-break-before: always;"/>
+                        <div style="position: absolute; right: 0; top: 177px; width: 53%; padding: 36px 0;" class="p-1">
+                            <img src="/impsa_cylinder_survey/static/src/img/esquema_base.png" class="img-fluid w-100" alt="Esquema base"/>
+                        </div>
+                    </div>
 
-                        <div class="page">
-                            <table class="table table-sm mb-0">
-                                <tbody>
+                    <div class="page">
+                        <style>
+                            .dynamic-table { width: 47%; border-collapse: collapse; table-layout: fixed; }
+                            .dynamic-table tr { page-break-inside: avoid; }
+
+                            /* Borde estándar para todas las celdas */
+                            .dynamic-table th, .dynamic-table td { 
+                                border: 1px solid #adb5bd; 
+                                padding: 4px; 
+                                background-color: #f8f9fa;
+                                word-wrap: break-word;
+                                overflow-wrap: break-word;
+                            }
+
+                            /* Quitamos el borde izquierdo de la primera columna */
+                            .dynamic-table th:first-child, 
+                            .dynamic-table td:first-child { 
+                                border-left: none !important; 
+                            }
+
+                            /* Quitamos el borde derecho de la última columna */
+                            .dynamic-table th:last-child, 
+                            .dynamic-table td:last-child { 
+                                border-right: none !important; 
+                            }
+                        </style>
+
+                        <table class="dynamic-table mt-2">
+                            <thead>
+                                <tr>
+                                    <th class="fw-bold text-center" style="width:9%">HRS</th>
+                                    <th class="fw-bold" style="width: 50%;">TRABAJOS A REALIZAR</th>
+                                    <th class="fw-bold" style="width: 41%;">OBS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.operational_record_ids" t-as="line">
                                     <tr>
-                                        <td rowspan="2" width="160">
-                                            <img width="150" t-if="o.env.company.logo" t-att-src="image_data_uri(o.env.company.logo)" class="img-fluid" alt="Logo"/>
-                                        </td>
-                                        <td width="120" class="ps-3">
-                                            <h5 class="m-0 fw-bold">Proceso</h5>
+                                        <td class="text-center">
+                                            <span t-esc="line.hr" t-options='{"widget": "float_time"}'/>
                                         </td>
                                         <td>
-                                            <h5 class="m-0 text-muted">Control operacional</h5>
+                                            <span t-esc="line.work_to_do"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="line.obs"/>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td colspan="2" class="ps-3">
-                                            <h5 class="m-0 fw-bold">Formato para levantamiento de cilindros</h5>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
 
-                            <table class="table table-sm mt-3 lh-sm">
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <span class="fw-bold">CLIENTE:</span>
-                                            <span t-field="o.partner_id" class="ms-2"/>
-                                        </td>
-                                        <td>
-                                            <span class="fw-bold">Ø CAMISA:</span>
-                                            <span t-field="o.diameter_sleeve" class="ms-2"/>
-                                        </td>
-                                        <td colspan="2">
-                                            <span class="fw-bold">FECHA:</span>
-                                            <span t-field="o.date" class="ms-2"/>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span class="fw-bold">DESCRIPCIÓN:</span>
-                                            <span t-field="o.description" class="ms-2"/>
-                                        </td>
-                                        <td>
-                                            <span class="fw-bold">Ø VÁSTAGO:</span>
-                                            <span t-field="o.diameter_rod" class="ms-2"/>
-                                        </td>
-                                        <td colspan="2">
-                                            <span class="fw-bold">O. TRABAJO:</span>
-                                            <span t-field="o.work_order" class="ms-2"/>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span class="fw-bold">CILINDRO DE:</span>
-                                            <span t-field="o.cylinder_type" class="ms-2"/>
-                                        </td>
-                                        <td>
-                                            <span class="fw-bold">CARRERA:</span>
-                                            <span t-field="o.stroke" class="ms-2"/>
-                                        </td>
-                                        <td>
-                                            <span class="fw-bold">No. SERIE:</span>
-                                            <span t-field="o.serial_number" class="ms-2"/>
-                                        </td>
-                                        <td>
-                                            <span class="fw-bold">No. PARTE:</span>
-                                            <span t-field="o.part_number" class="ms-2"/>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-
-                            <div class="row">
-                                <div class="col-5">
-                                    <table class="table table-sm">
-                                        <tr>
-                                            <th class="fw-bold" style="border:1px solid black;">HRS</th>
-                                            <th class="fw-bold" style="border:1px solid black;">TRABAJOS A REALIZAR</th>
-                                            <th class="fw-bold" style="border:1px solid black;">OBS</th>
-                                        </tr>
-
-                                        <t t-set="batch_records" t-value="o.operational_record_ids[batch_start:batch_start+19]"/>
-
-                                        <t t-foreach="batch_records" t-as="line">
-                                            <tr>
-                                                <td style="border:1px solid black; text-align: center;">
-                                                    <span t-esc="line.hr" t-options='{"widget": "float_time"}'/>
-                                                </td>
-                                                <td style="border:1px solid black; padding-left: 4px;">
-                                                    <span t-esc="line.work_to_do"/>
-                                                </td>
-                                                <td style="border:1px solid black; padding-left: 4px;">
-                                                    <span t-esc="line.obs"/>
-                                                </td>
-                                            </tr>
-                                        </t>
-
-                                        <t t-set="empty_lines" t-value="19 - len(batch_records)"/>
-
-                                        <t t-if="empty_lines > 0">
-                                            <t t-foreach="range(empty_lines)" t-as="i">
-                                                <tr>
-                                                    <td style="border:1px solid black;">&#160;</td>
-                                                    <td style="border:1px solid black;">&#160;</td>
-                                                    <td style="border:1px solid black;">&#160;</td>
-                                                </tr>
-                                            </t>
-                                        </t>
-                                    </table>
-                                </div>
-
-                                <div class="col-7 border p-1">
-                                    <img src="/impsa_cylinder_survey/static/src/img/esquema_base.png" class="img-fluid"/>
-                                </div>
+                    <div class="footer">
+                        <div class="row w-100 mt-2 border-top pt-2">
+                            <div class="col-2">
+                                <span class="text-muted small">Código:  F-05-01</span>
                             </div>
-
-                            <div class="row mt-4">
-                                <div class="col-2">
-                                    <span class="text-muted small">Código:  F-05-01</span>
-                                </div>
-                                <div class="col-5">
-                                    <span class="text-muted small">Nombre: F-05-01-Formato para levantamiento de cilindros</span>
-                                </div>
-                                <div class="col-4">
-                                    <span class="text-muted small">Fecha de revisión: 31 de marzo 2023</span>
-                                </div>
-                                <div class="col-1">
-                                    <span class="text-muted small">Versión: 01 </span>
-                                </div>
+                            <div class="col-5">
+                                <span class="text-muted small">Nombre: F-05-01-Formato para levantamiento de cilindros</span>
+                            </div>
+                            <div class="col-4">
+                                <span class="text-muted small">Fecha de revisión: 31 de marzo 2023</span>
+                            </div>
+                            <div class="col-1">
+                                <span class="text-muted small">Versión: 01</span>
                             </div>
                         </div>
-                    </t>
+                    </div>
+
                 </t>
             </t>
         </t>

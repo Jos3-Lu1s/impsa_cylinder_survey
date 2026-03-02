@@ -1,6 +1,4 @@
 from odoo import models, fields, api
-from . import operational_record_line
-
 
 class CylinderSurvey(models.Model):
     _name = "impsa.cylinder.survey"
