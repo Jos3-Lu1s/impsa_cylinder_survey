@@ -79,7 +79,33 @@
                         </table>
 
                         <div style="position: absolute; right: 0; top: 177px; width: 53%; padding: 36px 0;" class="p-1">
-                            <img src="/impsa_cylinder_survey/static/src/img/esquema_base.png" class="img-fluid w-100" alt="Esquema base"/>
+                            <div style="position: relative; width: 100%; display: block;">
+                                <img src="/impsa_cylinder_survey/static/src/img/esquema_base.png" class="img-fluid w-100" alt="Esquema base" style="position: relative; z-index: 1;"/>
+                                <div t-if="o.assembly_length" style="position: absolute; top: 2%; left: 13%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 294px; text-align: center; color: #5d5d5d;">
+                                    <span t-field="o.assembly_length"/>
+                                </div>
+
+                                <div t-if="o.barrel_length" style="position: absolute; top: 38%; left: 15%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 230px; text-align: center; color: #5d5d5d;">
+                                    <span t-field="o.barrel_length"/>
+                                </div>
+                                
+                                <div t-if="o.piston_width" style="position: absolute; top: 38%; left: 61%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 63px; text-align: center; color: #5d5d5d;">
+                                    <span t-field="o.piston_width"/>
+                                </div>
+                                
+                                <div t-if="o.head_width" style="position: absolute; top: 38%; left: 78%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 60px; text-align: center; color: #5d5d5d;">
+                                    <span t-field="o.head_width"/>
+                                </div>
+                                
+                                <div t-if="o.head_diameter" style="position: absolute; top: 50%; left: 91%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 60px; text-align: center; color: #5d5d5d;">
+                                    <span t-field="o.head_diameter"/>
+                                </div>
+
+                                <div t-if="o.rod_length" style="position: absolute; top: 77%; left: 15%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 250px; text-align: center; color: #5d5d5d;">
+                                    <span t-field="o.rod_length"/>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
 

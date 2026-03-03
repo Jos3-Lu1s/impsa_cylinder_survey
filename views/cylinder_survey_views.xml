@@ -12,11 +12,7 @@
                 <field name="work_order" optional="show"/>
                 <field name="description" optional="hide"/>
                 <field name="cylinder_type" optional="show"/>
-                <field name="state" 
-                   widget="badge" 
-                   decoration-info="state == 'draft'" 
-                   decoration-success="state == 'confirmed'" 
-                   decoration-danger="state == 'cancel'"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'confirmed'" decoration-danger="state == 'cancel'"/>
                 <field name="activity_ids" string="Actividades" widget="list_activity"/>
             </list>
         </field>
@@ -29,22 +25,11 @@
             <form string="Levantamiento de Cilindro">
                 <header>
                     <button name="%(action_report_cylinder_survey)d" string="Generar Formato" type="action" class="oe_highlight" icon="fa-print"/>
-                    <button name="action_confirm" 
-                            string="Confirmar Levantamiento" 
-                            type="object" 
-                            class="oe_highlight" 
-                            invisible="state != 'draft'"/>
-                    
-                    <button name="action_cancel" 
-                            string="Cancelar" 
-                            type="object" 
-                            invisible="state not in ['draft', 'confirmed']"
-                            confirm="¿Está seguro de que desea cancelar este registro?"/>
+                    <button name="action_confirm" string="Confirmar Levantamiento" type="object" class="oe_highlight" invisible="state != 'draft'"/>
 
-                    <button name="action_set_draft" 
-                            string="Volver a Levantamiento" 
-                            type="object" 
-                            invisible="state != 'cancel'"/>
+                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['draft', 'confirmed']" confirm="¿Está seguro de que desea cancelar este registro?"/>
+
+                    <button name="action_set_draft" string="Volver a Levantamiento" type="object" invisible="state != 'cancel'"/>
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
                 </header>
@@ -93,17 +78,32 @@
 
                     <notebook>
                         <page string="Especificaciones Técnicas" name="specs">
+
                             <group>
-                                <group string="Dimensiones">
-                                    <field name="diameter_sleeve"/>
-                                    <field name="diameter_rod"/>
-                                    <field name="stroke"/>
+                                <group string="Dimensiones Generales">
+                                    <field name="diameter_sleeve" string="Ø Camisa"/>
+                                    <field name="diameter_rod" string="Ø Vástago"/>
+                                    <field name="stroke" string="Carrera"/>
                                 </group>
                                 <group string="Identificación">
                                     <field name="serial_number"/>
                                     <field name="part_number"/>
                                 </group>
                             </group>
+
+                            <group>
+                                <group string="Esquema: Cuerpo y Vástago">
+                                    <field name="assembly_length" string="Ensamble (L)"/>
+                                    <field name="barrel_length" string="Camisa (L)"/>
+                                    <field name="rod_length" string="Vástago (L)"/>
+                                </group>
+                                <group string="Esquema: Componentes Internos">
+                                    <field name="piston_width" string="Pistón"/>
+                                    <field name="head_width" string="Cabeza (Largo)"/>
+                                    <field name="head_diameter" string="Cabeza (Ø)"/>
+                                </group>
+                            </group>
+
                         </page>
                         <page string="Registro Operativo" name="operational_record">
                             <field name="operational_record_ids">

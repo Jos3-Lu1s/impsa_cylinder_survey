@@ -56,6 +56,13 @@ class CylinderSurvey(models.Model):
         ('cancel', 'Cancelado'),
     ], string='Estado', default='draft', tracking=True, copy=False)
 
+    assembly_length = fields.Float(string='Longitud entre centros')
+    barrel_length = fields.Float(string='Longitud de la camisa')
+    piston_width = fields.Float(string='Ancho del pistón')
+    head_width = fields.Float(string='Ancho de la cabeza')
+    head_diameter = fields.Float(string='Diámetro de la cabeza')
+    rod_length = fields.Float(string='Longitud del vástago')
+
     def action_confirm(self):
         """Pasa de Levantamiento a Orden de Trabajo"""
         for record in self:
