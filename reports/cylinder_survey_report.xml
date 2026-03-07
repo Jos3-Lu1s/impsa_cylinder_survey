@@ -44,17 +44,17 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>
+                                    <td colspan="2" width="50%">
                                         <span class="fw-bold">DESCRIPCIÓN:</span>
                                         <span t-field="o.description" class="ms-2"/>
                                     </td>
-                                    <td>
+                                    <td width="25%">
                                         <span class="fw-bold">Ø VÁSTAGO:</span>
                                         <span t-field="o.diameter_rod" class="ms-2"/>
                                     </td>
-                                    <td colspan="2">
-                                        <span class="fw-bold">O. TRABAJO:</span>
-                                        <span t-field="o.work_order" class="ms-2"/>
+                                    <td colspan="2" width="25%">
+                                        <span class="fw-bold">DOC:</span>
+                                        <span t-field="o.name" class="ms-2 text-danger fw-bold"/>
                                     </td>
                                 </tr>
                                 <tr>

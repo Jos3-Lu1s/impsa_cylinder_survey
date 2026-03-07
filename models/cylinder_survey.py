@@ -28,7 +28,6 @@ class CylinderSurvey(models.Model):
     date = fields.Date(string="Fecha", default=fields.Date.context_today)
     description = fields.Char(string="Descripción")
     diameter_rod = fields.Char(string="Ø Vástago")
-    work_order = fields.Char(string="Orden de Trabajo")
     cylinder_type = fields.Char(string="Cilindro de")
     stroke = fields.Float(string="Carrera")
     identification_marks = fields.Char(
@@ -83,15 +82,32 @@ class CylinderSurvey(models.Model):
                 raise ValidationError("La cantidad de cilindros a evaluar debe ser al menos 1.")
 
     def action_confirm(self):
-        """Pasa de Levantamiento a Orden de Trabajo"""
+        """Pasa de Levantamiento a Orden de Trabajo y actualiza la referencia"""
         for record in self:
             if not record.operational_record_ids:
                 raise ValidationError("No puedes confirmar una Orden de Trabajo sin líneas de registro operativo.")
-            record.state = 'confirmed'
+            
+            # Cambiar prefijo para indicar que ya es una Orden de Trabajo
+            new_name = record.name
+            if new_name and new_name.startswith('LEV-'):
+                new_name = new_name.replace('LEV-', 'OT-', 1)
+                
+            record.write({
+                'state': 'confirmed',
+                'name': new_name
+            })
 
     def action_set_draft(self):
-        """Permite regresar a borrador si es necesario"""
-        self.write({'state': 'draft'})
+        """Permite regresar a borrador y restaura el prefijo original"""
+        for record in self:
+            new_name = record.name
+            if new_name and new_name.startswith('OT-'):
+                new_name = new_name.replace('OT-', 'LEV-', 1)
+                
+            record.write({
+                'state': 'draft',
+                'name': new_name
+            })
 
     def action_cancel(self):
         """Cancela el registro"""
