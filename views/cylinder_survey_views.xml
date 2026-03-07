@@ -5,15 +5,15 @@
         <field name="name">impsa.cylinder.survey.tree</field>
         <field name="model">impsa.cylinder.survey</field>
         <field name="arch" type="xml">
-            <list string="Levantamientos">
+            <list string="Levantamientos" decoration-muted="state == 'cancel'">
                 <field name="name" decoration-bf="1"/>
                 <field name="date"/>
                 <field name="partner_id" widget="many2one_avatar"/>
+                <field name="activity_ids" string="Actividades" widget="list_activity"/>
                 <field name="work_order" optional="show"/>
                 <field name="description" optional="hide"/>
                 <field name="cylinder_type" optional="show"/>
                 <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'confirmed'" decoration-danger="state == 'cancel'"/>
-                <field name="activity_ids" string="Actividades" widget="list_activity"/>
             </list>
         </field>
     </record>
@@ -45,6 +45,7 @@
                             <group mt-0="1">
                                 <field name="partner_id" widget="res_partner_many2one"/>
                                 <field name="date"/>
+                                <field name="cylinder_qty" style="width: 100px;" string="Cant. de Cilindros"/>
                                 <field name="work_order"/>
                             </group>
                         </div>
@@ -86,8 +87,7 @@
                                     <field name="stroke" string="Carrera"/>
                                 </group>
                                 <group string="Identificación">
-                                    <field name="serial_number"/>
-                                    <field name="part_number"/>
+                                    <field name="identification_marks" nolabel="1" placeholder="Ej. Sin placa, marcas de golpe en base, pintado de amarillo..." widget="text" colspan="2"/>
                                 </group>
                             </group>
 
@@ -108,8 +108,8 @@
                         <page string="Registro Operativo" name="operational_record">
                             <field name="operational_record_ids">
                                 <list editable="bottom">
-                                    <field name="work_to_do" optional="show"/>
-                                    <field name="obs" optional="show"/>
+                                    <field name="work_to_do" placeholder="Ej. Fabricación de vastago..." optional="show"/>
+                                    <field name="obs" placeholder="Ej. Ø 50mm / Requiere rectificado..." optional="show"/>
                                     <field name="hr" widget="float_time" optional="show"/>
                                 </list>
                             </field>
@@ -137,7 +137,7 @@
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="work_order"/>
-                <field name="serial_number"/>
+                <field name="identification_marks" string="Identificación"/>
                 <filter string="Fecha" name="date" date="date"/>
                 <group>
                     <filter string="Fecha" name="group_date" context="{'group_by': 'date'}"/>

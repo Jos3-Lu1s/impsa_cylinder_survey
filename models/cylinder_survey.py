@@ -15,6 +15,15 @@ class CylinderSurvey(models.Model):
     partner_id = fields.Many2one(
         "res.partner", string="Cliente", required=True, tracking=True
     )
+
+    cylinder_qty = fields.Integer(
+        string="Cantidad", 
+        default=1, 
+        required=True, 
+        tracking=True,
+        help="Número de cilindros que comparten exactamente estas mismas características."
+    )
+
     diameter_sleeve = fields.Char(string="Ø Camisa")
     date = fields.Date(string="Fecha", default=fields.Date.context_today)
     description = fields.Char(string="Descripción")
@@ -22,8 +31,11 @@ class CylinderSurvey(models.Model):
     work_order = fields.Char(string="Orden de Trabajo")
     cylinder_type = fields.Char(string="Cilindro de")
     stroke = fields.Float(string="Carrera")
-    serial_number = fields.Char(string="No. Serie")
-    part_number = fields.Char(string="No. Parte")
+    identification_marks = fields.Char(
+        string="Identificación", 
+        help="Marcas, características o notas visuales para identificar el cilindro físicamente.",
+        tracking=True
+    )
 
     internal_notes = fields.Html(
         string="Notas Internas",
@@ -62,6 +74,13 @@ class CylinderSurvey(models.Model):
     head_width = fields.Float(string='Ancho de la cabeza')
     head_diameter = fields.Float(string='Diámetro de la cabeza')
     rod_length = fields.Float(string='Longitud del vástago')
+
+    # Restricción de seguridad para evitar errores de captura
+    @api.constrains('cylinder_qty')
+    def _check_cylinder_qty(self):
+        for record in self:
+            if record.cylinder_qty <= 0:
+                raise ValidationError("La cantidad de cilindros a evaluar debe ser al menos 1.")
 
     def action_confirm(self):
         """Pasa de Levantamiento a Orden de Trabajo"""

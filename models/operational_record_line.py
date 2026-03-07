@@ -1,13 +1,13 @@
 from odoo import models, fields
 class OperationalRecordLine(models.Model):
     _name = 'operational.record.line'
-    _description = 'Operational Record Line'
+    _description = 'Línea de Registro Operativo'
 
     parent_id = fields.Many2one(
         'impsa.cylinder.survey',
-        string='Parent',
+        string='Levantamiento',
         ondelete='cascade'
     )
-    hr = fields.Float(string='Horas')
+    hr = fields.Float(string='Tiempo Estimado')
     work_to_do = fields.Char(string='Trabajos a realizar')
-    obs = fields.Text(string='Observaciones')
+    obs = fields.Text(string='Dimensiones / Observaciones')
