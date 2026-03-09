@@ -97,6 +97,17 @@ class CylinderSurvey(models.Model):
         "res.partner", string="Proveedor"
     )
     date_delivery = fields.Date(string="Fecha de Entrega")
+    
+    purchase_order_ids = fields.One2many(
+        "purchase.order",
+        "survey_id",
+        string="Órdenes de Compra"
+    )
+    
+    purchase_order_count = fields.Integer(
+        compute="_compute_purchase_order_count"
+    )
+
 
     internal_notes = fields.Html(
         string="Notas Internas",
@@ -180,6 +191,7 @@ class CylinderSurvey(models.Model):
             po = self.env['purchase.order'].create({
                 'partner_id': record.supplier_id.id,
                 'date_planned': record.date_delivery,
+                'survey_id': record.id,
             })
 
             for line in record.cylinder_survey_line_ids:
@@ -219,3 +231,18 @@ class CylinderSurvey(models.Model):
                 )
 
         return super(CylinderSurvey, self).create(vals_list)
+
+    def _compute_purchase_order_count(self):
+        for record in self:
+            record.purchase_order_count = len(record.purchase_order_ids)
+
+    def action_view_purchase_orders(self):
+        self.ensure_one()
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Órdenes de Compra',
+            'res_model': 'purchase.order',
+            'view_mode': 'list,form',
+            'domain': [('survey_id', '=', self.id)],
+        }

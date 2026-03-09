@@ -66,8 +66,12 @@
         <field name="arch" type="xml">
             <form string="Levantamiento de Cilindro">
                 <header>
-                    <button name="%(action_report_cylinder_survey)d" string="Generar Formato"
-                        type="action" class="oe_highlight" icon="fa-print" />
+                    <button name="action_create_purchase_order"
+                        string="Crear Orden de Compra"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state != 'confirmed'"/>
+
                     <button name="action_confirm" string="Confirmar Levantamiento" type="object"
                         class="oe_highlight" invisible="state != 'draft'" />
 
@@ -78,12 +82,8 @@
                     <button name="action_set_draft" string="Volver a Levantamiento" type="object"
                         invisible="state != 'cancel'" />
 
-                    <button name="action_create_purchase_order"
-                        string="Crear Orden de Compra"
-                        type="object"
-                        class="btn-primary"
-                        invisible="state != 'confirmed'"/>
-
+                    <button name="%(action_report_cylinder_survey)d" string="Generar Formato"
+                        type="action" class="oe_highlight" icon="fa-print" />
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed" />
                 </header>
@@ -94,6 +94,17 @@
                             <field name="name" placeholder="Referencia" />
                         </h1>
                     </div>
+                    <!-- Probar si aqui funciona el boton inteligente -->
+                     <div class="oe_button_box" name="button_box">
+                        <button name="action_view_purchase_orders"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-shopping-cart">
+
+                            <field name="purchase_order_count" widget="statinfo"
+                               string="Compras"/>
+                        </button>
+                     </div>
                     <div class="row">
                         <div class="col-12 col-md-6 border-end">
                             <group mt-0="1">
@@ -257,11 +268,6 @@
                             </field>
                         </page>
 
-                        <page string="Notas Internas" name="notes">
-                            <field name="internal_notes" placeholder="Escribe tus notas aquí..."
-                                nolabel="1" />
-                        </page>
-
                         <page string="Requisión de Empaques" name="packing_list"
                             invisible="state != 'confirmed'">
                             <field name="cylinder_survey_line_ids">
@@ -271,7 +277,7 @@
                                     <field name="dimensions" optional="show" />
                                     <field name="type_piece" optional="show" />
                                     <field name="unit_cantity" optional="show" />
-                                    <!-- <field name="unit_total" optional="show" /> -->
+                                    <field name="unit_total" optional="show" />
                                 </list>
                             </field>
 
@@ -279,6 +285,11 @@
                                 <field name="supplier_id" string="Proveedor" />
                                 <field name="date_delivery" string="Fecha de Entrega" />
                             </group>
+                        </page>
+                        
+                        <page string="Notas Internas" name="notes">
+                            <field name="internal_notes" placeholder="Escribe tus notas aquí..."
+                                nolabel="1" />
                         </page>
 
                     </notebook>
