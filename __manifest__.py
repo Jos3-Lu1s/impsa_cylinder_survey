@@ -16,7 +16,7 @@
     'category': 'Services/Field Service',
     'version': '19.0.1.0.0',
 
-    'depends': ['base', "crm", "mail"],
+    'depends': ['base', "crm", "mail", 'purchase'],
 
     "data": [
         "security/ir.model.access.csv",
