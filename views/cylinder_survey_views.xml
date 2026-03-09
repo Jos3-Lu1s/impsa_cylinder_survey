@@ -271,7 +271,7 @@
                                     <field name="dimensions" optional="show" />
                                     <field name="type_piece" optional="show" />
                                     <field name="unit_cantity" optional="show" />
-                                    <field name="unit_total" optional="show" />
+                                    <!-- <field name="unit_total" optional="show" /> -->
                                 </list>
                             </field>
 

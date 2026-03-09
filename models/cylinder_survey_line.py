@@ -26,5 +26,5 @@ class CylinderSurveyLine(models.Model):
     
     unit_cantity = fields.Integer(string="Cantidad")
     
-    unit_total = fields.Integer(string="Total", compute="_compute_unit_total", store=True)
+    # unit_total = fields.Integer(string="Total", compute="_compute_unit_total", store=True)
     
