@@ -20,9 +20,9 @@
 
     "data": [
         "security/ir.model.access.csv",
-        'data/paper_format.xml',
-        'reports/report_actions.xml',
-        'reports/cylinder_survey_report.xml',
+        # 'data/paper_format.xml',
+        # 'reports/report_actions.xml',
+        # 'reports/cylinder_survey_report.xml',
         "data/ir_sequence_data.xml",
         "views/cylinder_survey_views.xml",
         "views/integration_menu.xml",

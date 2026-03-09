@@ -15,13 +15,12 @@ class CylinderImage(models.Model):
     
     # Categorizar la foto para saber de qué pieza es
     component = fields.Selection([
-        ('assembly', 'Ensamble General'),
-        ('sleeve', 'Camisa'),
-        ('rod', 'Vástago'),
-        ('piston', 'Émbolo'),
+        ('barrel', 'Camisa'),
+        ('rod', 'Vastago'),
+        ('piston', 'Piston'),
         ('head', 'Cabeza'),
-        ('other', 'Otro / Daño')
-    ], string="Componente", required=True, default='assembly')
+        ('stroke', 'Carrera'),
+    ], string="Componente", required=True)
 
     # max_width y max_height para proteger el servidor de fotos de 10MB
     image = fields.Image(string="Imagen", max_width=1920, max_height=1920, required=True)

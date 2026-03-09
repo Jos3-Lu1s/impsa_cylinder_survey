@@ -30,18 +30,19 @@ class CylinderSurvey(models.Model):
         string="Galería de Imágenes"
     )
 
-    # Camisa (Sleeve/Barrel)
-    diameter_sleeve = fields.Float(string="Ø Camisa")
-    barrel_length = fields.Float(string='Largo de Camisa')
-    sleeve_image_ids = fields.One2many(
+    # Camisa (Barrel)
+    barrel_inner_diameter = fields.Float(string='Ø Interior')
+    barrel_outer_diameter = fields.Float(string='Ø Exterior')
+    barrel_length = fields.Float(string='Longitud')
+    barrel_image_ids = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes de la Camisa", 
-        domain=[('component', '=', 'sleeve')]
+        domain=[('component', '=', 'barrel')]
     )
 
     # Vástago (Rod)
     diameter_rod = fields.Float(string="Ø Vástago")
-    rod_length = fields.Float(string='Largo de Vástago')
+    rod_length = fields.Float(string='Longitud de Vástago')
     rod_image_ids = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes del Vástago", 
@@ -50,7 +51,7 @@ class CylinderSurvey(models.Model):
 
     # Émbolo (Piston)
     piston_diameter = fields.Float(string='Ø Émbolo') 
-    piston_width = fields.Float(string='Ancho de Émbolo')
+    piston_length = fields.Float(string='Longitud de Émbolo')
     piston_image_ids = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes del Émbolo", 
@@ -59,20 +60,19 @@ class CylinderSurvey(models.Model):
 
     # Cabeza (Head)
     head_diameter = fields.Float(string='Ø Cabeza')
-    head_width = fields.Float(string='Ancho de Cabeza')
+    head_length = fields.Float(string='Longitud de Cabeza')
     head_image_ids = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes de la Cabeza", 
         domain=[('component', '=', 'head')]
     )
 
-    # General / Carrera
-    stroke = fields.Float(string="Carrera")
-    assembly_length = fields.Float(string='Largo Ensamble (Centro a Centro)')
-    assembly_image_ids = fields.One2many(
+    # Carrera (Stroke)
+    stroke_length = fields.Float(string='Longitud de Carrera')
+    stroke_image_ids = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes del Ensamble", 
-        domain=[('component', '=', 'assembly')]
+        domain=[('component', '=', 'stroke')]
     )
 
     date = fields.Date(string="Fecha", default=fields.Date.context_today)

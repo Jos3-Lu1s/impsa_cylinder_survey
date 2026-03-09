@@ -32,43 +32,43 @@
                                 <tr>
                                     <td width="25%">
                                         <span class="fw-bold">CLIENTE:</span>
-                                        <span t-field="o.partner_id" class="ms-2"/>
+                                        <!-- <span t-field="o.partner_id" class="ms-2"/> -->
                                     </td>
                                     <td width="25%">
                                         <span class="fw-bold">Ø CAMISA:</span>
-                                        <span t-field="o.diameter_sleeve" class="ms-2"/>
+                                        <!-- <span t-field="o.diameter_sleeve" class="ms-2"/> -->
                                     </td>
                                     <td colspan="2">
                                         <span class="fw-bold">FECHA:</span>
-                                        <span t-field="o.date" class="ms-2"/>
+                                        <!-- <span t-field="o.date" class="ms-2"/> -->
                                     </td>
                                 </tr>
                                 <tr>
                                     <td colspan="2" width="50%">
                                         <span class="fw-bold">DESCRIPCIÓN:</span>
-                                        <span t-field="o.description" class="ms-2"/>
+                                        <!-- <span t-field="o.description" class="ms-2"/> -->
                                     </td>
                                     <td width="25%">
                                         <span class="fw-bold">Ø VÁSTAGO:</span>
-                                        <span t-field="o.diameter_rod" class="ms-2"/>
+                                        <!-- <span t-field="o.diameter_rod" class="ms-2"/> -->
                                     </td>
                                     <td colspan="2" width="25%">
                                         <span class="fw-bold">DOC:</span>
-                                        <span t-field="o.name" class="ms-2 text-danger fw-bold"/>
+                                        <!-- <span t-field="o.name" class="ms-2 text-danger fw-bold"/> -->
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>
                                         <span class="fw-bold">CILINDRO DE:</span>
-                                        <span t-field="o.cylinder_type" class="ms-2"/>
+                                        <!-- <span t-field="o.cylinder_type" class="ms-2"/> -->
                                     </td>
                                     <td>
                                         <span class="fw-bold">CARRERA:</span>
-                                        <span t-field="o.stroke" class="ms-2"/>
+                                        <!-- <span t-field="o.stroke" class="ms-2"/> -->
                                     </td>
                                     <td colspan="2" width="50%">
                                         <span class="fw-bold">IDENTIFICACIÓN:</span>
-                                        <span t-field="o.identification_marks" class="ms-2"/>
+                                        <!-- <span t-field="o.identification_marks" class="ms-2"/> -->
                                     </td>
                                 </tr>
                             </tbody>
@@ -78,27 +78,27 @@
                             <div style="position: relative; width: 100%; display: block;">
                                 <img src="/impsa_cylinder_survey/static/src/img/esquema_base.png" class="img-fluid w-100" alt="Esquema base" style="position: relative; z-index: 1;"/>
                                 <div t-if="o.assembly_length" style="position: absolute; top: 2%; left: 13%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 294px; text-align: center; color: #5d5d5d;">
-                                    <span t-field="o.assembly_length"/>
+                                    <!-- <span t-field="o.assembly_length"/> -->
                                 </div>
 
                                 <div t-if="o.barrel_length" style="position: absolute; top: 38%; left: 15%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 230px; text-align: center; color: #5d5d5d;">
-                                    <span t-field="o.barrel_length"/>
+                                    <!-- <span t-field="o.barrel_length"/> -->
                                 </div>
 
                                 <div t-if="o.piston_width" style="position: absolute; top: 38%; left: 61%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 63px; text-align: center; color: #5d5d5d;">
-                                    <span t-field="o.piston_width"/>
+                                    <!-- <span t-field="o.piston_width"/> -->
                                 </div>
 
                                 <div t-if="o.head_width" style="position: absolute; top: 38%; left: 78%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 60px; text-align: center; color: #5d5d5d;">
-                                    <span t-field="o.head_width"/>
+                                    <!-- <span t-field="o.head_width"/> -->
                                 </div>
 
                                 <div t-if="o.head_diameter" style="position: absolute; top: 50%; left: 91%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 60px; text-align: center; color: #5d5d5d;">
-                                    <span t-field="o.head_diameter"/>
+                                    <!-- <span t-field="o.head_diameter"/> -->
                                 </div>
 
                                 <div t-if="o.rod_length" style="position: absolute; top: 77%; left: 15%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 250px; text-align: center; color: #5d5d5d;">
-                                    <span t-field="o.rod_length"/>
+                                    <!-- <span t-field="o.rod_length"/> -->
                                 </div>
 
                             </div>

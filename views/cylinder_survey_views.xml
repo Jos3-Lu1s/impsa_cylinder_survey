@@ -66,8 +66,15 @@
         <field name="arch" type="xml">
             <form string="Levantamiento de Cilindro">
                 <header>
-                    <button name="%(action_report_cylinder_survey)d" string="Generar Formato"
-                        type="action" class="oe_highlight" icon="fa-print" />
+                    <!-- <button name="%(action_report_cylinder_survey)d" string="Generar Formato"
+                        type="action" class="oe_highlight" icon="fa-print" /> -->
+                        
+                    <button name="action_create_purchase_order"
+                        string="Crear Orden de Compra"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state != 'confirmed'"/>
+
                     <button name="action_confirm" string="Confirmar Levantamiento" type="object"
                         class="oe_highlight" invisible="state != 'draft'" />
 
@@ -77,13 +84,6 @@
 
                     <button name="action_set_draft" string="Volver a Levantamiento" type="object"
                         invisible="state != 'cancel'" />
-
-                    <button name="action_create_purchase_order"
-                        string="Crear Orden de Compra"
-                        type="object"
-                        class="btn-primary"
-                        invisible="state != 'confirmed'"/>
-
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed" />
                 </header>
@@ -140,25 +140,28 @@
 
                             <group col="1">
 
-                                <group string="Camisa">
+                                <group string="Camisa" col="3">
                                     <group>
-                                        <field name="diameter_sleeve" string="Diámetro (Ø)"/>
+                                        <field name="barrel_inner_diameter" string="Diámetro Interior (Ø)"/>
                                     </group>
                                     <group>
-                                        <field name="barrel_length" string="Largo (L)"/>
+                                        <field name="barrel_outer_diameter" string="Diámetro Exterior (Ø)"/>
+                                    </group>
+                                    <group>
+                                        <field name="barrel_length" string="Longitud de la Camisa"/>
                                     </group>
                                 </group>
-                                <field name="sleeve_image_ids" mode="kanban" nolabel="1" context="{
-                                    'default_component': 'sleeve', 
+                                <field name="barrel_image_ids" mode="kanban" nolabel="1" context="{
+                                    'default_component': 'barrel', 
                                     'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
                                     'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
                                 }"/>
                                 <group string="Vástago">
                                     <group>
-                                        <field name="diameter_rod" string="Diámetro (Ø)"/>
+                                        <field name="diameter_rod"/>
                                     </group>
                                     <group>
-                                        <field name="rod_length" string="Largo (L)"/>
+                                        <field name="rod_length"/>
                                     </group>
                                 </group>
                                 <field name="rod_image_ids" mode="kanban" nolabel="1" context="{
@@ -169,10 +172,10 @@
 
                                 <group string="Émbolo">
                                     <group>
-                                        <field name="piston_diameter" string="Diámetro (Ø)"/>
+                                        <field name="piston_diameter"/>
                                     </group>
                                     <group>
-                                        <field name="piston_width" string="Ancho / Largo (L)"/>
+                                        <field name="piston_length"/>
                                     </group>
                                 </group>
                                 <field name="piston_image_ids" mode="kanban" nolabel="1" context="{
@@ -183,10 +186,10 @@
 
                                 <group string="Cabeza">
                                     <group>
-                                        <field name="head_diameter" string="Diámetro (Ø)"/>
+                                        <field name="head_diameter"/>
                                     </group>
                                     <group>
-                                        <field name="head_width" string="Ancho / Largo (L)"/>
+                                        <field name="head_length"/>
                                     </group>
                                 </group>
                                 <field name="head_image_ids" mode="kanban" nolabel="1" context="{
@@ -195,16 +198,13 @@
                                     'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
                                 }"/>
 
-                                <group string="General y Ensamble">
+                                <group string="Carrera">
                                     <group>
-                                        <field name="assembly_length" string="Largo Total"/>
-                                    </group>
-                                    <group>
-                                        <field name="stroke" string="Carrera"/>
+                                        <field name="stroke_length"/>
                                     </group>
                                 </group>
-                                <field name="assembly_image_ids" mode="kanban" nolabel="1" context="{
-                                    'default_component': 'other', 
+                                <field name="stroke_image_ids" mode="kanban" nolabel="1" context="{
+                                    'default_component': 'stroke', 
                                     'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
                                     'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
                                 }"/>
