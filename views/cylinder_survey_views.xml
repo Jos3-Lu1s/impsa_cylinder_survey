@@ -1,6 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="view_cylinder_image_kanban_shared" model="ir.ui.view">
+        <field name="name">impsa.cylinder.image.kanban.shared</field>
+        <field name="model">impsa.cylinder.image</field>
+        <field name="arch" type="xml">
+            <kanban string="Imágenes del cilindro">
+                <templates>
+                    <t t-name="card">
+                        <div style="padding: 0; overflow: hidden;">
+                            <div class="d-flex align-items-center justify-content-center" style="height: 200px; background-color: #e4e4e4;">
+                                <field name="image" widget="image"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_cylinder_image_form_shared" model="ir.ui.view">
+        <field name="name">impsa.cylinder.image.form.shared</field>
+        <field name="model">impsa.cylinder.image</field>
+        <field name="arch" type="xml">
+            <form string="Detalle de Imagen">
+                <sheet>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <group>
+                                <field name="name" placeholder="Ej. Fisura en la rosca..."/>
+                                <field name="component"/>
+                            </group>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            <field name="image" widget="image" nolabel="1" style="width: 100%; background-color: #e4e4e4;"/>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
     <record id="view_impsa_cylinder_survey_tree" model="ir.ui.view">
         <field name="name">impsa.cylinder.survey.tree</field>
         <field name="model">impsa.cylinder.survey</field>
@@ -78,35 +121,119 @@
                     <notebook>
                         <page string="Especificaciones Técnicas" name="specs">
 
-                            <group>
-                                <group string="Dimensiones Generales">
-                                    <field name="diameter_sleeve" string="Ø Camisa"/>
-                                    <field name="diameter_rod" string="Ø Vástago"/>
-                                    <field name="stroke" string="Carrera"/>
-                                </group>
-                                <group string="Identificación">
-                                    <field name="identification_marks" nolabel="1" placeholder="Ej. Sin placa, marcas de golpe en base, pintado de amarillo..." widget="text" colspan="2"/>
-                                </group>
-                            </group>
+                            <group col="1">
 
-                            <group>
-                                <group string="Esquema: Cuerpo y Vástago">
-                                    <field name="assembly_length" string="Ensamble (L)"/>
-                                    <field name="barrel_length" string="Camisa (L)"/>
-                                    <field name="rod_length" string="Vástago (L)"/>
+                                <group string="Camisa">
+                                    <group>
+                                        <field name="diameter_sleeve" string="Diámetro (Ø)"/>
+                                    </group>
+                                    <group>
+                                        <field name="barrel_length" string="Largo (L)"/>
+                                    </group>
                                 </group>
-                                <group string="Esquema: Componentes Internos">
-                                    <field name="piston_width" string="Pistón"/>
-                                    <field name="head_width" string="Cabeza (Largo)"/>
-                                    <field name="head_diameter" string="Cabeza (Ø)"/>
+                                <field name="sleeve_image_ids" mode="kanban" nolabel="1" context="{
+                                    'default_component': 'sleeve', 
+                                    'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
+                                    'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
+                                }"/>
+                                <group string="Vástago">
+                                    <group>
+                                        <field name="diameter_rod" string="Diámetro (Ø)"/>
+                                    </group>
+                                    <group>
+                                        <field name="rod_length" string="Largo (L)"/>
+                                    </group>
                                 </group>
+                                <field name="rod_image_ids" mode="kanban" nolabel="1" context="{
+                                    'default_component': 'rod', 
+                                    'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
+                                    'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
+                                }"/>
+
+                                <group string="Émbolo">
+                                    <group>
+                                        <field name="piston_diameter" string="Diámetro (Ø)"/>
+                                    </group>
+                                    <group>
+                                        <field name="piston_width" string="Ancho / Largo (L)"/>
+                                    </group>
+                                </group>
+                                <field name="piston_image_ids" mode="kanban" nolabel="1" context="{
+                                    'default_component': 'piston', 
+                                    'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
+                                    'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
+                                }"/>
+
+                                <group string="Cabeza">
+                                    <group>
+                                        <field name="head_diameter" string="Diámetro (Ø)"/>
+                                    </group>
+                                    <group>
+                                        <field name="head_width" string="Ancho / Largo (L)"/>
+                                    </group>
+                                </group>
+                                <field name="head_image_ids" mode="kanban" nolabel="1" context="{
+                                    'default_component': 'head', 
+                                    'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
+                                    'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
+                                }"/>
+
+                                <group string="General y Ensamble">
+                                    <group>
+                                        <field name="assembly_length" string="Largo Total"/>
+                                    </group>
+                                    <group>
+                                        <field name="stroke" string="Carrera"/>
+                                    </group>
+                                </group>
+                                <field name="assembly_image_ids" mode="kanban" nolabel="1" context="{
+                                    'default_component': 'other', 
+                                    'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
+                                    'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
+                                }"/>
+
                             </group>
 
                         </page>
+                        <page string="Galería Fotográfica" name="gallery">
+                            <field name="image_ids" mode="kanban">
+                                <kanban string="Imágenes del Cilindro">
+                                    <templates>
+                                        <t t-name="card">
+                                            <div style="padding: 0; overflow: hidden;">
+                                                <div class="d-flex align-items-center justify-content-center" style="height: 200px; background-color: #e4e4e4;">
+                                                    <field name="image" widget="image"/>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+
+                                <form string="Detalle de Imagen">
+                                    <sheet>
+                                        <div class="row mb-3">
+                                            <div class="col-12">
+                                                <group>
+                                                    <field name="name" placeholder="Ej. Fisura en la rosca..."/>
+                                                    <field name="component"/>
+                                                </group>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-12 text-center">
+                                                <field name="image" widget="image" nolabel="1" style="width: 100%; background-color: #e4e4e4;"/>
+                                            </div>
+                                        </div>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
                         <page string="Registro Operativo" name="operational_record">
                             <field name="operational_record_ids">
-                                <list editable="bottom">
-                                    <field name="work_to_do" placeholder="Ej. Fabricación de vastago..." optional="show"/>
+                                <list editable="top">                                    <!-- limit="10" aplicar paginacion -->
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="work_to_do" placeholder="Ej. Fabricación de vastago..."/>
                                     <field name="obs" placeholder="Ej. Ø 50mm / Requiere rectificado..." optional="show"/>
                                     <field name="hr" widget="float_time" optional="show"/>
                                 </list>
