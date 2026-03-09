@@ -6,14 +6,15 @@
         <field name="model">impsa.cylinder.survey</field>
         <field name="arch" type="xml">
             <list string="Levantamientos">
-                <field name="name" decoration-bf="1"/>
-                <field name="date"/>
-                <field name="partner_id" widget="many2one_avatar"/>
-                <field name="work_order" optional="show"/>
-                <field name="description" optional="hide"/>
-                <field name="cylinder_type" optional="show"/>
-                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'confirmed'" decoration-danger="state == 'cancel'"/>
-                <field name="activity_ids" string="Actividades" widget="list_activity"/>
+                <field name="name" decoration-bf="1" />
+                <field name="date" />
+                <field name="partner_id" widget="many2one_avatar" />
+                <field name="work_order" optional="show" />
+                <field name="description" optional="hide" />
+                <field name="cylinder_type" optional="show" />
+                <field name="state" widget="badge" decoration-info="state == 'draft'"
+                    decoration-success="state == 'confirmed'" decoration-danger="state == 'cancel'" />
+                <field name="activity_ids" string="Actividades" widget="list_activity" />
             </list>
         </field>
     </record>
@@ -24,54 +25,71 @@
         <field name="arch" type="xml">
             <form string="Levantamiento de Cilindro">
                 <header>
-                    <button name="%(action_report_cylinder_survey)d" string="Generar Formato" type="action" class="oe_highlight" icon="fa-print"/>
-                    <button name="action_confirm" string="Confirmar Levantamiento" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="%(action_report_cylinder_survey)d" string="Generar Formato"
+                        type="action" class="oe_highlight" icon="fa-print" />
+                    <button name="action_confirm" string="Confirmar Levantamiento" type="object"
+                        class="oe_highlight" invisible="state != 'draft'" />
 
-                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['draft', 'confirmed']" confirm="¿Está seguro de que desea cancelar este registro?"/>
+                    <button name="action_cancel" string="Cancelar" type="object"
+                        invisible="state not in ['draft', 'confirmed']"
+                        confirm="¿Está seguro de que desea cancelar este registro?" />
 
-                    <button name="action_set_draft" string="Volver a Levantamiento" type="object" invisible="state != 'cancel'"/>
+                    <button name="action_set_draft" string="Volver a Levantamiento" type="object"
+                        invisible="state != 'cancel'" />
 
-                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+                    <button name="action_create_purchase_order"
+                        string="Crear Orden de Compra"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state != 'confirmed'"/>
+
+
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed" />
                 </header>
                 <sheet>
                     <div class="oe_title">
-                        <label for="name" class="oe_edit_only"/>
+                        <label for="name" class="oe_edit_only" />
                         <h1>
-                            <field name="name" placeholder="Referencia"/>
+                            <field name="name" placeholder="Referencia" />
                         </h1>
                     </div>
                     <div class="row">
                         <div class="col-12 col-md-6 border-end">
                             <group mt-0="1">
-                                <field name="partner_id" widget="res_partner_many2one"/>
-                                <field name="date"/>
-                                <field name="work_order"/>
+                                <field name="partner_id" widget="res_partner_many2one" />
+                                <field name="date" />
+                                <field name="work_order" />
                             </group>
                         </div>
 
                         <div class="col-12 col-md-6">
                             <div class="row g-2 mb-3 ms-md-2">
                                 <div class="col-6">
-                                    <div class="card shadow-sm border-0 bg-primary-light text-center p-2">
-                                        <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.7rem;">Total Tareas</div>
+                                    <div
+                                        class="card shadow-sm border-0 bg-primary-light text-center p-2">
+                                        <div class="text-muted small fw-bold text-uppercase"
+                                            style="font-size: 0.7rem;">Total Tareas</div>
                                         <div class="h4 mb-0 text-primary">
-                                            <field name="total_tasks" readonly="1" nolabel="1"/>
+                                            <field name="total_tasks" readonly="1" nolabel="1" />
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    <div class="card shadow-sm border-0 bg-success-light text-center p-2">
-                                        <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.7rem;">Tiempo Estimado</div>
+                                    <div
+                                        class="card shadow-sm border-0 bg-success-light text-center p-2">
+                                        <div class="text-muted small fw-bold text-uppercase"
+                                            style="font-size: 0.7rem;">Tiempo Estimado</div>
                                         <div class="h4 mb-0 text-success">
-                                            <field name="total_hours" widget="float_time" readonly="1" nolabel="1"/>
+                                            <field name="total_hours" widget="float_time"
+                                                readonly="1" nolabel="1" />
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <group mt-0="1" class="ms-md-2">
-                                <field name="cylinder_type" placeholder='Ej. Castillos, Elevador...'/>
-                                <field name="description" placeholder="Cilindro Hidráulico"/>
+                                <field name="cylinder_type" placeholder='Ej. Castillos, Elevador...' />
+                                <field name="description" placeholder="Cilindro Hidráulico" />
                             </group>
                         </div>
                     </div>
@@ -81,26 +99,26 @@
 
                             <group>
                                 <group string="Dimensiones Generales">
-                                    <field name="diameter_sleeve" string="Ø Camisa"/>
-                                    <field name="diameter_rod" string="Ø Vástago"/>
-                                    <field name="stroke" string="Carrera"/>
+                                    <field name="diameter_sleeve" string="Ø Camisa" />
+                                    <field name="diameter_rod" string="Ø Vástago" />
+                                    <field name="stroke" string="Carrera" />
                                 </group>
                                 <group string="Identificación">
-                                    <field name="serial_number"/>
-                                    <field name="part_number"/>
+                                    <field name="serial_number" />
+                                    <field name="part_number" />
                                 </group>
                             </group>
 
                             <group>
                                 <group string="Esquema: Cuerpo y Vástago">
-                                    <field name="assembly_length" string="Ensamble (L)"/>
-                                    <field name="barrel_length" string="Camisa (L)"/>
-                                    <field name="rod_length" string="Vástago (L)"/>
+                                    <field name="assembly_length" string="Ensamble (L)" />
+                                    <field name="barrel_length" string="Camisa (L)" />
+                                    <field name="rod_length" string="Vástago (L)" />
                                 </group>
                                 <group string="Esquema: Componentes Internos">
-                                    <field name="piston_width" string="Pistón"/>
-                                    <field name="head_width" string="Cabeza (Largo)"/>
-                                    <field name="head_diameter" string="Cabeza (Ø)"/>
+                                    <field name="piston_width" string="Pistón" />
+                                    <field name="head_width" string="Cabeza (Largo)" />
+                                    <field name="head_diameter" string="Cabeza (Ø)" />
                                 </group>
                             </group>
 
@@ -108,22 +126,43 @@
                         <page string="Registro Operativo" name="operational_record">
                             <field name="operational_record_ids">
                                 <list editable="bottom">
-                                    <field name="work_to_do" optional="show"/>
-                                    <field name="obs" optional="show"/>
-                                    <field name="hr" widget="float_time" optional="show"/>
+                                    <field name="work_to_do" optional="show" />
+                                    <field name="obs" optional="show" />
+                                    <field name="hr" widget="float_time" optional="show" />
                                 </list>
                             </field>
                         </page>
 
                         <page string="Notas Internas" name="notes">
-                            <field name="internal_notes" placeholder="Escribe tus notas aquí..." nolabel="1"/>
+                            <field name="internal_notes" placeholder="Escribe tus notas aquí..."
+                                nolabel="1" />
                         </page>
+
+                        <page string="Requisión de Empaques" name="packing_list"
+                            invisible="state != 'confirmed'">
+                            <field name="cylinder_survey_line_ids">
+                                <list editable="bottom">
+                                    <field name="description_springs" optional="show" />
+                                    <field name="code" optional="show" />
+                                    <field name="dimensions" optional="show" />
+                                    <field name="type_piece" optional="show" />
+                                    <field name="unit_cantity" optional="show" />
+                                    <field name="unit_total" optional="show" />
+                                </list>
+                            </field>
+
+                            <group string="Provevores">
+                                <field name="supplier_id" string="Proveedor" />
+                                <field name="date_delivery" string="Fecha de Entrega" />
+                            </group>
+                        </page>
+
                     </notebook>
                 </sheet>
                 <chatter>
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
+                    <field name="message_follower_ids" />
+                    <field name="activity_ids" />
+                    <field name="message_ids" />
                 </chatter>
             </form>
         </field>
@@ -134,14 +173,15 @@
         <field name="model">impsa.cylinder.survey</field>
         <field name="arch" type="xml">
             <search string="Buscar Levantamiento">
-                <field name="name"/>
-                <field name="partner_id"/>
-                <field name="work_order"/>
-                <field name="serial_number"/>
-                <filter string="Fecha" name="date" date="date"/>
+                <field name="name" />
+                <field name="partner_id" />
+                <field name="work_order" />
+                <field name="serial_number" />
+                <filter string="Fecha" name="date" date="date" />
                 <group>
-                    <filter string="Fecha" name="group_date" context="{'group_by': 'date'}"/>
-                    <filter string="Cliente" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Fecha" name="group_date" context="{'group_by': 'date'}" />
+                    <filter string="Cliente" name="group_partner"
+                        context="{'group_by': 'partner_id'}" />
                 </group>
             </search>
         </field>

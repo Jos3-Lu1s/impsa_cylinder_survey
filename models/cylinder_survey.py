@@ -25,6 +25,20 @@ class CylinderSurvey(models.Model):
     serial_number = fields.Char(string="No. Serie")
     part_number = fields.Char(string="No. Parte")
 
+    description_springs = fields.Char(string="Descripción")
+    code = fields.Char(string="Código")
+    dimensions = fields.Char(string="Dimensiones")
+    type_piece = fields.Selection([
+        ('enbolo', 'Énbolo'),
+        ('head', 'Cabeza'),
+        ('other', 'Otro'),
+    ], string='Tipo de Pieza')
+
+    supplier_id = fields.Many2one(
+        "res.partner", string="Proveedor"
+    )
+    date_delivery = fields.Date(string="Fecha de Entrega")
+
     internal_notes = fields.Html(
         string="Notas Internas",
         help="Espacio para notas detalladas sobre este registro.",
@@ -34,6 +48,12 @@ class CylinderSurvey(models.Model):
         "operational.record.line", 
         "parent_id",
         string="Registro Operativo",
+    )
+
+    cylinder_survey_line_ids = fields.One2many(
+        "impsa.cylinder.survey.line",
+        "survey_id",
+        string="Empaques",
     )
 
     total_tasks = fields.Integer(
@@ -77,6 +97,33 @@ class CylinderSurvey(models.Model):
     def action_cancel(self):
         """Cancela el registro"""
         self.write({'state': 'cancel'})
+
+    def action_create_purchase_order(self):
+        for record in self:
+
+            po = self.env['purchase.order'].create({
+                'partner_id': record.supplier_id.id,
+                'date_planned': record.date_delivery,
+            })
+
+            for line in record.cylinder_survey_line_ids:
+
+                self.env['purchase.order.line'].create({
+                    'order_id': po.id,
+                    'product_id': line.description_springs.id,
+                    'name': line.description_springs.name,
+                    'product_qty': 1,
+                    'price_unit': line.description_springs.standard_price,
+                    'date_planned': record.date_delivery,
+                })
+                
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Orden de Compra',
+                'res_model': 'purchase.order',
+                'view_mode': 'form',
+                'res_id': po.id,
+            }
 
     @api.depends('operational_record_ids.hr', 'operational_record_ids.work_to_do')
     def _compute_operational_totals(self):
