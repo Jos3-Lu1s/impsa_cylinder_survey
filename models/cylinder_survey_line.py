@@ -40,5 +40,5 @@ class CylinderSurveyLine(models.Model):
         for line in self:
             if line.description_springs:
                 line.dimensions = line.description_springs.name
-                line.type_piece = line.description_springs.product_tmpl_id.type_piece
+                # line.type_piece = line.description_springs.product_tmpl_id.type_piece
     
