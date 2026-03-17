@@ -76,15 +76,13 @@
                         class="btn-primary"
                         invisible="state != 'confirmed'" />
 
-                    <button name="action_confirm" string="Confirmar Levantamiento" type="object"
-                        class="oe_highlight" invisible="state != 'draft'" />
+                    <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed'"/>
 
-                    <button name="action_cancel" string="Cancelar" type="object"
-                        invisible="state not in ['draft', 'confirmed']"
-                        confirm="¿Está seguro de que desea cancelar este registro?" />
+                    <button name="action_confirm" string="Confirmar Levantamiento" type="object" class="oe_highlight" invisible="state != 'draft'" />
 
-                    <button name="action_set_draft" string="Volver a Levantamiento" type="object"
-                        invisible="state != 'cancel'" />
+                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['draft', 'confirmed']" confirm="¿Está seguro de que desea cancelar este registro?" />
+
+                    <button name="action_set_draft" string="Volver a Levantamiento" type="object" invisible="state != 'cancel'" />
 
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirmed" />
                 </header>
@@ -95,47 +93,37 @@
                             <field name="name" placeholder="Referencia" />
                         </h1>
                     </div>
-                    <!-- Probar si aqui funciona el boton inteligente -->
-                    <div class="oe_button_box" name="button_box">
-                        <button name="action_view_purchase_orders"
-                            type="object"
-                            class="oe_stat_button"
-                            icon="fa-shopping-cart">
 
-                            <field name="purchase_order_count" widget="statinfo"
-                                string="Compras" />
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_purchase_orders" type="object" class="oe_stat_button" icon="fa-shopping-cart">
+
+                            <field name="purchase_order_count" widget="statinfo" string="Compras"/>
                         </button>
                     </div>
                     <div class="row">
                         <div class="col-12 col-md-6 border-end">
                             <group mt-0="1">
-                                <field name="partner_id" widget="res_partner_many2one" />
-                                <field name="date" />
-                                <field name="cylinder_qty" style="width: 100px;"
-                                    string="Cant. de Cilindros" />
+                                <field name="partner_id" widget="res_partner_many2one"/>
+                                <field name="date" options="{'numeric': true}"/>
+                                <field name="cylinder_qty" style="width: 100px;" string="Cant. de Cilindros"/>
                             </group>
                         </div>
 
                         <div class="col-12 col-md-6">
                             <div class="row g-2 mb-3 ms-md-2">
                                 <div class="col-6">
-                                    <div
-                                        class="card shadow-sm border-0 bg-primary-light text-center p-2">
-                                        <div class="text-muted small fw-bold text-uppercase"
-                                            style="font-size: 0.7rem;">Total Tareas</div>
+                                    <div class="card shadow-sm border-0 bg-primary-light text-center p-2">
+                                        <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.7rem;">Total Tareas</div>
                                         <div class="h4 mb-0 text-primary">
                                             <field name="total_tasks" readonly="1" nolabel="1" />
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    <div
-                                        class="card shadow-sm border-0 bg-success-light text-center p-2">
-                                        <div class="text-muted small fw-bold text-uppercase"
-                                            style="font-size: 0.7rem;">Tiempo Estimado</div>
+                                    <div class="card shadow-sm border-0 bg-success-light text-center p-2">
+                                        <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.7rem;">Tiempo Estimado</div>
                                         <div class="h4 mb-0 text-success">
-                                            <field name="total_hours" widget="float_time"
-                                                readonly="1" nolabel="1" />
+                                            <field name="total_hours" widget="float_time" readonly="1" nolabel="1" />
                                         </div>
                                     </div>
                                 </div>
@@ -143,10 +131,37 @@
 
                             <group mt-0="1" class="ms-md-2">
                                 <field name="cylinder_type" placeholder='Ej. Castillos, Elevador...' />
-                                <field name="description" placeholder="Cilindro Hidráulico" />
+                                <field name="description" rows="3" placeholder="Cilindro Hidráulico" />
                             </group>
                         </div>
                     </div>
+                    <group string="Resumen Técnico" col="5">
+
+                        <group string="Camisa">
+                            <field name="barrel_inner_diameter"/>
+                            <field name="barrel_outer_diameter"/>
+                            <field name="barrel_length"/>
+                        </group>
+
+                        <group string="Vástago">
+                            <field name="diameter_rod"/>
+                            <field name="rod_length" string="Longitud"/>
+                        </group>
+
+                        <group string="Émbolo">
+                            <field name="piston_diameter"/>
+                            <field name="piston_length" string="Longitud"/>
+                        </group>
+
+                        <group string="Cabeza">
+                            <field name="head_diameter"/>
+                            <field name="head_length" string="Longitud"/>
+                        </group>
+
+                        <group string="Carrera">
+                            <field name="stroke_length" string="Longitud"/>
+                        </group>
+                    </group>
 
                     <notebook>
                         <page string="Especificaciones Técnicas" name="specs">
@@ -272,14 +287,11 @@
                         </page>
                         <page string="Registro Operativo" name="operational_record">
                             <field name="operational_record_ids">
-                                <list editable="top">                                    <!-- limit="10" aplicar paginacion -->
-                                    <field name="sequence" widget="handle" />
-                                    <field name="work_to_do"
-                                        placeholder="Ej. Fabricación de vastago..." />
-                                    <field name="obs"
-                                        placeholder="Ej. Ø 50mm / Requiere rectificado..."
-                                        optional="show" />
-                                    <field name="hr" widget="float_time" optional="show" />
+                                <list editable="bottom">                                    <!-- limit="10" aplicar paginacion -->
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="work_to_do" placeholder="Ej. Fabricación de vastago..."/>
+                                    <field name="obs" placeholder="Ej. Ø 50mm / Requiere rectificado..." optional="show"/>
+                                    <field name="hr" widget="float_time" optional="show"/>
                                 </list>
                             </field>
                         </page>
@@ -287,10 +299,12 @@
                         <page string="Requisión de Empaques" name="packing_list">
                             <field name="cylinder_survey_line_ids">
                                 <list editable="bottom">
-                                    <field name="description_springs" optional="show" />
+                                    <field name="product_id" string="Seleccionar Producto" options="{'no_create': True, 'no_open': True}" placeholder="Buscar en catálogo..."/>
+
+                                    <field name="description_label" />
                                     <field name="code" optional="show" />
                                     <field name="dimensions" optional="show" />
-                                    <field name="type_piece" optional="show" />
+                                    <field name="type_piece" widget="radio" options="{'horizontal': True}" optional="show" />
                                     <field name="unit_cantity" optional="show" />
                                     <field name="unit_total" optional="show" />
                                 </list>
@@ -303,8 +317,7 @@
                         </page>
 
                         <page string="Notas Internas" name="notes">
-                            <field name="internal_notes" placeholder="Escribe tus notas aquí..."
-                                nolabel="1" />
+                            <field name="internal_notes" placeholder="Escribe tus notas aquí..." nolabel="1" />
                         </page>
 
                     </notebook>
@@ -329,8 +342,7 @@
                 <filter string="Fecha" name="date" date="date" />
                 <group>
                     <filter string="Fecha" name="group_date" context="{'group_by': 'date'}" />
-                    <filter string="Cliente" name="group_partner"
-                        context="{'group_by': 'partner_id'}" />
+                    <filter string="Cliente" name="group_partner" context="{'group_by': 'partner_id'}" />
                 </group>
             </search>
         </field>

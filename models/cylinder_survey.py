@@ -76,7 +76,7 @@ class CylinderSurvey(models.Model):
     )
 
     date = fields.Date(string="Fecha", default=fields.Date.context_today)
-    description = fields.Char(string="Descripción")
+    description = fields.Text(string="Descripción")
     cylinder_type = fields.Char(string="Cilindro de")
     identification_marks = fields.Char(
         string="Identificación", 
