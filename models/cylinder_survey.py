@@ -125,6 +125,12 @@ class CylinderSurvey(models.Model):
         "survey_id",
         string="Empaques",
     )
+    
+    cylinder_to = fields.Many2one(
+        "impsa.cylinder.options",
+        string="Cilindro de",
+        required=True,
+    )
 
     total_tasks = fields.Integer(
         string='Total de Tareas',

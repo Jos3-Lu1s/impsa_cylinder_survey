@@ -40,6 +40,18 @@
       </field>
     </record>
 
+    <record id="action_cylinder_options" model="ir.actions.act_window">
+      <field name="name">Catálogo de cilindros</field>
+      <field name="res_model">impsa.cylinder.options</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_cylinder_material" model="ir.actions.act_window">
+      <field name="name">Catálogo de materiales</field>
+      <field name="res_model">impsa.cylinder.material</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
     <menuitem id="menu_crm_cylinder_survey_root" name="Taller de Cilindros" parent="crm.crm_menu_root" sequence="15"/>
 
     <menuitem id="menu_cylinder_survey_all" name="Todos los Registros" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_all" sequence="10"/>
@@ -47,6 +59,10 @@
     <menuitem id="menu_cylinder_survey_draft" name="Levantamientos" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_draft" sequence="20"/>
 
     <menuitem id="menu_cylinder_survey_confirmed" name="Órdenes de Trabajo" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_confirmed" sequence="30"/>
+
+    <menuitem id="menu_cylinder_options" name="Catálogo de valores" parent="menu_crm_cylinder_survey_root" action="action_cylinder_options" sequence="40"/>
+
+    <menuitem id="menu_cylinder_material" name="Catálogo de materiales" parent="menu_crm_cylinder_survey_root" action="action_cylinder_material" sequence="50"/>
 
   </data>
 </odoo>

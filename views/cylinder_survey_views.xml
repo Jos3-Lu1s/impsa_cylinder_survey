@@ -70,7 +70,6 @@
         <field name="arch" type="xml">
             <form string="Levantamiento de Cilindro">
                 <header>
-
                     <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed'"/>
 
                     <button name="action_confirm" string="Confirmar Levantamiento" type="object" class="oe_highlight" invisible="state != 'draft'" />
@@ -127,7 +126,7 @@
                             </div>
 
                             <group mt-0="1" class="ms-md-2">
-                                <field name="cylinder_type" placeholder='Ej. Castillos, Elevador...' />
+                                <field name="cylinder_to" string="Cilindro de"/>
                                 <field name="description" rows="3" placeholder="Cilindro Hidráulico" />
                             </group>
                         </div>
@@ -301,6 +300,7 @@
                                     <field name="code" optional="show" />
                                     <field name="dimensions" optional="show" />
                                     <field name="type_piece" widget="radio" options="{'horizontal': True}" optional="show" />
+                                    <field name="material_drop" string="Material desplegable" optional="show" />
                                     <field name="unit_cantity" optional="show" />
                                     <field name="unit_total" optional="show" />
                                 </list>

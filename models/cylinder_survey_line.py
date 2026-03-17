@@ -23,11 +23,17 @@ class CylinderSurveyLine(models.Model):
     code = fields.Char(string="Código", related="product_id.default_code", store=True)
 
     dimensions = fields.Char(string="Dimensiones")
+    
     type_piece = fields.Selection([
         ('piston', 'Pistón'),
         ('head', 'Cabeza'),
         ('other', 'Otro'),
     ], string='Tipo de Pieza')
+    
+    material_drop = fields.Many2one(
+        "impsa.cylinder.material",
+        string="Material desplegable",
+    )
     
     unit_cantity = fields.Integer(string="Cantidad")
     
@@ -44,8 +50,4 @@ class CylinderSurveyLine(models.Model):
     def _onchange_product_id(self):
         if self.product_id:
             self.description_label = self.product_id.display_name
-        for line in self:
-            if line.product_id:
-                line.dimensions = line.product_id.name
-                # line.type_piece = line.product_id.product_tmpl_id.type_piece
-    
+        
