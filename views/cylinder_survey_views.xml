@@ -84,7 +84,7 @@
                             <field name="name" placeholder="Referencia" />
                         </h1>
                     </div>
-                    <!-- Probar si aqui funciona el boton inteligente -->
+
                     <div class="oe_button_box" name="button_box">
                         <button name="action_view_purchase_orders" type="object" class="oe_stat_button" icon="fa-shopping-cart">
 
@@ -95,7 +95,7 @@
                         <div class="col-12 col-md-6 border-end">
                             <group mt-0="1">
                                 <field name="partner_id" widget="res_partner_many2one"/>
-                                <field name="date"/>
+                                <field name="date" options="{'numeric': true}"/>
                                 <field name="cylinder_qty" style="width: 100px;" string="Cant. de Cilindros"/>
                             </group>
                         </div>
@@ -276,13 +276,15 @@
                             </field>
                         </page>
 
-                        <page string="Requisión de Empaques" name="packing_list" invisible="state != 'confirmed'">
+                        <page string="Requisión de Empaques" name="packing_list">
                             <field name="cylinder_survey_line_ids">
                                 <list editable="bottom">
-                                    <field name="description_springs" optional="show" />
+                                    <field name="product_id" string="Seleccionar Producto" options="{'no_create': True, 'no_open': True}" placeholder="Buscar en catálogo..."/>
+
+                                    <field name="description_label" />
                                     <field name="code" optional="show" />
                                     <field name="dimensions" optional="show" />
-                                    <field name="type_piece" optional="show" />
+                                    <field name="type_piece" widget="radio" options="{'horizontal': True}" optional="show" />
                                     <field name="unit_cantity" optional="show" />
                                     <field name="unit_total" optional="show" />
                                 </list>

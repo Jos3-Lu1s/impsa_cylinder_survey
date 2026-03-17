@@ -9,17 +9,23 @@ class CylinderSurveyLine(models.Model):
         ondelete='cascade'
     )
 
-    description_springs = fields.Many2one(
+    product_id = fields.Many2one(
         "product.product",
         string="Descripción",
-        domain="[('categ_id.name', '=', 'Sellos')]"
+        domain="[('categ_id.name', '=', 'SELLOS')]"
     )
 
-    code = fields.Char(string="Código", related="description_springs.default_code", store=True)
+    description_label = fields.Char(
+        string="Descripción",
+        required=True,
+        help="Escriba aquí o seleccione un producto"
+    )
+
+    code = fields.Char(string="Código", related="product_id.default_code", store=True)
 
     dimensions = fields.Char(string="Dimensiones")
     type_piece = fields.Selection([
-        ('enbolo', 'Énbolo'),
+        ('piston', 'Pistón'),
         ('head', 'Cabeza'),
         ('other', 'Otro'),
     ], string='Tipo de Pieza')
@@ -35,10 +41,12 @@ class CylinderSurveyLine(models.Model):
             quantity = line.unit_cantity or 0
             line.unit_total = cylinders * quantity
             
-    @api.onchange('description_springs')
-    def _onchange_description_springs(self):
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        if self.product_id:
+            self.description_label = self.product_id.display_name
         for line in self:
-            if line.description_springs:
-                line.dimensions = line.description_springs.name
-                # line.type_piece = line.description_springs.product_tmpl_id.type_piece
+            if line.product_id:
+                line.dimensions = line.product_id.name
+                # line.type_piece = line.product_id.product_tmpl_id.type_piece
     
