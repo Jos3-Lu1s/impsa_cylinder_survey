@@ -70,11 +70,6 @@
         <field name="arch" type="xml">
             <form string="Levantamiento de Cilindro">
                 <header>
-                    <button name="action_create_purchase_order"
-                        string="Crear Orden de Compra"
-                        type="object"
-                        class="btn-primary"
-                        invisible="state != 'confirmed'" />
 
                     <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed'"/>
 
@@ -105,7 +100,9 @@
                             <group mt-0="1">
                                 <field name="partner_id" widget="res_partner_many2one"/>
                                 <field name="date" options="{'numeric': true}"/>
-                                <field name="cylinder_qty" style="width: 100px;" string="Cant. de Cilindros"/>
+                                <field name="cylinder_qty" style="width: 100px;" string="Cantidad de Cilindros"/>
+                                <field name="is_standardized" widget="boolean_icon" options="{'icon': 'fa-cog'}"/>
+                                <field name="cylinder_type" widget="selection_badge"/>
                             </group>
                         </div>
 
@@ -299,9 +296,8 @@
                         <page string="Requisión de Empaques" name="packing_list">
                             <field name="cylinder_survey_line_ids">
                                 <list editable="bottom">
-                                    <field name="product_id" string="Seleccionar Producto" options="{'no_create': True, 'no_open': True}" placeholder="Buscar en catálogo..."/>
-
-                                    <field name="description_label" />
+                                    <field name="product_id" optional="show" options="{'no_create': True, 'no_open': True}" placeholder="Buscar en catálogo..."/>
+                                    <field name="description_label" optional="hide" />
                                     <field name="code" optional="show" />
                                     <field name="dimensions" optional="show" />
                                     <field name="type_piece" widget="radio" options="{'horizontal': True}" optional="show" />

@@ -16,9 +16,8 @@ class CylinderSurveyLine(models.Model):
     )
 
     description_label = fields.Char(
-        string="Descripción",
+        string="Nombre del producto",
         required=True,
-        help="Escriba aquí o seleccione un producto"
     )
 
     code = fields.Char(string="Código", related="product_id.default_code", store=True)

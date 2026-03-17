@@ -84,7 +84,7 @@ class CylinderSurvey(models.Model):
         tracking=True
     )
 
-    description_springs = fields.Char(string="Descripción")
+    product_id = fields.Char(string="Descripción")
     code = fields.Char(string="Código")
     dimensions = fields.Char(string="Dimensiones")
     type_piece = fields.Selection([
@@ -146,6 +146,15 @@ class CylinderSurvey(models.Model):
         ('cancel', 'Cancelado'),
     ], string='Estado', default='draft', tracking=True, copy=False)
 
+    cylinder_type = fields.Selection([
+        ('hydraulic', 'Hidráulico'),
+        ('pneumatic', 'Neumático')
+    ],string='Tipo de Cilindro')
+
+    is_standardized = fields.Boolean(
+        string='Normalizado'
+    )
+
     # Restricción de seguridad para evitar errores de captura
     @api.constrains('cylinder_qty')
     def _check_cylinder_qty(self):
@@ -198,10 +207,10 @@ class CylinderSurvey(models.Model):
 
                 self.env['purchase.order.line'].create({
                     'order_id': po.id,
-                    'product_id': line.description_springs.id,
-                    'name': line.description_springs.name,
+                    'product_id': line.product_id.id,
+                    'name': line.product_id.name,
                     'product_qty': 1,
-                    'price_unit': line.description_springs.standard_price,
+                    'price_unit': line.product_id.standard_price,
                     'date_planned': record.date_delivery,
                 })
                 
