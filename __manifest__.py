@@ -26,6 +26,8 @@
         "data/ir_sequence_data.xml",
         "views/cylinder_survey_views.xml",
         "views/integration_menu.xml",
+        "views/cylinder_options_views.xml",
+        "views/cylinder_materials_views.xml",
     ],
 
     'demo': [

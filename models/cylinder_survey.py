@@ -125,6 +125,12 @@ class CylinderSurvey(models.Model):
         "survey_id",
         string="Empaques",
     )
+    
+    cylinder_to = fields.Many2one(
+        "impsa.cylinder.options",
+        string="Cilindro de",
+        required=True,
+    )
 
     total_tasks = fields.Integer(
         string='Total de Tareas',
@@ -198,10 +204,10 @@ class CylinderSurvey(models.Model):
 
                 self.env['purchase.order.line'].create({
                     'order_id': po.id,
-                    'product_id': line.description_springs.id,
-                    'name': line.description_springs.name,
+                    'product_id': line.product_id.id,
+                    'name': line.product_id.name,
                     'product_qty': 1,
-                    'price_unit': line.description_springs.standard_price,
+                    'price_unit': line.product_id.standard_price,
                     'date_planned': record.date_delivery,
                 })
                 
