@@ -12,7 +12,7 @@ class CylinderSurveyLine(models.Model):
     description_springs = fields.Many2one(
         "product.product",
         string="Descripción",
-        domain="[('categ_id.name', '=', 'Sellos')]"
+        domain="[('categ_id.name', '=', 'SELLOS')]"
     )
 
     code = fields.Char(string="Código", related="description_springs.default_code", store=True)
@@ -40,5 +40,5 @@ class CylinderSurveyLine(models.Model):
         for line in self:
             if line.description_springs:
                 line.dimensions = line.description_springs.name
-                line.type_piece = line.description_springs.product_tmpl_id.type_piece
+                """ line.type_piece = line.description_springs.product_tmpl_id.type_piece """
     

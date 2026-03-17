@@ -9,8 +9,9 @@
                 <templates>
                     <t t-name="card">
                         <div style="padding: 0; overflow: hidden;">
-                            <div class="d-flex align-items-center justify-content-center" style="height: 200px; background-color: #e4e4e4;">
-                                <field name="image" widget="image"/>
+                            <div class="d-flex align-items-center justify-content-center"
+                                style="height: 200px; background-color: #e4e4e4;">
+                                <field name="image" widget="image" />
                             </div>
                         </div>
                     </t>
@@ -28,15 +29,16 @@
                     <div class="row mb-3">
                         <div class="col-12">
                             <group>
-                                <field name="name" placeholder="Ej. Fisura en la rosca..."/>
-                                <field name="component"/>
+                                <field name="name" placeholder="Ej. Fisura en la rosca..." />
+                                <field name="component" />
                             </group>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-12 text-center">
-                            <field name="image" widget="image" nolabel="1" style="width: 100%; background-color: #e4e4e4;"/>
+                            <field name="image" widget="image" nolabel="1"
+                                style="width: 100%; background-color: #e4e4e4;" />
                         </div>
                     </div>
                 </sheet>
@@ -49,13 +51,15 @@
         <field name="model">impsa.cylinder.survey</field>
         <field name="arch" type="xml">
             <list string="Levantamientos" decoration-muted="state == 'cancel'">
-                <field name="name" decoration-bf="1"/>
-                <field name="date"/>
-                <field name="partner_id" widget="many2one_avatar"/>
-                <field name="activity_ids" string="Actividades" widget="list_activity"/>
-                <field name="description" optional="hide"/>
-                <field name="cylinder_type" optional="show"/>
-                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'confirmed'" decoration-danger="state == 'cancel'" column_invisible="context.get('hide_state', False)"/>
+                <field name="name" decoration-bf="1" />
+                <field name="date" />
+                <field name="partner_id" widget="many2one_avatar" />
+                <field name="activity_ids" string="Actividades" widget="list_activity" />
+                <field name="description" optional="hide" />
+                <field name="cylinder_type" optional="show" />
+                <field name="state" widget="badge" decoration-info="state == 'draft'"
+                    decoration-success="state == 'confirmed'" decoration-danger="state == 'cancel'"
+                    column_invisible="context.get('hide_state', False)" />
             </list>
         </field>
     </record>
@@ -66,14 +70,11 @@
         <field name="arch" type="xml">
             <form string="Levantamiento de Cilindro">
                 <header>
-                    <!-- <button name="%(action_report_cylinder_survey)d" string="Generar Formato"
-                        type="action" class="oe_highlight" icon="fa-print" /> -->
-                        
                     <button name="action_create_purchase_order"
                         string="Crear Orden de Compra"
                         type="object"
                         class="btn-primary"
-                        invisible="state != 'confirmed'"/>
+                        invisible="state != 'confirmed'" />
 
                     <button name="action_confirm" string="Confirmar Levantamiento" type="object"
                         class="oe_highlight" invisible="state != 'draft'" />
@@ -95,22 +96,23 @@
                         </h1>
                     </div>
                     <!-- Probar si aqui funciona el boton inteligente -->
-                     <div class="oe_button_box" name="button_box">
+                    <div class="oe_button_box" name="button_box">
                         <button name="action_view_purchase_orders"
                             type="object"
                             class="oe_stat_button"
                             icon="fa-shopping-cart">
 
                             <field name="purchase_order_count" widget="statinfo"
-                               string="Compras"/>
+                                string="Compras" />
                         </button>
-                     </div>
+                    </div>
                     <div class="row">
                         <div class="col-12 col-md-6 border-end">
                             <group mt-0="1">
-                                <field name="partner_id" widget="res_partner_many2one"/>
-                                <field name="date"/>
-                                <field name="cylinder_qty" style="width: 100px;" string="Cant. de Cilindros"/>
+                                <field name="partner_id" widget="res_partner_many2one" />
+                                <field name="date" />
+                                <field name="cylinder_qty" style="width: 100px;"
+                                    string="Cant. de Cilindros" />
                             </group>
                         </div>
 
@@ -153,72 +155,79 @@
 
                                 <group string="Camisa" col="3">
                                     <group>
-                                        <field name="barrel_inner_diameter" string="Diámetro Interior (Ø)"/>
+                                        <field name="barrel_inner_diameter"
+                                            string="Diámetro Interior (Ø)" />
                                     </group>
                                     <group>
-                                        <field name="barrel_outer_diameter" string="Diámetro Exterior (Ø)"/>
+                                        <field name="barrel_outer_diameter"
+                                            string="Diámetro Exterior (Ø)" />
                                     </group>
                                     <group>
-                                        <field name="barrel_length" string="Longitud de la Camisa"/>
+                                        <field name="barrel_length" string="Longitud de la Camisa" />
                                     </group>
                                 </group>
-                                <field name="barrel_image_ids" mode="kanban" nolabel="1" context="{
+                                <field name="barrel_image_ids" mode="kanban" nolabel="1"
+                                    context="{
                                     'default_component': 'barrel', 
                                     'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
                                     'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
-                                }"/>
+                                }" />
                                 <group string="Vástago">
                                     <group>
-                                        <field name="diameter_rod"/>
+                                        <field name="diameter_rod" />
                                     </group>
                                     <group>
-                                        <field name="rod_length"/>
+                                        <field name="rod_length" />
                                     </group>
                                 </group>
-                                <field name="rod_image_ids" mode="kanban" nolabel="1" context="{
+                                <field name="rod_image_ids" mode="kanban" nolabel="1"
+                                    context="{
                                     'default_component': 'rod', 
                                     'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
                                     'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
-                                }"/>
+                                }" />
 
                                 <group string="Émbolo">
                                     <group>
-                                        <field name="piston_diameter"/>
+                                        <field name="piston_diameter" />
                                     </group>
                                     <group>
-                                        <field name="piston_length"/>
+                                        <field name="piston_length" />
                                     </group>
                                 </group>
-                                <field name="piston_image_ids" mode="kanban" nolabel="1" context="{
+                                <field name="piston_image_ids" mode="kanban" nolabel="1"
+                                    context="{
                                     'default_component': 'piston', 
                                     'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
                                     'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
-                                }"/>
+                                }" />
 
                                 <group string="Cabeza">
                                     <group>
-                                        <field name="head_diameter"/>
+                                        <field name="head_diameter" />
                                     </group>
                                     <group>
-                                        <field name="head_length"/>
+                                        <field name="head_length" />
                                     </group>
                                 </group>
-                                <field name="head_image_ids" mode="kanban" nolabel="1" context="{
+                                <field name="head_image_ids" mode="kanban" nolabel="1"
+                                    context="{
                                     'default_component': 'head', 
                                     'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
                                     'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
-                                }"/>
+                                }" />
 
                                 <group string="Carrera">
                                     <group>
-                                        <field name="stroke_length"/>
+                                        <field name="stroke_length" />
                                     </group>
                                 </group>
-                                <field name="stroke_image_ids" mode="kanban" nolabel="1" context="{
+                                <field name="stroke_image_ids" mode="kanban" nolabel="1"
+                                    context="{
                                     'default_component': 'stroke', 
                                     'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
                                     'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
-                                }"/>
+                                }" />
 
                             </group>
 
@@ -229,8 +238,10 @@
                                     <templates>
                                         <t t-name="card">
                                             <div style="padding: 0; overflow: hidden;">
-                                                <div class="d-flex align-items-center justify-content-center" style="height: 200px; background-color: #e4e4e4;">
-                                                    <field name="image" widget="image"/>
+                                                <div
+                                                    class="d-flex align-items-center justify-content-center"
+                                                    style="height: 200px; background-color: #e4e4e4;">
+                                                    <field name="image" widget="image" />
                                                 </div>
                                             </div>
                                         </t>
@@ -242,15 +253,17 @@
                                         <div class="row mb-3">
                                             <div class="col-12">
                                                 <group>
-                                                    <field name="name" placeholder="Ej. Fisura en la rosca..."/>
-                                                    <field name="component"/>
+                                                    <field name="name"
+                                                        placeholder="Ej. Fisura en la rosca..." />
+                                                    <field name="component" />
                                                 </group>
                                             </div>
                                         </div>
 
                                         <div class="row">
                                             <div class="col-12 text-center">
-                                                <field name="image" widget="image" nolabel="1" style="width: 100%; background-color: #e4e4e4;"/>
+                                                <field name="image" widget="image" nolabel="1"
+                                                    style="width: 100%; background-color: #e4e4e4;" />
                                             </div>
                                         </div>
                                     </sheet>
@@ -260,16 +273,18 @@
                         <page string="Registro Operativo" name="operational_record">
                             <field name="operational_record_ids">
                                 <list editable="top">                                    <!-- limit="10" aplicar paginacion -->
-                                    <field name="sequence" widget="handle"/>
-                                    <field name="work_to_do" placeholder="Ej. Fabricación de vastago..."/>
-                                    <field name="obs" placeholder="Ej. Ø 50mm / Requiere rectificado..." optional="show"/>
-                                    <field name="hr" widget="float_time" optional="show"/>
+                                    <field name="sequence" widget="handle" />
+                                    <field name="work_to_do"
+                                        placeholder="Ej. Fabricación de vastago..." />
+                                    <field name="obs"
+                                        placeholder="Ej. Ø 50mm / Requiere rectificado..."
+                                        optional="show" />
+                                    <field name="hr" widget="float_time" optional="show" />
                                 </list>
                             </field>
                         </page>
 
-                        <page string="Requisión de Empaques" name="packing_list"
-                            invisible="state != 'confirmed'">
+                        <page string="Requisión de Empaques" name="packing_list">
                             <field name="cylinder_survey_line_ids">
                                 <list editable="bottom">
                                     <field name="description_springs" optional="show" />
@@ -286,7 +301,7 @@
                                 <field name="date_delivery" string="Fecha de Entrega" />
                             </group>
                         </page>
-                        
+
                         <page string="Notas Internas" name="notes">
                             <field name="internal_notes" placeholder="Escribe tus notas aquí..."
                                 nolabel="1" />
@@ -308,10 +323,10 @@
         <field name="model">impsa.cylinder.survey</field>
         <field name="arch" type="xml">
             <search string="Buscar Levantamiento">
-                <field name="name"/>
-                <field name="partner_id"/>
-                <field name="identification_marks" string="Identificación"/>
-                <filter string="Fecha" name="date" date="date"/>
+                <field name="name" />
+                <field name="partner_id" />
+                <field name="identification_marks" string="Identificación" />
+                <filter string="Fecha" name="date" date="date" />
                 <group>
                     <filter string="Fecha" name="group_date" context="{'group_by': 'date'}" />
                     <filter string="Cliente" name="group_partner"
