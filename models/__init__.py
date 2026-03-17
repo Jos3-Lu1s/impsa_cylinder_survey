@@ -5,3 +5,4 @@ from . import cylinder_survey_line
 from . import purchase_order
 from . import cylinder_options
 from . import cylinder_material
+from . import crm_decision

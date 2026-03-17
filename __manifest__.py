@@ -28,6 +28,7 @@
         "views/integration_menu.xml",
         "views/cylinder_options_views.xml",
         "views/cylinder_materials_views.xml",
+        "views/crm_adition.xml",
     ],
 
     'demo': [

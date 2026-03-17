@@ -93,9 +93,6 @@ class CylinderSurvey(models.Model):
         ('other', 'Otro'),
     ], string='Tipo de Pieza')
 
-    supplier_id = fields.Many2one(
-        "res.partner", string="Proveedor"
-    )
     date_delivery = fields.Date(string="Fecha de Entrega")
     
     purchase_order_ids = fields.One2many(
@@ -129,7 +126,6 @@ class CylinderSurvey(models.Model):
     cylinder_to = fields.Many2one(
         "impsa.cylinder.options",
         string="Cilindro de",
-        required=True,
     )
 
     total_tasks = fields.Integer(
@@ -174,6 +170,28 @@ class CylinderSurvey(models.Model):
             if not record.operational_record_ids:
                 raise ValidationError("No puedes confirmar una Orden de Trabajo sin líneas de registro operativo.")
             
+            category = self.env['product.category'].search([
+                ('name', '=', 'SELLOS')
+            ], limit=1)
+            
+            for line in record.cylinder_survey_line_ids:
+
+                # 🔍 Buscar por código (code_label)
+                product = self.env['product.product'].search([
+                    ('default_code', '=', line.code_label)
+                ], limit=1)
+
+                if not product:
+                    product = self.env['product.product'].create({
+                        'name': line.description_label or line.code_label,
+                        'default_code': line.code_label,
+                        'type': 'consu',
+                        'categ_id': category.id if category else False,
+                    })
+
+                # 🔗 Asignar
+                line.product_id = product.id
+            
             # Cambiar prefijo para indicar que ya es una Orden de Trabajo
             new_name = record.name
             if new_name and new_name.startswith('LEV-'):
@@ -204,7 +222,6 @@ class CylinderSurvey(models.Model):
         for record in self:
 
             po = self.env['purchase.order'].create({
-                'partner_id': record.supplier_id.id,
                 'date_planned': record.date_delivery,
                 'survey_id': record.id,
             })

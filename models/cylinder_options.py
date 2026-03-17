@@ -5,3 +5,5 @@ class CylinderOptions(models.Model):
     _description = 'Catálogo de valores'
 
     name = fields.Char(string="Nombre", required=True)
+    
+    

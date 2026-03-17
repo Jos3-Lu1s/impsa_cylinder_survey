@@ -19,6 +19,10 @@ class CylinderSurveyLine(models.Model):
         string="Nombre del producto",
         required=True,
     )
+    
+    code_label = fields.Char(
+        string="Código del producto",  
+        store=True)
 
     code = fields.Char(string="Código", related="product_id.default_code", store=True)
 
@@ -51,3 +55,20 @@ class CylinderSurveyLine(models.Model):
         if self.product_id:
             self.description_label = self.product_id.display_name
         
+    @api.onchange('code_label')
+    def _onchange_code_label(self):
+        for line in self:
+            if line.code_label:
+
+                product = self.env['product.product'].search([
+                    ('default_code', 'ilike', line.code_label),
+                    ('categ_id.name', '=', 'SELLOS')
+                ], limit=1)
+
+                if product:
+                    line.product_id = product.id
+                    line.code_label = product.default_code
+                    
+                else:
+                    line.product_id = False
+                    line.code = False
