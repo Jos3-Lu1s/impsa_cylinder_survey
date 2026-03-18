@@ -24,6 +24,26 @@ class CylinderSurvey(models.Model):
         help="Número de cilindros que comparten exactamente estas mismas características."
     )
 
+    allocated_qty = fields.Integer(
+        string="Cilindros Asignados",
+        compute="_compute_allocated_qty",
+        store=True,
+        help="Suma de los cilindros ya distribuidos en grupos."
+    )
+
+    group_ids = fields.One2many(
+        "impsa.cylinder.group", 
+        "survey_id",
+        string="Grupos de Cilindros",
+    )
+
+    all_operational_record_ids = fields.One2many(
+        "operational.record.line",
+        "survey_id",
+        string="Resumen de Operaciones",
+        help="Vista consolidada de todas las operaciones de todos los grupos."
+    )
+
     image_ids = fields.One2many(
         'impsa.cylinder.image', 
         'survey_id', 
@@ -111,12 +131,6 @@ class CylinderSurvey(models.Model):
         help="Espacio para notas detalladas sobre este registro.",
     )
 
-    operational_record_ids = fields.One2many(
-        "operational.record.line", 
-        "parent_id",
-        string="Registro Operativo",
-    )
-
     cylinder_survey_line_ids = fields.One2many(
         "impsa.cylinder.survey.line",
         "survey_id",
@@ -164,36 +178,69 @@ class CylinderSurvey(models.Model):
             if record.cylinder_qty <= 0:
                 raise ValidationError("La cantidad de cilindros a evaluar debe ser al menos 1.")
 
+    @api.constrains('cylinder_qty', 'allocated_qty')
+    def _check_quantities(self):
+        """Previene que el usuario agrupe más cilindros de los que existen en el total."""
+        for survey in self:
+            if survey.allocated_qty > survey.cylinder_qty:
+                raise ValidationError(
+                    f"Inconsistencia: Has asignado {survey.allocated_qty} cilindros en los grupos, "
+                    f"pero el total declarado es de solo {survey.cylinder_qty}."
+                )
+
     def action_confirm(self):
-        """Pasa de Levantamiento a Orden de Trabajo y actualiza la referencia"""
+        """Pasa de Levantamiento a Orden de Trabajo, valida grupos, empaques y actualiza la referencia"""
         for record in self:
-            if not record.operational_record_ids:
-                raise ValidationError("No puedes confirmar una Orden de Trabajo sin líneas de registro operativo.")
+            # 1. VALIDACIÓN DE GRUPOS Y OPERACIONES (Refactorizado para la nueva arquitectura 1:N:N)
+            if not record.group_ids:
+                raise ValidationError("No puedes confirmar una Orden de Trabajo sin haber definido al menos un Grupo de Cilindros.")
             
+            # Validar que al menos un grupo tenga líneas de registro operativo
+            has_operations = any(group.operational_record_ids for group in record.group_ids)
+            if not has_operations:
+                raise ValidationError("Los grupos definidos no tienen tareas operativas (Registro Operativo) asignadas.")
+
+            # 2. VALIDACIÓN DE CANTIDADES (Para evitar errores de captura del usuario)
+            if record.allocated_qty != record.cylinder_qty:
+                raise ValidationError(
+                    f"No puedes confirmar. Has declarado un total de {record.cylinder_qty} cilindros, "
+                    f"pero has asignado {record.allocated_qty} en los grupos. Deben coincidir exactamente."
+                )
+
+            # 3. GESTIÓN DE PRODUCTOS (Requisición de Empaques)
+            # Buscamos de forma insensible a mayúsculas/minúsculas (ilike) por si alguien escribe "Sellos" o "sellos"
             category = self.env['product.category'].search([
-                ('name', '=', 'SELLOS')
+                ('name', 'ilike', 'SELLOS')
             ], limit=1)
             
+            # Si no existe la categoría SELLOS, usaremos la categoría por defecto 'All' de Odoo para que no falle
+            # default_category_id = category.id if category else self.env.ref('product.product_category_all').id
+            
             for line in record.cylinder_survey_line_ids:
+                # Evitar errores si intentan confirmar una línea vacía
+                if not line.code_label:
+                    raise ValidationError("Una de las líneas de empaque no tiene el código definido (code_label).")
 
-                # 🔍 Buscar por código (code_label)
+                # 🔍 Buscar producto por código
                 product = self.env['product.product'].search([
                     ('default_code', '=', line.code_label)
                 ], limit=1)
 
+                # 🛠️ Crear producto si no existe
                 if not product:
                     product = self.env['product.product'].create({
-                        'name': line.description_label or line.code_label,
+                        'name': line.description_label or f"Empaque {line.code_label}",
                         'default_code': line.code_label,
-                        'type': 'consu',
-                        'categ_id': category.id if category else False,
+                        'type': 'consu',  # Consumible es correcto en Odoo 18 para este tipo de piezas
+                        'categ_id': category.id,
                     })
 
-                # 🔗 Asignar
+                # 🔗 Asignar el producto a la línea
                 line.product_id = product.id
             
-            # Cambiar prefijo para indicar que ya es una Orden de Trabajo
+            # 4. CAMBIO DE NOMENCLATURA Y ESTADO
             new_name = record.name
+            # startswith nos asegura que no reemplacemos 'LEV-' si por casualidad aparece a la mitad de un texto
             if new_name and new_name.startswith('LEV-'):
                 new_name = new_name.replace('LEV-', 'OT-', 1)
                 
@@ -245,13 +292,24 @@ class CylinderSurvey(models.Model):
                 'res_id': po.id,
             }
 
-    @api.depends('operational_record_ids.hr', 'operational_record_ids.work_to_do')
+    @api.depends('group_ids.operational_record_ids.hr', 'group_ids.operational_record_ids')
     def _compute_operational_totals(self):
         for record in self:
-            # Cantidad de registros y suma de horas
-            lines = record.operational_record_ids
-            record.total_tasks = len(lines)
-            record.total_hours = sum(line.hr for line in lines)
+            # Obtener todas las líneas de todos los grupos del levantamiento
+            all_lines = record.group_ids.mapped('operational_record_ids')
+            record.total_tasks = len(all_lines)
+            
+            total_h = 0.0
+            for group in record.group_ids:
+                group_hours = sum(line.hr for line in group.operational_record_ids)
+                total_h += (group_hours * group.quantity)
+            
+            record.total_hours = total_h
+        
+    @api.depends('group_ids.quantity')
+    def _compute_allocated_qty(self):
+        for survey in self:
+            survey.allocated_qty = sum(survey.group_ids.mapped('quantity'))
 
     @api.model_create_multi
     def create(self, vals_list):

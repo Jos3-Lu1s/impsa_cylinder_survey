@@ -5,10 +5,19 @@ class OperationalRecordLine(models.Model):
 
     _order = 'sequence, id desc'
 
-    parent_id = fields.Many2one(
+    group_id = fields.Many2one(
+        'impsa.cylinder.group',
+        string='Grupo',
+        required=True,
+        ondelete='cascade'
+    )
+
+    survey_id = fields.Many2one(
         'impsa.cylinder.survey',
         string='Levantamiento',
-        ondelete='cascade'
+        related='group_id.survey_id',
+        store=True,
+        index=True
     )
 
     sequence = fields.Integer(string='Secuencia', default=0)
