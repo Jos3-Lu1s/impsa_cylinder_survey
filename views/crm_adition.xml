@@ -4,21 +4,28 @@
         <record id="view_crm_adition" model="ir.ui.view">
             <field name="name">crm.lead.form.inherit.cylinder_survey</field>
             <field name="model">crm.lead</field>
-            <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+            <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
             <field name="arch" type="xml">
 
             <xpath expr="//field[@name='tag_ids']" position="after">
-                <field name="test_label"/>
-                <field name="selection_crm" widget="radio" options="{'horizontal': True}" optional="show"/>
+                <field name="is_won_stage" invisible="1"/>
+                <field name="selection_crm"/>
+            </xpath>
+
+            <xpath expr="//header//button[@name='action_sale_quotations_new']" position="attributes">
+                <attribute name="invisible">
+                    not is_won_stage or selection_crm == True
+                </attribute>
+            </xpath>
+
+            <xpath expr="//header" position="inside">
+                <button name="action_open_cylinder_survey"
+                    string="Ir a Cylinder Survey"
+                    type="object"
+                    class="oe_highlight"
+                    invisible="not is_won_stage or selection_crm == False"/>
             </xpath>
     
-                <xpath expr="//notebook" position="inside">
-                    <page string="Taller de Cilindros" name="cylinder_survey_page">
-                        <group>
-                            <field name="test_label"/>
-                        </group>
-                    </page>
-                </xpath>
             </field>
         </record>
     </data>
