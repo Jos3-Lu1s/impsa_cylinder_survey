@@ -1,5 +1,5 @@
 from odoo import models, fields, api
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 class CylinderSurvey(models.Model):
     _name = "impsa.cylinder.survey"
@@ -270,9 +270,21 @@ class CylinderSurvey(models.Model):
     def action_create_purchase_order(self):
         for record in self:
 
+            # Obtener proveedor desde el primer producto
+            supplier = False
+
+            for line in record.cylinder_survey_line_ids:
+                if line.product_id.seller_ids:
+                    supplier = line.product_id.seller_ids[0].partner_id
+                    break
+
+            if not supplier:
+                raise UserError("No hay proveedor definido en los productos.")            
+            
             po = self.env['purchase.order'].create({
                 'date_planned': record.date_delivery,
                 'survey_id': record.id,
+                'partner_id': supplier.id
             })
 
             for line in record.cylinder_survey_line_ids:
