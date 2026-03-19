@@ -62,7 +62,7 @@
 
     <menuitem id="menu_cylinder_catalogos" name="Catálogos" parent="menu_crm_cylinder_survey_root" sequence="40"/>
     
-    <menuitem id="menu_cylinder_options" name="Catálogo de valores" parent="menu_cylinder_catalogos" action="action_cylinder_options" sequence="40"/>
+    <menuitem id="menu_cylinder_options" name="Catálogo de cilindros" parent="menu_cylinder_catalogos" action="action_cylinder_options" sequence="40"/>
 
     <menuitem id="menu_cylinder_material" name="Catálogo de materiales" parent="menu_cylinder_catalogos" action="action_cylinder_material" sequence="50"/>
 

@@ -97,6 +97,14 @@ class CylinderSurvey(models.Model):
         string="Imágenes del Ensamble", 
         domain=[('component', '=', 'stroke')]
     )
+    
+    # Carrera (Stroke)
+    accessories  = fields.Float(string='Accesorios')
+    accessory_image_ids  = fields.One2many(
+        'impsa.cylinder.image', 'survey_id', 
+        string="Imágenes de accesorios", 
+        domain=[('component', '=', 'accessory')]
+    )
 
     date = fields.Date(string="Fecha", default=fields.Date.context_today)
     description = fields.Text(string="Descripción")

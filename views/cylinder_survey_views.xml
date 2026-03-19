@@ -237,6 +237,17 @@
                                     'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
                                 }" />
 
+                                <group string="Accesorios">
+                                    <group>
+                                        <field name="accessories" />
+                                    </group>
+                                </group>
+                                <field name="accessory_image_ids" mode="kanban" nolabel="1" context="{
+                                    'default_component': 'accessories', 
+                                    'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
+                                    'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
+                                }" />
+
                             </group>
 
                         </page>
@@ -278,6 +289,7 @@
                             <field name="group_ids">
                                 <list string="Grupos de Cilindros">
                                     <field name="name"/>
+                                    <field name="operational_record_ids"/>
                                     <field name="quantity" sum="Total Asignados"/>
                                 </list>
 
@@ -294,7 +306,7 @@
                                                         <field name="sequence" widget="handle"/>
                                                         <field name="work_to_do"/>
                                                         <field name="obs" optional="show"/>
-                                                        <field name="hr" widget="float_time" sum="Total Hrs Grupo"/>
+                                                        <field name="hr" widget="float_time"/>
                                                     </list>
                                                 </field>
                                             </page>
@@ -311,7 +323,7 @@
                                     <field name="group_id" string="Grupo" required="1" options="{'no_create': True, 'no_open': True}" domain="[('survey_id', '=', parent.id)]" decoration-bf="1"/>
                                     <field name="work_to_do"/>
                                     <field name="obs" optional="show"/>
-                                    <field name="hr" widget="float_time" sum="Total Hrs Globales"/>
+                                    <field name="hr" widget="float_time"/>
                                 </list>
                             </field>
 
@@ -329,7 +341,7 @@
                                     <field name="code" optional="hide" />
                                     <field name="code_label" optional="show" />
                                     <field name="dimensions" optional="show" />
-                                    <field name="type_piece" widget="radio" options="{'horizontal': True}" optional="show" style="width: 130px;" />
+                                    <field name="type_piece" widget="radio" options="{'horizontal': True}" optional="show" width="220" />
                                     <field name="material_drop" string="Material desplegable" optional="show" />
                                     <field name="unit_cantity" optional="show" />
                                     <field name="unit_total" optional="show" />
