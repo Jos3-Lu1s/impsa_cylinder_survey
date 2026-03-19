@@ -112,6 +112,8 @@ class CylinderSurvey(models.Model):
         ('head', 'Cabeza'),
         ('other', 'Otro'),
     ], string='Tipo de Pieza')
+    
+    lead_id = fields.Many2one('crm.lead', string="Oportunidad")
 
     date_delivery = fields.Date(string="Fecha de Entrega")
     
