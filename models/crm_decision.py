@@ -21,13 +21,15 @@ class CrmDecision(models.Model):
     def action_open_cylinder_survey(self):
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Cylinder Survey',
+            'name': 'Nuevo Cylinder Survey',
             'res_model': 'impsa.cylinder.survey',
-            'view_mode': 'list,form',
+            'view_mode': 'form',
             'target': 'current',
             'domain': [('lead_id', '=', self.id)],
             'context': {
-                'default_lead_id': self.id
+                'default_lead_id': self.id,
+                'default_partner_id': self.partner_id.id,
+                'default_name': self.name,
             }
         }
         
