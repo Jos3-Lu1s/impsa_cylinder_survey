@@ -270,6 +270,7 @@
                             <field name="group_ids">
                                 <list string="Grupos de Cilindros">
                                     <field name="name"/>
+                                    
                                     <field name="quantity" sum="Total Asignados"/>
                                 </list>
 
@@ -303,7 +304,7 @@
                                     <field name="group_id" string="Grupo" required="1" options="{'no_create': True, 'no_open': True}" domain="[('survey_id', '=', parent.id)]" decoration-bf="1"/>
                                     <field name="work_to_do"/>
                                     <field name="obs" optional="show"/>
-                                    <field name="hr" widget="float_time" sum="Total Hrs Globales"/>
+                                    <field name="hr" widget="float_time"/>
                                 </list>
                             </field>
 
