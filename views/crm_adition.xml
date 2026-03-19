@@ -7,6 +7,16 @@
             <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
             <field name="arch" type="xml">
 
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_cylinder_surveys"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-cogs">
+
+                    <field name="cylinder_survey_count" widget="statinfo" string="Reparaciones"/>
+                </button>
+            </xpath>
+
             <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="is_won_stage" invisible="1"/>
                 <field name="selection_crm"/>
@@ -20,7 +30,7 @@
 
             <xpath expr="//header" position="inside">
                 <button name="action_open_cylinder_survey"
-                    string="Ir a Cylinder Survey"
+                    string="Requisión nueva"
                     type="object"
                     class="oe_highlight"
                     invisible="not is_won_stage or selection_crm == False"/>
