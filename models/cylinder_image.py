@@ -20,6 +20,7 @@ class CylinderImage(models.Model):
         ('piston', 'Piston'),
         ('head', 'Cabeza'),
         ('stroke', 'Carrera'),
+        ('accessory', 'Accesorio'),
     ], string="Componente", required=True)
 
     # max_width y max_height para proteger el servidor de fotos de 10MB
