@@ -68,6 +68,9 @@ class CylinderSurvey(models.Model):
         string="Imágenes del Vástago", 
         domain=[('component', '=', 'rod')]
     )
+    
+    diameter_rod2 = fields.Float(string="Ø Vástago 2")
+    rod_length2 = fields.Float(string='Longitud de Vástago 2')
 
     # Émbolo (Piston)
     piston_diameter = fields.Float(string='Ø Émbolo') 
@@ -115,6 +118,12 @@ class CylinderSurvey(models.Model):
     
     lead_id = fields.Many2one('crm.lead', string="Oportunidad")
 
+    rotula_id = fields.Many2one(
+        "product.product",
+        string="Rotula",
+        domain="[('categ_id.name', '=', 'FERRETERIA')]"
+    )
+    
     date_delivery = fields.Date(string="Fecha de Entrega")
     
     purchase_order_ids = fields.One2many(

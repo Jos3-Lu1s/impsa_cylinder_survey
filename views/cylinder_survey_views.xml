@@ -124,33 +124,39 @@
                             <group mt-0="1" class="ms-md-2">
                                 <field name="cylinder_to" string="Cilindro de"/>
                                 <field name="description" rows="3" placeholder="Cilindro Hidráulico" />
+                                <field name="rotula_id"/>
                             </group>
                         </div>
                     </div>
                     <group string="Resumen Técnico" col="5">
 
-                        <group string="Camisa">
+                        <group string="Camisa" invisible="cylinder_to != 1 and cylinder_to != 2 and cylinder_to != 5">
                             <field name="barrel_inner_diameter"/>
                             <field name="barrel_outer_diameter"/>
                             <field name="barrel_length"/>
                         </group>
 
-                        <group string="Vástago">
+                        <group string="Vástago" invisible="cylinder_to != 1 and cylinder_to != 2 and cylinder_to != 4">
                             <field name="diameter_rod"/>
                             <field name="rod_length" string="Longitud"/>
                         </group>
 
-                        <group string="Émbolo">
+                        <group string="Vástago 2" invisible="cylinder_to != 4">
+                            <field name="diameter_rod2"/>
+                            <field name="rod_length2" string="Longitud"/>
+                        </group>
+
+                        <group string="Émbolo" invisible="cylinder_to != 1 and cylinder_to != 2">
                             <field name="piston_diameter"/>
                             <field name="piston_length" string="Longitud"/>
                         </group>
 
-                        <group string="Cabeza">
+                        <group string="Cabeza" invisible="cylinder_to != 1 and cylinder_to != 2">
                             <field name="head_diameter"/>
                             <field name="head_length" string="Longitud"/>
                         </group>
 
-                        <group string="Carrera">
+                        <group string="Carrera" invisible="cylinder_to != 1 and cylinder_to != 2  and cylinder_to != 5 and cylinder_to != 4">
                             <field name="stroke_length" string="Longitud"/>
                         </group>
                     </group>
