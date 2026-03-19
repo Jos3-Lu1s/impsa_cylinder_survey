@@ -11,9 +11,10 @@
                 <button name="action_view_cylinder_surveys"
                     type="object"
                     class="oe_stat_button"
-                    icon="fa-cogs">
+                    icon="fa-cogs"
+                    invisible="not is_won_stage or selection_crm == False">
 
-                    <field name="cylinder_survey_count" widget="statinfo" string="Reparaciones"/>
+                    <field name="cylinder_survey_count" widget="statinfo" string="Levantamientos"/>
                 </button>
             </xpath>
 
@@ -30,7 +31,7 @@
 
             <xpath expr="//header" position="inside">
                 <button name="action_open_cylinder_survey"
-                    string="Requisión nueva"
+                    string="Levantamiento"
                     type="object"
                     class="oe_highlight"
                     invisible="not is_won_stage or selection_crm == False"/>
