@@ -293,7 +293,7 @@ class CylinderSurvey(models.Model):
                     'order_id': po.id,
                     'product_id': line.product_id.id,
                     'name': line.product_id.name,
-                    'product_qty': 1,
+                    'product_qty': line.unit_total,
                     'price_unit': line.product_id.standard_price,
                     'date_planned': record.date_delivery,
                 })

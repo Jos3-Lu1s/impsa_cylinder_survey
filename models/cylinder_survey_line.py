@@ -72,3 +72,4 @@ class CylinderSurveyLine(models.Model):
                 else:
                     line.product_id = False
                     line.code = False
+                    line.description_label = False

@@ -317,9 +317,9 @@
                             <field name="cylinder_survey_line_ids">
                                 <list editable="bottom">
                                     <field name="product_id" optional="show" options="{'no_create': True, 'no_open': True}" placeholder="Buscar en catálogo..."/>
-                                    <field name="description_label" optional="hide" />
-                                    <field name="code" optional="show" />
-                                    <field name="code_label" optional="hide" />
+                                    <field name="description_label" optional="show" />
+                                    <field name="code" optional="hide" />
+                                    <field name="code_label" optional="show" />
                                     <field name="dimensions" optional="show" />
                                     <field name="type_piece" widget="radio" options="{'horizontal': True}" optional="show" style="width: 130px;" />
                                     <field name="material_drop" string="Material desplegable" optional="show" />
