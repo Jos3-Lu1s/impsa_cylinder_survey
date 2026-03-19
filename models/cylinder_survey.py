@@ -169,6 +169,7 @@ class CylinderSurvey(models.Model):
     )
     state = fields.Selection([
         ('draft', 'Levantamiento'),
+        ('quoted', 'Cotización'),
         ('confirmed', 'Orden de Trabajo'),
         ('cancel', 'Cancelado'),
     ], string='Estado', default='draft', tracking=True, copy=False)
@@ -258,6 +259,16 @@ class CylinderSurvey(models.Model):
             record.write({
                 'state': 'confirmed',
                 'name': new_name
+            })
+    
+    def action_quoted(self):
+        """Pasa de Cotización a Orden de Trabajo"""
+        for record in self:
+            if record.state != 'draft':
+                raise ValidationError("Solo puedes confirmar una Orden de Trabajo que esté en estado 'Cotización'.")
+            
+            record.write({
+                'state': 'quoted'
             })
 
     def action_set_draft(self):
