@@ -68,6 +68,9 @@ class CylinderSurvey(models.Model):
         string="Imágenes del Vástago", 
         domain=[('component', '=', 'rod')]
     )
+    
+    diameter_rod2 = fields.Float(string="Ø Vástago 2")
+    rod_length2 = fields.Float(string='Longitud de Vástago 2')
 
     # Émbolo (Piston)
     piston_diameter = fields.Float(string='Ø Émbolo') 
@@ -123,6 +126,12 @@ class CylinderSurvey(models.Model):
     
     lead_id = fields.Many2one('crm.lead', string="Oportunidad")
 
+    rotula_id = fields.Many2one(
+        "product.product",
+        string="Rotula",
+        domain="[('categ_id.name', '=', 'FERRETERIA')]"
+    )
+    
     date_delivery = fields.Date(string="Fecha de Entrega")
     
     purchase_order_ids = fields.One2many(
@@ -168,6 +177,7 @@ class CylinderSurvey(models.Model):
     )
     state = fields.Selection([
         ('draft', 'Levantamiento'),
+        ('quoted', 'Cotización'),
         ('confirmed', 'Orden de Trabajo'),
         ('cancel', 'Cancelado'),
     ], string='Estado', default='draft', tracking=True, copy=False)
@@ -258,6 +268,16 @@ class CylinderSurvey(models.Model):
                 'state': 'confirmed',
                 'name': new_name
             })
+    
+    def action_quoted(self):
+        """Pasa de Cotización a Orden de Trabajo"""
+        for record in self:
+            if record.state != 'draft':
+                raise ValidationError("Solo puedes confirmar una Orden de Trabajo que esté en estado 'Cotización'.")
+            
+            record.write({
+                'state': 'quoted'
+            })
 
     def action_set_draft(self):
         """Permite regresar a borrador y restaura el prefijo original"""
@@ -301,7 +321,7 @@ class CylinderSurvey(models.Model):
                     'order_id': po.id,
                     'product_id': line.product_id.id,
                     'name': line.product_id.name,
-                    'product_qty': 1,
+                    'product_qty': line.unit_total,
                     'price_unit': line.product_id.standard_price,
                     'date_planned': record.date_delivery,
                 })

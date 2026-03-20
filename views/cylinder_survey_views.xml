@@ -55,7 +55,7 @@
                 <field name="activity_ids" string="Actividades" widget="list_activity" />
                 <field name="description" optional="hide" />
                 <field name="cylinder_type" optional="show" />
-                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'confirmed'" decoration-danger="state == 'cancel'" column_invisible="context.get('hide_state', False)" />
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'quoted'" decoration-success="state == 'confirmed'" decoration-danger="state == 'cancel'" column_invisible="context.get('hide_state', False)" />
             </list>
         </field>
     </record>
@@ -68,13 +68,15 @@
                 <header>
                     <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed'"/>
 
-                    <button name="action_confirm" string="Confirmar Levantamiento" type="object" class="oe_highlight" invisible="state != 'draft'" />
+                    <button name="action_quoted" string="Confirmar Cotización" type="object" class="oe_highlight" invisible="state != 'draft'" />
 
-                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['draft', 'confirmed']" confirm="¿Está seguro de que desea cancelar este registro?" />
+                    <button name="action_confirm" string="Confirmar Levantamiento" type="object" class="oe_highlight" invisible="state != 'quoted'" />
+
+                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['draft', 'quoted', 'confirmed']" confirm="¿Está seguro de que desea cancelar este registro?" />
 
                     <button name="action_set_draft" string="Volver a Levantamiento" type="object" invisible="state != 'cancel'" />
 
-                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed" />
+                    <field name="state" widget="statusbar" statusbar_visible="draft,quoted,confirmed" />
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -124,33 +126,39 @@
                             <group mt-0="1" class="ms-md-2">
                                 <field name="cylinder_to" string="Cilindro de"/>
                                 <field name="description" rows="3" placeholder="Cilindro Hidráulico" />
+                                <field name="rotula_id"/>
                             </group>
                         </div>
                     </div>
                     <group string="Resumen Técnico" col="5">
 
-                        <group string="Camisa">
+                        <group string="Camisa" invisible="cylinder_to != 1 and cylinder_to != 2 and cylinder_to != 5">
                             <field name="barrel_inner_diameter"/>
                             <field name="barrel_outer_diameter"/>
                             <field name="barrel_length"/>
                         </group>
 
-                        <group string="Vástago">
+                        <group string="Vástago" invisible="cylinder_to != 1 and cylinder_to != 2 and cylinder_to != 4">
                             <field name="diameter_rod"/>
                             <field name="rod_length" string="Longitud"/>
                         </group>
 
-                        <group string="Émbolo">
+                        <group string="Vástago 2" invisible="cylinder_to != 4">
+                            <field name="diameter_rod2"/>
+                            <field name="rod_length2" string="Longitud"/>
+                        </group>
+
+                        <group string="Émbolo" invisible="cylinder_to != 1 and cylinder_to != 2">
                             <field name="piston_diameter"/>
                             <field name="piston_length" string="Longitud"/>
                         </group>
 
-                        <group string="Cabeza">
+                        <group string="Cabeza" invisible="cylinder_to != 1 and cylinder_to != 2">
                             <field name="head_diameter"/>
                             <field name="head_length" string="Longitud"/>
                         </group>
 
-                        <group string="Carrera">
+                        <group string="Carrera" invisible="cylinder_to != 1 and cylinder_to != 2  and cylinder_to != 5 and cylinder_to != 4">
                             <field name="stroke_length" string="Longitud"/>
                         </group>
                     </group>
@@ -329,9 +337,9 @@
                             <field name="cylinder_survey_line_ids">
                                 <list editable="bottom">
                                     <field name="product_id" optional="show" options="{'no_create': True, 'no_open': True}" placeholder="Buscar en catálogo..."/>
-                                    <field name="description_label" optional="hide" />
-                                    <field name="code" optional="show" />
-                                    <field name="code_label" optional="hide" />
+                                    <field name="description_label" optional="show" />
+                                    <field name="code" optional="hide" />
+                                    <field name="code_label" optional="show" />
                                     <field name="dimensions" optional="show" />
                                     <field name="type_piece" widget="radio" options="{'horizontal': True}" optional="show" width="220" />
                                     <field name="material_drop" string="Material desplegable" optional="show" />
