@@ -123,8 +123,6 @@ class CylinderSurvey(models.Model):
         ('head', 'Cabeza'),
         ('other', 'Otro'),
     ], string='Tipo de Pieza')
-    
-    lead_id = fields.Many2one('crm.lead', string="Oportunidad")
 
     rotula_id = fields.Many2one(
         "product.product",
@@ -133,17 +131,6 @@ class CylinderSurvey(models.Model):
     )
     
     date_delivery = fields.Date(string="Fecha de Entrega")
-    
-    purchase_order_ids = fields.One2many(
-        "purchase.order",
-        "survey_id",
-        string="Órdenes de Compra"
-    )
-    
-    purchase_order_count = fields.Integer(
-        compute="_compute_purchase_order_count"
-    )
-
 
     internal_notes = fields.Html(
         string="Notas Internas",
@@ -190,6 +177,62 @@ class CylinderSurvey(models.Model):
     is_standardized = fields.Boolean(
         string='Normalizado'
     )
+
+    ''' ------------------------
+        Botones inteligentes
+    -------------------------'''
+    
+    purchase_order_ids = fields.One2many(
+        "purchase.order",
+        "survey_id",
+        string="Órdenes de Compra"
+    )
+
+    purchase_order_count = fields.Integer(
+        compute="_compute_purchase_order_count"
+    )
+
+    def _compute_purchase_order_count(self):
+        for record in self:
+            record.purchase_order_count = len(record.purchase_order_ids)
+
+    def action_view_purchase_orders(self):
+        self.ensure_one()
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Órdenes de Compra',
+            'res_model': 'purchase.order',
+            'view_mode': 'list,form',
+            'domain': [('survey_id', '=', self.id)],
+        }
+
+    lead_id = fields.Many2one(
+        'crm.lead',
+        string="Oportunidad"
+    )
+
+    lead_count = fields.Integer(
+        string="Oportunidades",
+        compute="_compute_lead_count"
+    )
+
+    def _compute_lead_count(self):
+        for rec in self:
+            rec.lead_count = 1 if rec.lead_id else 0
+
+    def action_view_lead(self):
+        self.ensure_one()
+        
+        if self.lead_id:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Oportunidad',
+                'res_model': 'crm.lead',
+                'view_mode': 'form',
+                'res_id': self.lead_id.id,
+                'target': 'current',
+            }
 
     # Restricción de seguridad para evitar errores de captura
     @api.constrains('cylinder_qty')
@@ -363,18 +406,3 @@ class CylinderSurvey(models.Model):
                 )
 
         return super(CylinderSurvey, self).create(vals_list)
-
-    def _compute_purchase_order_count(self):
-        for record in self:
-            record.purchase_order_count = len(record.purchase_order_ids)
-
-    def action_view_purchase_orders(self):
-        self.ensure_one()
-
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Órdenes de Compra',
-            'res_model': 'purchase.order',
-            'view_mode': 'list,form',
-            'domain': [('survey_id', '=', self.id)],
-        }

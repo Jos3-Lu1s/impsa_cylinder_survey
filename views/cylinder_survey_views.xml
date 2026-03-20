@@ -87,9 +87,11 @@
                     </div>
 
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_view_purchase_orders" type="object" class="oe_stat_button" icon="fa-shopping-cart">
-
+                        <button name="action_view_purchase_orders" type="object" class="oe_stat_button" icon="fa-shopping-cart" invisible="not purchase_order_ids">
                             <field name="purchase_order_count" widget="statinfo" string="Compras"/>
+                        </button>
+                        <button name="action_view_lead" type="object" class="oe_stat_button" icon="fa-star" invisible="not lead_id">
+                            <field name="lead_count" widget="statinfo" string="Oportunidad"/>
                         </button>
                     </div>
                     <div class="row">
@@ -336,7 +338,7 @@
                         <page string="Requisión de Empaques" name="packing_list">
                             <field name="cylinder_survey_line_ids">
                                 <list editable="bottom">
-                                    <field name="product_id" optional="show" options="{'no_create': True, 'no_open': True}" placeholder="Buscar en catálogo..."/>
+                                    <field name="product_id" optional="show" options="{'no_create': True}" placeholder="Buscar en catálogo..."/>
                                     <field name="description_label" optional="show" />
                                     <field name="code" optional="hide" />
                                     <field name="code_label" optional="show" />
