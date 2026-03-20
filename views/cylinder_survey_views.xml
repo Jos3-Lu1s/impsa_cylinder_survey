@@ -235,7 +235,7 @@
                                     </group>
                                 </group>
                                 <field name="accessory_image_ids" mode="kanban" nolabel="1" context="{
-                                    'default_component': 'accessories', 
+                                    'default_component': 'accessory', 
                                     'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
                                     'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
                                 }" />
@@ -282,7 +282,7 @@
                                 <list string="Grupos de Cilindros">
                                     <field name="name"/>
                                     <field name="operational_record_ids"/>
-                                    <field name="quantity" sum="Total Asignados"/>
+                                    <field name="quantity" string="Total de cilindros" sum="Total Asignados" width="150"/>
                                 </list>
 
                                 <form string="Detalle del Grupo">

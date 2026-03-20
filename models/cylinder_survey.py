@@ -95,8 +95,8 @@ class CylinderSurvey(models.Model):
         domain=[('component', '=', 'stroke')]
     )
     
-    # Carrera (Stroke)
-    accessories  = fields.Float(string='Accesorios')
+    # Accesorios
+    accessories  = fields.Text(string='Accesorios')
     accessory_image_ids  = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes de accesorios", 
