@@ -1,6 +1,8 @@
-from odoo import models, fields
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
+
 class OperationalRecordLine(models.Model):
-    _name = 'operational.record.line'
+    _name = 'impsa.operational.record.line'
     _description = 'Línea de Registro Operativo'
 
     _order = 'sequence, id desc'
@@ -9,7 +11,8 @@ class OperationalRecordLine(models.Model):
         'impsa.cylinder.group',
         string='Grupo',
         required=True,
-        ondelete='cascade'
+        ondelete='cascade',
+        index=True
     )
 
     survey_id = fields.Many2one(
@@ -29,3 +32,9 @@ class OperationalRecordLine(models.Model):
         help="Describe la tarea o trabajo específico a realizar en esta línea."
     )
     obs = fields.Text(string='Dimensiones / Observaciones')
+
+    @api.constrains('hr')
+    def _check_positive_hours(self):
+        for line in self:
+            if line.hr < 0:
+                raise ValidationError(_("El tiempo estimado no puede ser negativo en la tarea: %s") % line.work_to_do)

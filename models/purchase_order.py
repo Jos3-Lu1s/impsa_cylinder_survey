@@ -5,6 +5,8 @@ class PurchaseCylinder(models.Model):
 
     survey_id = fields.Many2one(
         "impsa.cylinder.survey",
-        string="Cylinder Survey",
-        ondelete="set null"
+        string="Levantamiento de Cilindro",
+        ondelete="set null",
+        index=True,
+        copy=False
     )
