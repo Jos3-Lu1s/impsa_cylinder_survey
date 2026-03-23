@@ -45,27 +45,18 @@ class CylinderSurvey(models.Model):
     image_ids = fields.One2many(
         'impsa.cylinder.image', 
         'survey_id', 
-        string="Galería de Imágenes"
+        string="Galería de Imágenes",
+        readonly=True
     )
 
     # Camisa (Barrel)
     barrel_inner_diameter = fields.Float(string='Ø Interior')
     barrel_outer_diameter = fields.Float(string='Ø Exterior')
     barrel_length = fields.Float(string='Longitud')
-    barrel_image_ids = fields.One2many(
-        'impsa.cylinder.image', 'survey_id', 
-        string="Imágenes de la Camisa", 
-        domain=[('component', '=', 'barrel')]
-    )
 
     # Vástago (Rod)
     diameter_rod = fields.Float(string="Ø Vástago")
     rod_length = fields.Float(string='Longitud de Vástago')
-    rod_image_ids = fields.One2many(
-        'impsa.cylinder.image', 'survey_id', 
-        string="Imágenes del Vástago", 
-        domain=[('component', '=', 'rod')]
-    )
     
     diameter_rod2 = fields.Float(string="Ø Vástago 2")
     rod_length2 = fields.Float(string='Longitud de Vástago 2')
@@ -73,36 +64,16 @@ class CylinderSurvey(models.Model):
     # Émbolo (Piston)
     piston_diameter = fields.Float(string='Ø Émbolo') 
     piston_length = fields.Float(string='Longitud de Émbolo')
-    piston_image_ids = fields.One2many(
-        'impsa.cylinder.image', 'survey_id', 
-        string="Imágenes del Émbolo", 
-        domain=[('component', '=', 'piston')]
-    )
 
     # Cabeza (Head)
     head_diameter = fields.Float(string='Ø Cabeza')
     head_length = fields.Float(string='Longitud de Cabeza')
-    head_image_ids = fields.One2many(
-        'impsa.cylinder.image', 'survey_id', 
-        string="Imágenes de la Cabeza", 
-        domain=[('component', '=', 'head')]
-    )
 
     # Carrera (Stroke)
     stroke_length = fields.Float(string='Longitud de Carrera')
-    stroke_image_ids = fields.One2many(
-        'impsa.cylinder.image', 'survey_id', 
-        string="Imágenes del Ensamble", 
-        domain=[('component', '=', 'stroke')]
-    )
     
     # Accesorios
     accessories  = fields.Text(string='Accesorios')
-    accessory_image_ids  = fields.One2many(
-        'impsa.cylinder.image', 'survey_id', 
-        string="Imágenes de accesorios", 
-        domain=[('component', '=', 'accessory')]
-    )
 
     date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True)
     description = fields.Text(string="Descripción")
