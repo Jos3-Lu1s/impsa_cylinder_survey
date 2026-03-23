@@ -141,6 +141,8 @@ class CylinderSurvey(models.Model):
         string='Normalizado'
     )
     
+    num_section = fields.Integer(string='Número de Secciones')
+    
     purchase_order_ids = fields.One2many(
         "purchase.order",
         "survey_id",
@@ -268,6 +270,10 @@ class CylinderSurvey(models.Model):
                     missing_components.append('Cabeza')
                 if rec.stroke_length <= 0.0:
                     missing_components.append('Carrera')
+                    
+            elif code in ['CE-T']:
+                if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0 or rec.barrel_length <= 0.0:
+                    missing_components.append('Camisa')
 
             if missing_components:
                 componentes = ", ".join(missing_components)

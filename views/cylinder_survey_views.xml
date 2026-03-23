@@ -153,6 +153,7 @@
                                 <field name="cylinder_to" string="Cilindro de" options="{'no_open': True}"/>
                                 <field name="cylinder_to_code" invisible="1"/>
                                 <field name="description" rows="3" placeholder="Cilindro Hidráulico" />
+                                <field name="num_section" invisible="cylinder_to_code != 'CE-T'"/>
                             </group>
                         </div>
                     </div>
