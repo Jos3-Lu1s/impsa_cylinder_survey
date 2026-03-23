@@ -161,7 +161,7 @@
                             <field name="rod_length" string="Longitud"/>
                         </group>
 
-                        <group string="Vástago 2">
+                        <group string="Vástago 2" invisible="cylinder_to_code != 'CE-DV'">
                             <field name="diameter_rod2"/>
                             <field name="rod_length2" string="Longitud"/>
                         </group>

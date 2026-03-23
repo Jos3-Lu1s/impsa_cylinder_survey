@@ -260,8 +260,14 @@ class CylinderSurvey(models.Model):
 
             # Evaluamos por bloque de pieza en lugar de campo por campo
             if code == 'CE-OT':
-                if rec.barrel_inner_diameter <= 0.0:
-                    missing_components.append('Diámetro Interior de la Camisa')
+                if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0:
+                    missing_components.append('Camisa')
+                
+            elif code == 'CE-DV':
+                if rec.stroke_length <= 0.0:
+                    missing_components.append('Carrera')
+                if rec.diameter_rod <= 0.0 or rec.rod_length <= 0.0 or rec.diameter_rod2 <= 0.0 or rec.rod_length2 <= 0.0:
+                    missing_components.append('Vástagos')
 
             elif code in ['CE-DE', 'CE-SE']:
                 if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0 or rec.barrel_length <= 0.0:
@@ -278,7 +284,7 @@ class CylinderSurvey(models.Model):
             if missing_components:
                 componentes = ", ".join(missing_components)
                 raise ValidationError(
-                    f"Faltan medidas para el cilindro '{rec.cylinder_to.name}'.\n\n"
+                    f"Debe completar las medidas para el cilindro tipo '{rec.cylinder_to.name}'.\n\n"
                     f"Asegúrate de registrar valores mayores a 0 en: {componentes}."
                 )
 
