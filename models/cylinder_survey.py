@@ -220,7 +220,7 @@ class CylinderSurvey(models.Model):
     @api.depends('sale_order_id')
     def _compute_sale_count(self):
         for rec in self:
-            rec.sale_count = 1 if rec.sale_order_id else 0
+            rec.sale_count = len(rec.group_ids) if rec.sale_order_id else 0
 
     @api.depends('group_ids.operational_record_ids.hr', 'group_ids.operational_record_ids', 'group_ids.quantity')
     def _compute_operational_totals(self):
@@ -335,9 +335,8 @@ class CylinderSurvey(models.Model):
                 'type': 'ir.actions.act_window',
                 'name': 'Orden de Venta',
                 'res_model': 'sale.order',
-                'view_mode': 'form',
-                'res_id': self.sale_order_id.id,
-                'target': 'current',
+                'view_mode': 'list,form',
+                'domain': [('survey_id', '=', self.id)],
             }
 
     def action_confirm(self):
@@ -408,6 +407,7 @@ class CylinderSurvey(models.Model):
                     continue
 
                 sale_order = self.env['sale.order'].create({
+                    'survey_id': self.id,
                     'partner_id': record.partner_id.id,
                     'requeriments_work_order': record.name,
                     'group_requeriments_work_order': group.name,
