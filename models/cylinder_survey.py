@@ -103,7 +103,7 @@ class CylinderSurvey(models.Model):
     accessory_image_ids  = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes de accesorios", 
-        domain=[('component', '=', 'accessory')]
+        #domain=[('component', '=', 'accessory')]
     )
 
     date = fields.Date(string="Fecha", default=fields.Date.context_today)
@@ -241,12 +241,10 @@ class CylinderSurvey(models.Model):
                 if not line.code_label:
                     raise ValidationError("Una de las líneas de empaque no tiene el código definido (code_label).")
 
-                # 🔍 Buscar producto por código
                 product = self.env['product.product'].search([
                     ('default_code', '=', line.code_label)
                 ], limit=1)
 
-                # 🛠️ Crear producto si no existe
                 if not product:
                     product = self.env['product.product'].create({
                         'name': line.description_label or f"Empaque {line.code_label}",
@@ -255,7 +253,6 @@ class CylinderSurvey(models.Model):
                         'categ_id': category.id,
                     })
 
-                # 🔗 Asignar el producto a la línea
                 line.product_id = product.id
             
             # 4. CAMBIO DE NOMENCLATURA Y ESTADO
