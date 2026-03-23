@@ -39,6 +39,12 @@ class CylinderGroup(models.Model):
         help="Tiempo total estimado para este grupo (Suma de horas de sus operaciones multiplicada por la cantidad de cilindros)."
     )
 
+    image_ids = fields.One2many(
+        'impsa.cylinder.image', 
+        'group_id', 
+        string="Imágenes por Cilindro",
+    )
+
     @api.depends('operational_record_ids.hr', 'quantity')
     def _compute_group_total_hours(self):
         for group in self:
