@@ -1,6 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_impsa_cylinder_survey,impsa.cylinder.survey,model_impsa_cylinder_survey,base.group_user,1,1,1,1
-access_operational_record_line, impsa.operational.record.line,model_operational_record_line,base.group_user,1,1,1,1
+access_operational_record_line, impsa.operational.record.line,model_impsa_operational_record_line,base.group_user,1,1,1,1
 access_impsa_cylinder_image,impsa.cylinder.image,model_impsa_cylinder_image,base.group_user,1,1,1,1
 access_cylinder_survey_line,access_cylinder_survey_line,model_impsa_cylinder_survey_line,base.group_user,1,1,1,1
 access_cylinder_options,access_cylinder_options,model_impsa_cylinder_options,base.group_user,1,1,1,1

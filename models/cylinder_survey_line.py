@@ -1,68 +1,93 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
+
 class CylinderSurveyLine(models.Model):
     _name = 'impsa.cylinder.survey.line'
-    _description = 'Cylinder Survey Line'
+    _description = 'Línea de Levantamiento de Cilindros'
 
     survey_id = fields.Many2one(
         "impsa.cylinder.survey",
-        string="Survey",
-        ondelete='cascade'
+        string="Levantamiento",
+        ondelete='cascade',
+        index=True
     )
 
     product_id = fields.Many2one(
         "product.product",
-        string="Descripción",
-        domain="[('categ_id.name', '=', 'SELLOS')]"
+        string="Producto Base",
+        domain="[('categ_id.name', '=', 'SELLOS')]",
+        ondelete='restrict'
     )
 
     description_label = fields.Char(
-        string="Nombre del producto",
+        string="Descripción del Empaque",
         required=True,
     )
     
     code_label = fields.Char(
-        string="Código del producto",  
-        store=True)
+        string="Código Capturado"
+    )
 
-    code = fields.Char(string="Código", related="product_id.default_code", store=True)
+    code = fields.Char(
+        string="Código Maestro", 
+        related="product_id.default_code", 
+        store=True
+    )
 
     dimensions = fields.Char(string="Dimensiones")
     
     type_piece = fields.Selection([
-        ('piston', 'Pistón'),
+        ('piston', 'Émbolo'),
         ('head', 'Cabeza'),
         ('other', 'Otro'),
-    ], string='Tipo de Pieza')
+    ], string='Aplicación en Pieza')
     
     material_drop = fields.Many2one(
         "impsa.cylinder.material",
-        string="Material desplegable",
+        string="Material",
+        ondelete='restrict'
     )
     
-    unit_cantity = fields.Integer(string="Cantidad")
+    unit_quantity = fields.Integer(string="Cantidad por Cilindro", default=1, required=True)
     
-    unit_total = fields.Integer(string="Total")
+    unit_total = fields.Integer(
+        string="Total a Requerir", 
+        compute="_compute_unit_total", 
+        store=True
+    )
 
+    @api.constrains('unit_quantity')
+    def _check_unit_quantity(self):
+        for line in self:
+            if line.unit_quantity <= 0:
+                raise ValidationError(_("La cantidad por cilindro debe ser mayor a cero."))
+    
+    @api.depends('unit_quantity', 'survey_id.cylinder_qty')
+    def _compute_unit_total(self):
+        for line in self:
+            cylinders = line.survey_id.cylinder_qty or 0
+            quantity = line.unit_quantity or 0
+            line.unit_total = cylinders * quantity
             
     @api.onchange('product_id')
     def _onchange_product_id(self):
-        if self.product_id:
-            self.description_label = self.product_id.display_name
-        
+        for line in self:
+            if line.product_id:
+                line.description_label = line.product_id.name
+                line.code_label = line.product_id.default_code
+            
     @api.onchange('code_label')
     def _onchange_code_label(self):
         for line in self:
             if line.code_label:
-
                 product = self.env['product.product'].search([
-                    ('default_code', 'ilike', line.code_label),
+                    ('default_code', '=ilike', line.code_label),
                     ('categ_id.name', '=', 'SELLOS')
                 ], limit=1)
 
                 if product:
                     line.product_id = product.id
-                    line.code_label = product.default_code
-                    
+                    line.description_label = product.name
                 else:
+                    # Si no existe, limpiamos el producto.
                     line.product_id = False
-                    line.code = False

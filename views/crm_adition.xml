@@ -12,7 +12,7 @@
                     type="object"
                     class="oe_stat_button"
                     icon="fa-cogs"
-                    invisible="not is_won_stage or selection_crm == False">
+                    invisible="cylinder_survey_count == 0">
 
                     <field name="cylinder_survey_count" widget="statinfo" string="Levantamientos"/>
                 </button>

@@ -1,9 +1,9 @@
-from odoo import models, fields
+# [MODIFICADO] Se agregó la importación de 'api'
+from odoo import models, fields, api
 
 class CrmDecision(models.Model):
     _inherit = "crm.lead"
 
-    
     selection_crm = fields.Boolean(
         string="Reparación de cilindro"
     )
@@ -13,36 +13,39 @@ class CrmDecision(models.Model):
         store=True
     )
     
+    cylinder_survey_ids = fields.One2many(
+        'impsa.cylinder.survey',
+        'lead_id',
+        string="Levantamientos de Cilindro"
+    )
+    
     cylinder_survey_count = fields.Integer(
-        string="Surveys",
+        string="Levantamientos",
         compute="_compute_cylinder_survey_count"
     )
     
     def action_open_cylinder_survey(self):
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Nuevo Cylinder Survey',
+            'name': 'Nuevo Levantamiento',
             'res_model': 'impsa.cylinder.survey',
             'view_mode': 'form',
             'target': 'current',
-            'domain': [('lead_id', '=', self.id)],
             'context': {
                 'default_lead_id': self.id,
                 'default_partner_id': self.partner_id.id,
-                'default_name': self.name,
             }
         }
-        
+
+    @api.depends('cylinder_survey_ids')
     def _compute_cylinder_survey_count(self):
         for rec in self:
-            rec.cylinder_survey_count = self.env['impsa.cylinder.survey'].search_count([
-                ('lead_id', '=', rec.id)
-            ])
+            rec.cylinder_survey_count = len(rec.cylinder_survey_ids)
             
     def action_view_cylinder_surveys(self):
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Cylinder Surveys',
+            'name': 'Levantamientos',
             'res_model': 'impsa.cylinder.survey',
             'view_mode': 'list,form',
             'domain': [('lead_id', '=', self.id)],

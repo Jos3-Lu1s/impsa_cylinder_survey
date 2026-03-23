@@ -10,7 +10,7 @@
                     <t t-name="card">
                         <div style="padding: 0; overflow: hidden;">
                             <div class="d-flex align-items-center justify-content-center" style="height: 200px; background-color: #e4e4e4;">
-                                <field name="image" widget="image" />
+                                <field name="image" widget="image" options="{'size': [256, 256]}" />
                             </div>
                         </div>
                     </t>
@@ -87,18 +87,36 @@
                     </div>
 
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_view_purchase_orders" type="object" class="oe_stat_button" icon="fa-shopping-cart">
-
+                        <button name="action_view_purchase_orders" type="object" class="oe_stat_button" icon="fa-shopping-cart" invisible="not purchase_order_ids">
                             <field name="purchase_order_count" widget="statinfo" string="Compras"/>
+                        </button>
+                        <button name="action_view_lead" type="object" class="oe_stat_button" icon="fa-star" invisible="not lead_id">
+                            <field name="lead_count" widget="statinfo" string="Oportunidad"/>
                         </button>
                     </div>
                     <div class="row">
                         <div class="col-12 col-md-6 border-end">
-                            <group mt-0="1">
+                            <group>
                                 <field name="partner_id" widget="res_partner_many2one"/>
                                 <field name="date" options="{'numeric': true}"/>
-                                <field name="cylinder_qty" style="width: 100px;" string="Cantidad de Cilindros"/>
-                                <field name="is_standardized" widget="boolean_icon" options="{'icon': 'fa-cog'}"/>
+                                <label for="cylinder_qty" string="Cilindros"/>
+
+                                <div class="d-flex align-items-center">
+                                    <field name="allocated_qty"
+                                        nolabel="1"
+                                        readonly="1"
+                                        class="fw-bold fs-5 me-1 flex-grow-0 w-auto"
+                                        decoration-danger="allocated_qty != cylinder_qty"
+                                        decoration-success="allocated_qty == cylinder_qty"/>
+
+                                    <span class="mx-1 mb-2 fs-5 text-muted">/</span>
+
+                                    <field name="cylinder_qty"
+                                        nolabel="1"
+                                        class="flex-grow-0 fs-5 ms-1 w-auto"
+                                        style="width: 60px;"/>
+                                </div>
+                                <field name="is_standardized" widget="boolean_toggle"/>
                                 <field name="cylinder_type" widget="selection_badge"/>
                             </group>
                         </div>
@@ -123,43 +141,48 @@
                                 </div>
                             </div>
 
-                            <group mt-0="1" class="ms-md-2">
-                                <field name="cylinder_to" string="Cilindro de"/>
+                            <group>
+                                <field name="cylinder_to" string="Cilindro de" options="{'no_open': True}"/>
+                                <field name="cylinder_to_code" invisible="1"/>
                                 <field name="description" rows="3" placeholder="Cilindro Hidráulico" />
-                                <field name="rotula_id"/>
                             </group>
                         </div>
                     </div>
-                    <group string="Resumen Técnico" col="5">
+                    <group string="Resumen Técnico" col="3">
 
-                        <group string="Camisa" invisible="cylinder_to != 1 and cylinder_to != 2 and cylinder_to != 5">
+                        <group string="Camisa">
                             <field name="barrel_inner_diameter"/>
                             <field name="barrel_outer_diameter"/>
                             <field name="barrel_length"/>
                         </group>
 
-                        <group string="Vástago" invisible="cylinder_to != 1 and cylinder_to != 2 and cylinder_to != 4">
+                        <group string="Vástago">
                             <field name="diameter_rod"/>
                             <field name="rod_length" string="Longitud"/>
                         </group>
 
-                        <group string="Vástago 2" invisible="cylinder_to != 4">
+                        <group string="Vástago 2">
                             <field name="diameter_rod2"/>
                             <field name="rod_length2" string="Longitud"/>
                         </group>
 
-                        <group string="Émbolo" invisible="cylinder_to != 1 and cylinder_to != 2">
+                        <group string="Émbolo">
                             <field name="piston_diameter"/>
                             <field name="piston_length" string="Longitud"/>
                         </group>
 
-                        <group string="Cabeza" invisible="cylinder_to != 1 and cylinder_to != 2">
+                        <group string="Cabeza">
                             <field name="head_diameter"/>
                             <field name="head_length" string="Longitud"/>
                         </group>
 
-                        <group string="Carrera" invisible="cylinder_to != 1 and cylinder_to != 2  and cylinder_to != 5 and cylinder_to != 4">
+                        <group string="Carrera">
                             <field name="stroke_length" string="Longitud"/>
+                        </group>
+                        
+                        <group string="Accesorios">
+                            <field name="rotula_id"/>
+                            <field name="accessories" nolabel="1" placeholder="Detalle los accesorios aquí..." colspan="2"/>
                         </group>
                     </group>
 
@@ -238,12 +261,11 @@
                                 }" />
 
                                 <group string="Accesorios">
-                                    <group>
-                                        <field name="accessories" />
-                                    </group>
+                                    <field name="accessories" nolabel="1" placeholder="Detalle los accesorios aquí..." colspan="2"/>
                                 </group>
+
                                 <field name="accessory_image_ids" mode="kanban" nolabel="1" context="{
-                                    'default_component': 'accessories', 
+                                    'default_component': 'accessory', 
                                     'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
                                     'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
                                 }" />
@@ -290,7 +312,8 @@
                                 <list string="Grupos de Cilindros">
                                     <field name="name"/>
                                     <field name="operational_record_ids"/>
-                                    <field name="quantity" sum="Total Asignados"/>
+                                    <field name="quantity" string="Total de cilindros" width="150"/>
+                                    <field name="group_total_hours" string="Horas del Grupo" widget="float_time"/>
                                 </list>
 
                                 <form string="Detalle del Grupo">
@@ -320,7 +343,7 @@
                             <field name="all_operational_record_ids">
                                 <list editable="bottom" default_order="group_id, sequence">
                                     <field name="sequence" widget="handle"/>
-                                    <field name="group_id" string="Grupo" required="1" options="{'no_create': True, 'no_open': True}" domain="[('survey_id', '=', parent.id)]" decoration-bf="1"/>
+                                    <field name="group_id" string="Grupo" options="{'no_create': True, 'no_open': True}" domain="[('survey_id', '=', parent.id)]" decoration-bf="1"/>
                                     <field name="work_to_do"/>
                                     <field name="obs" optional="show"/>
                                     <field name="hr" widget="float_time"/>
@@ -333,22 +356,22 @@
                             </p>
                         </page>
 
-                        <page string="Requisión de Empaques" name="packing_list">
+                        <page string="Requisición de Empaques" name="packing_list">
                             <field name="cylinder_survey_line_ids">
                                 <list editable="bottom">
-                                    <field name="product_id" optional="show" options="{'no_create': True, 'no_open': True}" placeholder="Buscar en catálogo..."/>
+                                    <field name="product_id" optional="show" options="{'no_create': True}" placeholder="Buscar en catálogo..."/>
                                     <field name="description_label" optional="show" />
                                     <field name="code" optional="hide" />
                                     <field name="code_label" optional="show" />
                                     <field name="dimensions" optional="show" />
                                     <field name="type_piece" widget="radio" options="{'horizontal': True}" optional="show" width="220" />
-                                    <field name="material_drop" string="Material desplegable" optional="show" />
-                                    <field name="unit_cantity" optional="show" />
+                                    <field name="material_drop" string="Material" options="{'no_open': True}" optional="show" />
+                                    <field name="unit_quantity" optional="show" />
                                     <field name="unit_total" optional="show" />
                                 </list>
                             </field>
 
-                            <group string="Provevores">
+                            <group string="Proveedores">
                                 <field name="date_delivery" string="Fecha de Entrega" />
                             </group>
                         </page>
@@ -375,7 +398,6 @@
             <search string="Buscar Levantamiento">
                 <field name="name" />
                 <field name="partner_id" />
-                <field name="identification_marks" string="Identificación" />
                 <filter string="Fecha" name="date" date="date" />
                 <group>
                     <filter string="Fecha" name="group_date" context="{'group_by': 'date'}" />

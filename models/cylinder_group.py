@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 
 class CylinderGroup(models.Model):
@@ -9,7 +9,8 @@ class CylinderGroup(models.Model):
         "impsa.cylinder.survey", 
         string="Levantamiento", 
         required=True, 
-        ondelete="cascade" # Crítico: Si se borra el levantamiento, se borran los grupos
+        ondelete="cascade",
+        index=True
     )
 
     name = fields.Char(
@@ -26,13 +27,26 @@ class CylinderGroup(models.Model):
     )
 
     operational_record_ids = fields.One2many(
-        "operational.record.line", 
+        "impsa.operational.record.line", 
         "group_id",
         string="Registro Operativo",
     )
+
+    group_total_hours = fields.Float(
+        string="Subtotal de Horas",
+        compute="_compute_group_total_hours",
+        store=True,
+        help="Tiempo total estimado para este grupo (Suma de horas de sus operaciones multiplicada por la cantidad de cilindros)."
+    )
+
+    @api.depends('operational_record_ids.hr', 'quantity')
+    def _compute_group_total_hours(self):
+        for group in self:
+            base_hours = sum(group.operational_record_ids.mapped('hr'))
+            group.group_total_hours = base_hours * group.quantity
 
     @api.constrains('quantity')
     def _check_group_quantity(self):
         for group in self:
             if group.quantity < 1:
-                raise ValidationError("Un grupo debe contener al menos 1 cilindro.")
+                raise ValidationError(_("Un grupo debe contener al menos 1 cilindro."))
