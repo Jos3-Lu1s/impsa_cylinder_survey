@@ -116,7 +116,7 @@
                                         class="flex-grow-0 fs-5 ms-1 w-auto"
                                         style="width: 60px;"/>
                                 </div>
-                                <field name="is_standardized" widget="boolean_icon" options="{'icon': 'fa-cog'}"/>
+                                <field name="is_standardized" widget="boolean_toggle"/>
                                 <field name="cylinder_type" widget="selection_badge"/>
                             </group>
                         </div>
@@ -141,43 +141,48 @@
                                 </div>
                             </div>
 
-                            <group mt-0="1" class="ms-md-2">
+                            <group>
                                 <field name="cylinder_to" string="Cilindro de" options="{'no_open': True}"/>
+                                <field name="cylinder_to_code" invisible="1"/>
                                 <field name="description" rows="3" placeholder="Cilindro Hidráulico" />
-                                <field name="rotula_id"/>
                             </group>
                         </div>
                     </div>
-                    <group string="Resumen Técnico" col="5">
+                    <group string="Resumen Técnico" col="3">
 
-                        <group string="Camisa" invisible="cylinder_to != 1 and cylinder_to != 2 and cylinder_to != 5">
+                        <group string="Camisa">
                             <field name="barrel_inner_diameter"/>
                             <field name="barrel_outer_diameter"/>
                             <field name="barrel_length"/>
                         </group>
 
-                        <group string="Vástago" invisible="cylinder_to != 1 and cylinder_to != 2 and cylinder_to != 4">
+                        <group string="Vástago">
                             <field name="diameter_rod"/>
                             <field name="rod_length" string="Longitud"/>
                         </group>
 
-                        <group string="Vástago 2" invisible="cylinder_to != 4">
+                        <group string="Vástago 2">
                             <field name="diameter_rod2"/>
                             <field name="rod_length2" string="Longitud"/>
                         </group>
 
-                        <group string="Émbolo" invisible="cylinder_to != 1 and cylinder_to != 2">
+                        <group string="Émbolo">
                             <field name="piston_diameter"/>
                             <field name="piston_length" string="Longitud"/>
                         </group>
 
-                        <group string="Cabeza" invisible="cylinder_to != 1 and cylinder_to != 2">
+                        <group string="Cabeza">
                             <field name="head_diameter"/>
                             <field name="head_length" string="Longitud"/>
                         </group>
 
-                        <group string="Carrera" invisible="cylinder_to != 1 and cylinder_to != 2  and cylinder_to != 5 and cylinder_to != 4">
+                        <group string="Carrera">
                             <field name="stroke_length" string="Longitud"/>
+                        </group>
+                        
+                        <group string="Accesorios">
+                            <field name="rotula_id"/>
+                            <field name="accessories" nolabel="1" placeholder="Detalle los accesorios aquí..." colspan="2"/>
                         </group>
                     </group>
 
@@ -338,7 +343,7 @@
                             <field name="all_operational_record_ids">
                                 <list editable="bottom" default_order="group_id, sequence">
                                     <field name="sequence" widget="handle"/>
-                                    <field name="group_id" string="Grupo" required="1" options="{'no_create': True, 'no_open': True}" domain="[('survey_id', '=', parent.id)]" decoration-bf="1"/>
+                                    <field name="group_id" string="Grupo" options="{'no_create': True, 'no_open': True}" domain="[('survey_id', '=', parent.id)]" decoration-bf="1"/>
                                     <field name="work_to_do"/>
                                     <field name="obs" optional="show"/>
                                     <field name="hr" widget="float_time"/>

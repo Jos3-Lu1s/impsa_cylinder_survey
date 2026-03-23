@@ -130,7 +130,14 @@ class CylinderSurvey(models.Model):
     cylinder_to = fields.Many2one(
         "impsa.cylinder.options",
         string="Cilindro de",
-        ondelete='restrict'
+        ondelete='restrict',
+        required=True
+    )
+
+    cylinder_to_code = fields.Char(
+        string="Código del Cilindro",
+        related="cylinder_to.code",
+        store=False
     )
 
     total_tasks = fields.Integer(
@@ -236,6 +243,43 @@ class CylinderSurvey(models.Model):
                 raise ValidationError(
                     f"Inconsistencia: Has asignado {survey.allocated_qty} cilindros en los grupos, "
                     f"pero el total declarado es de solo {survey.cylinder_qty}."
+                )
+
+    @api.constrains(
+        'cylinder_to', 'barrel_inner_diameter', 'barrel_outer_diameter', 'barrel_length',
+        'diameter_rod', 'rod_length', 'piston_diameter', 'piston_length', 
+        'head_diameter', 'head_length', 'stroke_length'
+    )
+    def _check_required_dimensions_by_type(self):
+        for rec in self:
+            if not rec.cylinder_to or not rec.cylinder_to.code:
+                continue
+                
+            code = rec.cylinder_to.code
+            missing_components = []
+
+            # Evaluamos por bloque de pieza en lugar de campo por campo
+            if code == 'CE-OT':
+                if rec.barrel_inner_diameter <= 0.0:
+                    missing_components.append('Diámetro Interior de la Camisa')
+
+            elif code in ['CE-DE', 'CE-SE']:
+                if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0 or rec.barrel_length <= 0.0:
+                    missing_components.append('Camisa')
+                if rec.diameter_rod <= 0.0 or rec.rod_length <= 0.0:
+                    missing_components.append('Vástago')
+                if rec.piston_diameter <= 0.0 or rec.piston_length <= 0.0:
+                    missing_components.append('Émbolo')
+                if rec.head_diameter <= 0.0 or rec.head_length <= 0.0:
+                    missing_components.append('Cabeza')
+                if rec.stroke_length <= 0.0:
+                    missing_components.append('Carrera')
+
+            if missing_components:
+                componentes = ", ".join(missing_components)
+                raise ValidationError(
+                    f"Faltan medidas para el cilindro '{rec.cylinder_to.name}'.\n\n"
+                    f"Asegúrate de registrar valores mayores a 0 en: {componentes}."
                 )
 
     ''' ------------------------
