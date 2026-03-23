@@ -198,6 +198,9 @@
                                     <field name="name"/>
                                     <field name="quantity" string="Total de cilindros" width="150"/>
                                     <field name="group_total_hours" string="Horas del Grupo" widget="float_time"/>
+                                    <field name="sale_order_id" string="Cotización"/>
+                                    <field name="sale_state" string="Estado Cot."/>
+
                                 </list>
 
                                 <form string="Detalle del Grupo">
