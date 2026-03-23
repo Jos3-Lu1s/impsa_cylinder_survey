@@ -185,10 +185,22 @@ class CylinderSurvey(models.Model):
         string="Oportunidad",
         ondelete='set null'
     )
+    
+    sale_order_id = fields.One2many(
+        'sale.order',
+        'survey_id',
+        string="Orden de Venta",
+        ondelete='set null'
+    )
 
     lead_count = fields.Integer(
         string="Oportunidades",
         compute="_compute_lead_count"
+    )
+    
+    sale_count = fields.Integer(
+        string="Órdenes de Venta",
+        compute="_compute_sale_count"
     )
 
     ''' ------------------------
@@ -204,6 +216,11 @@ class CylinderSurvey(models.Model):
     def _compute_lead_count(self):
         for rec in self:
             rec.lead_count = 1 if rec.lead_id else 0
+            
+    @api.depends('sale_order_id')
+    def _compute_sale_count(self):
+        for rec in self:
+            rec.sale_count = 1 if rec.sale_order_id else 0
 
     @api.depends('group_ids.operational_record_ids.hr', 'group_ids.operational_record_ids', 'group_ids.quantity')
     def _compute_operational_totals(self):
@@ -307,6 +324,19 @@ class CylinderSurvey(models.Model):
                 'res_model': 'crm.lead',
                 'view_mode': 'form',
                 'res_id': self.lead_id.id,
+                'target': 'current',
+            }
+            
+    def action_view_sale_order(self):
+        self.ensure_one()
+        
+        if self.sale_order_id:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Orden de Venta',
+                'res_model': 'sale.order',
+                'view_mode': 'form',
+                'res_id': self.sale_order_id.id,
                 'target': 'current',
             }
 

@@ -98,6 +98,9 @@
                         <button name="action_view_lead" type="object" class="oe_stat_button" icon="fa-star" invisible="not lead_id">
                             <field name="lead_count" widget="statinfo" string="Oportunidad"/>
                         </button>
+                        <button name="action_view_sale_order" type="object" class="oe_stat_button" icon="fa-shopping-cart" invisible="not sale_order_id">
+                            <field name="sale_count" widget="statinfo" string="Ventas"/>
+                        </button>
                     </div>
                     <div class="row">
                         <div class="col-12 col-md-6 border-end">
