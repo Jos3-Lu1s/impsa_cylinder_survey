@@ -45,6 +45,20 @@ class CylinderGroup(models.Model):
         string="Imágenes por Cilindro",
     )
 
+    ''' ------------------------
+        SALE FIELDS RELATED
+    -------------------------'''
+    sale_order_id = fields.Many2one(
+        'sale.order',
+        string="Cotización"
+    )
+
+    sale_state = fields.Selection(
+        related='sale_order_id.state',
+        string="Estado",
+        store=True
+    )
+
     @api.depends('operational_record_ids.hr', 'quantity')
     def _compute_group_total_hours(self):
         for group in self:

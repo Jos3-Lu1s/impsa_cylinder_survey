@@ -45,35 +45,116 @@ class CylinderSurvey(models.Model):
     image_ids = fields.One2many(
         'impsa.cylinder.image', 
         'survey_id', 
-        string="Galería de Imágenes",
-        readonly=True
+        string="Galería de Imágenes"
     )
 
     # Camisa (Barrel)
     barrel_inner_diameter = fields.Float(string='Ø Interior')
     barrel_outer_diameter = fields.Float(string='Ø Exterior')
     barrel_length = fields.Float(string='Longitud')
+    barrel_image_ids = fields.One2many(
+        'impsa.cylinder.image', 'survey_id', 
+        string="Imágenes de la Camisa", 
+        domain=[('component', '=', 'barrel')]
+    )
+    
+    barrel_inner_diameter2 = fields.Float(string='Ø Interior 2')
+    barrel_outer_diameter2 = fields.Float(string='Ø Exterior 2')
+    barrel_length2 = fields.Float(string='Longitud 2')
+    
+    barrel_inner_diameter3 = fields.Float(string='Ø Interior 3')
+    barrel_outer_diameter3 = fields.Float(string='Ø Exterior 3')
+    barrel_length3 = fields.Float(string='Longitud 3')
+    
+    barrel_inner_diameter4 = fields.Float(string='Ø Interior 4')
+    barrel_outer_diameter4 = fields.Float(string='Ø Exterior 4')
+    barrel_length4 = fields.Float(string='Longitud 4')
+    
+    barrel_inner_diameter5 = fields.Float(string='Ø Interior 5')
+    barrel_outer_diameter5 = fields.Float(string='Ø Exterior 5')
+    barrel_length5 = fields.Float(string='Longitud 5')
 
     # Vástago (Rod)
     diameter_rod = fields.Float(string="Ø Vástago")
     rod_length = fields.Float(string='Longitud de Vástago')
+    rod_image_ids = fields.One2many(
+        'impsa.cylinder.image', 'survey_id', 
+        string="Imágenes del Vástago", 
+        domain=[('component', '=', 'rod')]
+    )
     
     diameter_rod2 = fields.Float(string="Ø Vástago 2")
     rod_length2 = fields.Float(string='Longitud de Vástago 2')
+    
+    diameter_rod3 = fields.Float(string="Ø Vástago 3")
+    rod_length3 = fields.Float(string='Longitud de Vástago 3')
+    
+    diameter_rod4 = fields.Float(string="Ø Vástago 4")
+    rod_length4 = fields.Float(string='Longitud de Vástago 4')
+    
+    diameter_rod5 = fields.Float(string="Ø Vástago 5")
+    rod_length5 = fields.Float(string='Longitud de Vástago 5')
+    
+    diameter_rod6 = fields.Float(string="Ø Vástago 2")
+    rod_length6 = fields.Float(string='Longitud de Vástago 2')
 
     # Émbolo (Piston)
     piston_diameter = fields.Float(string='Ø Émbolo') 
     piston_length = fields.Float(string='Longitud de Émbolo')
+    piston_image_ids = fields.One2many(
+        'impsa.cylinder.image', 'survey_id', 
+        string="Imágenes del Émbolo", 
+        domain=[('component', '=', 'piston')]
+    )
+    
+    piston_diameter2 = fields.Float(string='Ø Émbolo 2')
+    piston_length2 = fields.Float(string='Longitud de Émbolo 2')
+    
+    piston_diameter3 = fields.Float(string='Ø Émbolo 3')
+    piston_length3 = fields.Float(string='Longitud de Émbolo 3')
+    
+    piston_diameter4 = fields.Float(string='Ø Émbolo 4')
+    piston_length4 = fields.Float(string='Longitud de Émbolo 4')
+    
+    piston_diameter5 = fields.Float(string='Ø Émbolo 5')
+    piston_length5 = fields.Float(string='Longitud de Émbolo 5')
 
     # Cabeza (Head)
     head_diameter = fields.Float(string='Ø Cabeza')
     head_length = fields.Float(string='Longitud de Cabeza')
+    head_image_ids = fields.One2many(
+        'impsa.cylinder.image', 'survey_id', 
+        string="Imágenes de la Cabeza", 
+        domain=[('component', '=', 'head')]
+    )
+    
+    head_diameter2 = fields.Float(string='Ø Cabeza 2')
+    head_length2 = fields.Float(string='Longitud de Cabeza 2')
+    
+    head_diameter3 = fields.Float(string='Ø Cabeza 3')
+    head_length3 = fields.Float(string='Longitud de Cabeza 3')
+    
+    head_diameter4 = fields.Float(string='Ø Cabeza 4')
+    head_length4 = fields.Float(string='Longitud de Cabeza 4')
+    
+    head_diameter5 = fields.Float(string='Ø Cabeza 5')
+    head_length5 = fields.Float(string='Longitud de Cabeza 5')
 
     # Carrera (Stroke)
     stroke_length = fields.Float(string='Longitud de Carrera')
+    stroke_image_ids = fields.One2many(
+        'impsa.cylinder.image', 'survey_id', 
+        string="Imágenes del Ensamble", 
+        domain=[('component', '=', 'stroke')]
+    )
     
     # Accesorios
     accessories  = fields.Text(string='Accesorios')
+    accessory_image_ids  = fields.One2many(
+        'impsa.cylinder.image', 'survey_id', 
+        string="Imágenes de accesorios", 
+        domain=[('component', '=', 'accessory')]
+    )
 
     date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True)
     description = fields.Text(string="Descripción")
@@ -143,6 +224,12 @@ class CylinderSurvey(models.Model):
     
     num_section = fields.Integer(string='Número de Secciones')
     
+    section_ids = fields.One2many(
+        'impsa.cylinder.section',
+        'survey_id',
+        string='Secciones del Cilindro'
+    )
+    
     purchase_order_ids = fields.One2many(
         "purchase.order",
         "survey_id",
@@ -193,7 +280,7 @@ class CylinderSurvey(models.Model):
     @api.depends('sale_order_id')
     def _compute_sale_count(self):
         for rec in self:
-            rec.sale_count = 1 if rec.sale_order_id else 0
+            rec.sale_count = len(rec.group_ids) if rec.sale_order_id else 0
 
     @api.depends('group_ids.operational_record_ids.hr', 'group_ids.operational_record_ids', 'group_ids.quantity')
     def _compute_operational_totals(self):
@@ -213,6 +300,13 @@ class CylinderSurvey(models.Model):
     def _compute_allocated_qty(self):
         for survey in self:
             survey.allocated_qty = sum(survey.group_ids.mapped('quantity'))
+            
+    @api.onchange('num_section')
+    def _onchange_num_section_limit(self):
+        if self.num_section <= 0:
+            self.num_section = 1
+        elif self.num_section > 5:
+            self.num_section = 5
 
     ''' ------------------------
         CONSTRAINS
@@ -250,14 +344,8 @@ class CylinderSurvey(models.Model):
 
             # Evaluamos por bloque de pieza en lugar de campo por campo
             if code == 'CE-OT':
-                if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0:
-                    missing_components.append('Camisa')
-                
-            elif code == 'CE-DV':
-                if rec.stroke_length <= 0.0:
-                    missing_components.append('Carrera')
-                if rec.diameter_rod <= 0.0 or rec.rod_length <= 0.0 or rec.diameter_rod2 <= 0.0 or rec.rod_length2 <= 0.0:
-                    missing_components.append('Vástagos')
+                if rec.barrel_inner_diameter <= 0.0:
+                    missing_components.append('Diámetro Interior de la Camisa')
 
             elif code in ['CE-DE', 'CE-SE']:
                 if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0 or rec.barrel_length <= 0.0:
@@ -278,8 +366,16 @@ class CylinderSurvey(models.Model):
             if missing_components:
                 componentes = ", ".join(missing_components)
                 raise ValidationError(
-                    f"Debe completar las medidas para el cilindro tipo '{rec.cylinder_to.name}'.\n\n"
+                    f"Faltan medidas para el cilindro '{rec.cylinder_to.name}'.\n\n"
                     f"Asegúrate de registrar valores mayores a 0 en: {componentes}."
+                )
+                
+    @api.constrains('num_section')
+    def _check_num_section(self):
+        for record in self:
+            if record.num_section <= 0 or record.num_section > 5:
+                raise ValidationError(
+                    "El número de secciones debe ser mayor a 0 y máximo 5."
                 )
 
     ''' ------------------------
@@ -318,9 +414,8 @@ class CylinderSurvey(models.Model):
                 'type': 'ir.actions.act_window',
                 'name': 'Orden de Venta',
                 'res_model': 'sale.order',
-                'view_mode': 'form',
-                'res_id': self.sale_order_id.id,
-                'target': 'current',
+                'view_mode': 'list,form',
+                'domain': [('survey_id', '=', self.id)],
             }
 
     def action_confirm(self):
@@ -384,10 +479,24 @@ class CylinderSurvey(models.Model):
         for record in self:
             if record.state != 'draft':
                 raise ValidationError(_("Solo puedes confirmar una Orden de Trabajo que esté en estado 'Cotización'."))
-            
-            record.write({
-                'state': 'quoted'
-            })
+            for group in record.group_ids:
+
+                # Evitar duplicados
+                if group.sale_order_id:
+                    continue
+
+                sale_order = self.env['sale.order'].create({
+                    'survey_id': self.id,
+                    'partner_id': record.partner_id.id,
+                    'requeriments_work_order': record.name,
+                    'group_requeriments_work_order': group.name,
+                })
+
+                # Guardar referencia en el grupo
+                group.sale_order_id = sale_order.id
+                record.write({
+                    'state': 'quoted'
+                })
 
     def action_set_draft(self):
         """Permite regresar a borrador"""
