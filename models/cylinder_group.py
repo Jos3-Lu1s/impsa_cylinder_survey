@@ -15,8 +15,7 @@ class CylinderGroup(models.Model):
 
     name = fields.Char(
         string="Identificador del Grupo", 
-        required=True, 
-        placeholder="Ej. 3 Cilindros Idénticos del frente..."
+        required=True,
     )
     
     quantity = fields.Integer(

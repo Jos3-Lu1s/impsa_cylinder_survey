@@ -203,7 +203,7 @@
                                 <form string="Detalle del Grupo">
                                     <sheet>
                                         <group col="4">
-                                            <field name="name"/>
+                                            <field name="name" placeholder="Ej. 3 Cilindros Idénticos del frente..."/>
                                             <field name="quantity"/>
                                         </group>
                                         <notebook>
@@ -231,17 +231,6 @@
                             </field>
                         </page>
 
-                        <page string="Galería Fotográfica Total" name="gallery">
-                            <p class="text-muted mt-2 mb-2">
-                                <i class="fa fa-info-circle me-1"></i>
-                                <em>Vista consolidada de todas las fotos de todos los grupos. Para agregar o modificar fotos, ingresa a la pestaña "Grupos y Operaciones".</em>
-                            </p>
-                            <field name="image_ids" mode="kanban" readonly="1" context="{
-                                'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
-                                'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
-                            }"/>
-                        </page>
-
                         <page string="Resumen de Operaciones" name="all_operations_summary" invisible="not group_ids">
                             <field name="all_operational_record_ids">
                                 <list editable="bottom" default_order="group_id, sequence">
@@ -252,6 +241,17 @@
                                     <field name="hr" widget="float_time"/>
                                 </list>
                             </field>
+                        </page>
+
+                        <page string="Galería Fotográfica Total" name="gallery">
+                            <p class="text-muted mt-2 mb-2">
+                                <i class="fa fa-info-circle me-1" title="Información"></i>
+                                <em>Vista consolidada de todas las fotos de todos los grupos. Para agregar o modificar fotos, ingresa a la pestaña "Grupos y Operaciones".</em>
+                            </p>
+                            <field name="image_ids" mode="kanban" readonly="1" context="{
+                                'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
+                                'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
+                            }"/>
                         </page>
 
                         <page string="Requisición de Empaques" name="packing_list">
