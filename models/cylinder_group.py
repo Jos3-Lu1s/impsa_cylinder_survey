@@ -44,6 +44,20 @@ class CylinderGroup(models.Model):
         string="Imágenes por Cilindro",
     )
 
+    ''' ------------------------
+        SALE FIELDS RELATED
+    -------------------------'''
+    sale_order_id = fields.Many2one(
+        'sale.order',
+        string="Cotización"
+    )
+
+    sale_state = fields.Selection(
+        related='sale_order_id.state',
+        string="Estado",
+        store=True
+    )
+
     @api.depends('operational_record_ids.hr', 'quantity')
     def _compute_group_total_hours(self):
         for group in self:
@@ -55,3 +69,16 @@ class CylinderGroup(models.Model):
         for group in self:
             if group.quantity < 1:
                 raise ValidationError(_("Un grupo debe contener al menos 1 cilindro."))
+                
+    def action_open_sale_order(self):
+        self.ensure_one()
+        
+        if self.sale_order_id:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Orden de Venta',
+                'res_model': 'sale.order',
+                'view_mode': 'form',
+                'res_id': self.sale_order_id.id,
+                'target': 'current',
+            }

@@ -7,3 +7,4 @@ from . import cylinder_options
 from . import cylinder_material
 from . import crm_decision
 from . import cylinder_group
+from . import sale_order_smart

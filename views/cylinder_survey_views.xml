@@ -98,6 +98,9 @@
                         <button name="action_view_lead" type="object" class="oe_stat_button" icon="fa-star" invisible="not lead_id">
                             <field name="lead_count" widget="statinfo" string="Oportunidad"/>
                         </button>
+                        <button name="action_view_sale_order" type="object" class="oe_stat_button" icon="fa-shopping-cart" invisible="not sale_order_id">
+                            <field name="sale_count" widget="statinfo" string="Ventas"/>
+                        </button>
                     </div>
                     <div class="row">
                         <div class="col-12 col-md-6 border-end">
@@ -198,6 +201,20 @@
                                     <field name="name"/>
                                     <field name="quantity" string="Total de cilindros" width="150"/>
                                     <field name="group_total_hours" string="Horas del Grupo" widget="float_time"/>
+                                    <field name="sale_order_id" string="Cotización" widget="badge" decoration-success="True"/>
+                                    <field name="sale_state" string="Estado Cot." widget="badge"
+                                        decoration-warning="sale_state == 'draft'"
+                                        decoration-info="sale_state == 'sent'"
+                                        decoration-success="sale_state == 'sale'"
+                                        decoration-danger="sale_state == 'cancel'"/>
+                                    <button name="action_open_sale_order"
+                                            type="object"
+                                            class="oe_link"
+                                            string="Ver Cotización"
+                                            invisible="sale_order_id == False">
+                                    </button>
+
+
                                 </list>
 
                                 <form string="Detalle del Grupo">

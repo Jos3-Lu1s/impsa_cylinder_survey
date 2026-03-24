@@ -1,0 +1,27 @@
+<odoo>
+    <data>
+        <record id="view_sale_order_form_inherit_survey" model="ir.ui.view">
+            <field name="name">sale.order.form.inherit.survey</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']"
+                   position="after">       
+                     <field name="requeriments_work_order"/>
+                     <field name="group_requeriments_work_order"/>
+                </xpath>
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_survey"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-cogs"
+                        invisible="cylinder_survey_count == 0">
+
+                        <field name="cylinder_survey_count" widget="statinfo" string="Levantamientos"/>
+                        </button>
+
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
