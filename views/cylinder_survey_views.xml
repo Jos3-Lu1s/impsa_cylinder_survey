@@ -211,6 +211,7 @@
                                             type="object"
                                             class="oe_link"
                                             string="Ver Cotización"
+                                            width="150"
                                             invisible="sale_order_id == False">
                                     </button>
 
@@ -236,11 +237,14 @@
                                             </page>
                                             
                                             <page string="Fotografías por Cilindro" name="group_images">
-                                                <field name="image_ids" mode="kanban" context="{
-                                                    'default_group_id': id,
-                                                    'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
-                                                    'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
-                                                }"/>
+                                                <field name="image_ids" widget="impsa_image_gallery" style="width:100%;">
+                                                    <list>
+                                                        <field name="name"/>
+                                                        <field name="component"/>
+                                                        <field name="cylinder_number"/>
+                                                        <field name="image"/>
+                                                    </list>
+                                                </field>
                                             </page>
                                         </notebook>
                                     </sheet>
@@ -261,14 +265,14 @@
                         </page>
 
                         <page string="Galería Fotográfica Total" name="gallery">
-                            <p class="text-muted mt-2 mb-2">
-                                <i class="fa fa-info-circle me-1" title="Información"></i>
-                                <em>Vista consolidada de todas las fotos de todos los grupos. Para agregar o modificar fotos, ingresa a la pestaña "Grupos y Operaciones".</em>
-                            </p>
-                            <field name="image_ids" mode="kanban" readonly="1" context="{
-                                'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
-                                'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
-                            }"/>
+                            <field name="image_ids" widget="impsa_image_gallery" readonly="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="component"/>
+                                    <field name="cylinder_number"/>
+                                    <field name="image"/>
+                                </list>
+                            </field>
                         </page>
 
                         <page string="Requisición de Empaques" name="packing_list">

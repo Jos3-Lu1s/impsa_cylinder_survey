@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="impsa_cylinder_survey.ImageGallery">
+        <div class="w-100">
+            <t t-if="!props.readonly">
+                <div class="mb-3">
+                    <button class="btn btn-primary" t-on-click="onAddImage">
+                        <i class="fa fa-camera me-1"/> Añadir Fotografía
+                    </button>
+                </div>
+            </t>
+
+            <div class="row g-3">
+                <t t-foreach="records" t-as="rec" t-key="rec.id">
+                    <div class="col-2">
+                        <div class="card h-100 shadow-sm cursor-pointer" t-on-click="() => this.openRecord(rec)">
+                            
+                            <t t-if="!props.readonly">
+                                <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 shadow" 
+                                        style="z-index: 2; border-radius: 50%; width: 32px; height: 32px; padding: 0;"
+                                        t-on-click.stop="() => this.onDeleteImage(rec)"
+                                        title="Eliminar Imagen">
+                                    <i class="fa fa-trash"/>
+                                </button>
+                            </t>
+
+                            <div class="ratio ratio-1x1 bg-light border-bottom">
+                                <img t-att-src="getImageUrl(rec)" 
+                                     class="object-fit-cover w-100 h-100 rounded-top" 
+                                     alt="Imagen del Cilindro" 
+                                     loading="lazy"/>
+                            </div>
+                            
+                            <div class="card-body p-2 d-flex flex-column justify-content-center text-center">
+                                <h6 class="card-title fw-bold text-truncate mb-2 text-dark" t-att-title="rec.data.name">
+                                    <t t-esc="rec.data.name or 'Nueva Imagen'"/>
+                                </h6>
+                                <div class="mt-auto d-flex justify-content-center gap-1 flex-wrap">
+                                    <span class="badge text-bg-primary text-uppercase">
+                                        <t t-esc="rec.data.component"/>
+                                    </span>
+                                    <span class="badge text-bg-secondary">
+                                        Cil. <t t-esc="rec.data.cylinder_number"/>
+                                    </span>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </t>
+            </div>
+            
+            <t t-if="records.length === 0">
+                <div class="text-muted w-100 text-center py-5 border rounded bg-light">
+                    <i class="fa fa-image fa-3x mb-3 text-secondary"/>
+                    <p class="mb-0">No hay imágenes agregadas a esta galería.</p>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

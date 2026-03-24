@@ -16,7 +16,7 @@
     'category': 'Services/Field Service',
     'version': '19.0.1.0.0',
 
-    'depends': ['base', "crm", "mail", 'purchase', 'sale_crm', 'sale'],
+    'depends': ['base', "crm", "mail", 'purchase', 'sale_management'],
 
     "data": [
         "security/ir.model.access.csv",
@@ -32,6 +32,13 @@
         "views/saler_view.xml",
         "views/purchase_views.xml",
     ],
+
+    'assets': {
+        'web.assets_backend': [
+            'impsa_cylinder_survey/static/src/components/image_gallery/image_gallery.js',
+            'impsa_cylinder_survey/static/src/components/image_gallery/image_gallery.xml',
+        ],
+    },
 
     'demo': [
         'demo/demo.xml',
