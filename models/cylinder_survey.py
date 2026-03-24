@@ -203,6 +203,7 @@ class CylinderSurvey(models.Model):
         compute="_compute_sale_count"
     )
 
+
     ''' ------------------------
         COMPUTE METHODS
     -------------------------'''
@@ -423,10 +424,9 @@ class CylinderSurvey(models.Model):
 
                     # Guardar referencia en el grupo
                 group.sale_order_id = sale_order.id
-                    
         record.write({
                'state': 'quoted'
-           })
+           })         
 
     def action_set_draft(self):
         """Permite regresar a borrador"""
@@ -499,6 +499,7 @@ class CylinderSurvey(models.Model):
                 'view_mode': 'list,form',
                 'domain': [('id', 'in', created_pos.ids)],
             }
+
 
     @api.model_create_multi
     def create(self, vals_list):

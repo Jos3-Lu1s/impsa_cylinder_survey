@@ -77,7 +77,7 @@
 
                     <button name="action_confirm" string="Confirmar Levantamiento" type="object" class="oe_highlight" invisible="state != 'quoted'" />
 
-                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['draft', 'quoted', 'confirmed']" confirm="¿Está seguro de que desea cancelar este registro?" />
+                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['draft', 'confirmed']" confirm="¿Está seguro de que desea cancelar este registro?" />
 
                     <button name="action_set_draft" string="Volver a Levantamiento" type="object" invisible="state != 'cancel'" />
 
@@ -196,7 +196,7 @@
 
                     <notebook>
                         <page string="Grupos y Operaciones" name="groups">
-                            <field name="group_ids">
+                            <field name="group_ids" readonly="state != 'draft'">
                                 <list string="Grupos de Cilindros">
                                     <field name="name"/>
                                     <field name="quantity" string="Total de cilindros" width="150"/>
