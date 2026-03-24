@@ -13,6 +13,9 @@ class SaleOrderSmart(models.Model):
         compute="_compute_cylinder_survey_count"
     )
     
+    requeriments_work_order=fields.Text(string="Levantamiento/OT", store=True, readonly=True)
+    group_requeriments_work_order=fields.Text(string="Grupo Relacionado", store=True, readonly=True)
+
     def _compute_cylinder_survey_count(self):
         for record in self:
             record.cylinder_survey_count = len(record.survey_id)
