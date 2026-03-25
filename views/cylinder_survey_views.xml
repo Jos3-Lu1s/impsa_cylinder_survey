@@ -153,16 +153,59 @@
                                 <field name="cylinder_to" string="Cilindro de" options="{'no_open': True}"/>
                                 <field name="cylinder_to_code" invisible="1"/>
                                 <field name="description" rows="3" placeholder="Cilindro Hidráulico" />
+                                <field name="num_section" invisible="cylinder_to_code != 'CE-T'"/>
                             </group>
                         </div>
                     </div>
                     <group string="Resumen Técnico" col="3">
+
+                        <separator string="Camisas"
+                            invisible="cylinder_to_code != 'CE-T'"/>
 
                         <group string="Camisa">
                             <field name="barrel_inner_diameter"/>
                             <field name="barrel_outer_diameter"/>
                             <field name="barrel_length"/>
                         </group>
+
+                        <group string="Camisa 2" invisible="num_section &lt; 2 or cylinder_to_code != 'CE-T'">
+                            <field name="barrel_inner_diameter2" invisible="num_section == 2"/>
+                            <field name="barrel_outer_diameter2"/>
+                            <field name="barrel_length2"/>
+                        </group>
+
+                        <group string="Camisa 3" invisible="num_section &lt; 3 or cylinder_to_code != 'CE-T'">
+                            <field name="barrel_inner_diameter3" invisible="num_section == 3"/>
+                            <field name="barrel_outer_diameter3"/>
+                            <field name="barrel_length3"/>
+                        </group>
+
+                        <group string="Camisa 4" invisible="num_section &lt; 4 or cylinder_to_code != 'CE-T'">
+                            <field name="barrel_inner_diameter4" invisible="num_section == 4"/>
+                            <field name="barrel_outer_diameter4"/>
+                            <field name="barrel_length4"/>
+                        </group>
+
+                        <group string="Camisa 5" invisible="num_section &lt; 5 or cylinder_to_code != 'CE-T'">
+                            <field name="barrel_inner_diameter5" invisible="num_section == 5"/>
+                            <field name="barrel_outer_diameter5"/>
+                            <field name="barrel_length5"/>
+                        </group>
+                        
+                        <!-- <field name="section_ids" nolabel="1" colspan="3">
+                            <form>
+                                <group string="Camisa">
+                                    <field name="sequence"/>
+                                    <field name="barrel_inner_diameter" invisible="is_last"/>
+
+                                    <field name="barrel_outer_diameter"/>
+                                    <field name="barrel_length"/>
+                                </group>
+                            </form>
+                        </field> -->
+
+                        <separator string="Vástagos"
+                            invisible="cylinder_to_code != 'CE-T'"/>
 
                         <group string="Vástago">
                             <field name="diameter_rod"/>
@@ -174,14 +217,80 @@
                             <field name="rod_length2" string="Longitud"/>
                         </group>
 
+                        <group string="Vástago 2" invisible="num_section &lt; 3 or cylinder_to_code != 'CE-T'">
+                            <field name="diameter_rod6"/>
+                            <field name="rod_length6" string="Longitud"/>
+                        </group>
+
+                        <group string="Vástago 3" invisible="num_section &lt; 3 or cylinder_to_code != 'CE-T'">
+                            <field name="diameter_rod3"/>
+                            <field name="rod_length3" string="Longitud"/>
+                        </group>
+
+                        <group string="Vástago 4" invisible="num_section &lt; 4 or cylinder_to_code != 'CE-T'">
+                            <field name="diameter_rod4"/>
+                            <field name="rod_length4" string="Longitud"/>
+                        </group>
+
+                        <group string="Vástago 5" invisible="num_section &lt; 5 or cylinder_to_code != 'CE-T'">
+                            <field name="diameter_rod5"/>
+                            <field name="rod_length5" string="Longitud"/>
+                        </group>
+
+                        <separator string="Émbolos"
+                            invisible="cylinder_to_code != 'CE-T'"/>
+
                         <group string="Émbolo">
                             <field name="piston_diameter"/>
                             <field name="piston_length" string="Longitud"/>
                         </group>
 
+                        <group string="Émbolo 2" invisible="num_section &lt; 2 or cylinder_to_code != 'CE-T'">
+                            <field name="piston_diameter2"/>
+                            <field name="piston_length2" string="Longitud"/>
+                        </group>
+
+                        <group string="Émbolo 3" invisible="num_section &lt; 3 or cylinder_to_code != 'CE-T'">
+                            <field name="piston_diameter3"/>
+                            <field name="piston_length3" string="Longitud"/>
+                        </group>
+
+                        <group string="Émbolo 4" invisible="num_section &lt; 4 or cylinder_to_code != 'CE-T'">
+                            <field name="piston_diameter4"/>
+                            <field name="piston_length4" string="Longitud"/>
+                        </group>
+
+                        <group string="Émbolo 5" invisible="num_section &lt; 5 or cylinder_to_code != 'CE-T'">
+                            <field name="piston_diameter5"/>
+                            <field name="piston_length5" string="Longitud"/>
+                        </group>
+
+                        <separator string="Cabezas"
+                            invisible="cylinder_to_code != 'CE-T'"/>
+
                         <group string="Cabeza">
                             <field name="head_diameter"/>
                             <field name="head_length" string="Longitud"/>
+                        </group>
+
+                        <group string="Cabeza 2" invisible="num_section &lt; 2 or cylinder_to_code != 'CE-T'">
+                            <field name="head_diameter2"/>
+                            <field name="head_length2" string="Longitud"/>
+                        </group>
+                        
+                        <group string="Cabeza 3" invisible="num_section &lt; 3 or cylinder_to_code != 'CE-T'">
+                            <field name="head_diameter3"/>
+                            <field name="head_length3" string="Longitud"/>
+                        </group>
+
+                        <group string="Cabeza 4" invisible="num_section &lt; 4 or cylinder_to_code != 'CE-T'">
+                            <field name="head_diameter4"/>
+                            <field name="head_length4" string="Longitud"/>
+                        </group>
+
+                        <group string="Cabeza 5" invisible="num_section &lt; 5 or cylinder_to_code != 'CE-T'">
+                            <field name="head_diameter5"/>
+                            <field name="head_length5" string="Longitud"/>
                         </group>
 
                         <group string="Carrera">
