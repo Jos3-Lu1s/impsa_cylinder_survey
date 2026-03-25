@@ -293,9 +293,15 @@
                             <field name="head_length5" string="Longitud"/>
                         </group>
 
+                        <separator string="Carrea"
+                            invisible="cylinder_to_code != 'CE-T'"/>
+
                         <group string="Carrera">
                             <field name="stroke_length" string="Longitud"/>
                         </group>
+
+                        <separator string="Accesorios"
+                            invisible="cylinder_to_code != 'CE-T'"/>
                         
                         <group string="Accesorios">
                             <field name="rotula_id"/>
@@ -310,8 +316,19 @@
                                     <field name="name"/>
                                     <field name="quantity" string="Total de cilindros" width="150"/>
                                     <field name="group_total_hours" string="Horas del Grupo" widget="float_time"/>
-                                    <field name="sale_order_id" string="Cotización"/>
-                                    <field name="sale_state" string="Estado Cot."/>
+                                    <field name="sale_order_id" string="Cotización" widget="badge" decoration-success="True"/>
+                                    <field name="sale_state" string="Estado Cot." widget="badge"
+                                        decoration-warning="sale_state == 'draft'"
+                                        decoration-info="sale_state == 'sent'"
+                                        decoration-success="sale_state == 'sale'"
+                                        decoration-danger="sale_state == 'cancel'"/>
+                                    <button name="action_open_sale_order"
+                                            type="object"
+                                            class="oe_link"
+                                            string="Ver Cotización"
+                                            invisible="sale_order_id == False">
+                                    </button>
+
 
                                 </list>
 

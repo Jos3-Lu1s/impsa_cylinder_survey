@@ -5,6 +5,11 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form" />
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']"
+                   position="after">       
+                     <field name="requeriments_work_order"/>
+                     <field name="group_requeriments_work_order"/>
+                </xpath>
                 <xpath expr="//div[@name='button_box']" position="inside">
                     <button name="action_view_survey"
                         type="object"

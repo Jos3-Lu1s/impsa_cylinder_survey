@@ -431,7 +431,7 @@ class CylinderSurvey(models.Model):
                     f"Debes asignar exactamente {record.cylinder_qty} cilindros. "
                     f"Actualmente hay {record.allocated_qty}."
                 )
-
+            
             # 2. Creación de Productos en Lote
             Product = self.env['product.product']
             category = self.env['product.category'].search([('name', '=', 'SELLOS')], limit=1)
@@ -470,6 +470,14 @@ class CylinderSurvey(models.Model):
             # Asignar productos a las líneas
             for line in lines:
                 line.product_id = product_map[line.code_label]
+            
+            if record.group_ids:
+                count_quotation=0
+                for group in record.group_ids:
+                    if group.sale_order_id and group.sale_order_id.state == 'sale':
+                        count_quotation+=1
+                if count_quotation == 0:
+                    raise ValidationError("Debe existir al menos 1 cotización (orden de venta) aceptada por el cliente.")
 
             # 3. Cambio de Estado                
             record.write({'state': 'confirmed'})
@@ -477,8 +485,8 @@ class CylinderSurvey(models.Model):
     def action_quoted(self):
         """Pasa de Cotización a Orden de Trabajo"""
         for record in self:
-            if record.state != 'draft':
-                raise ValidationError(_("Solo puedes confirmar una Orden de Trabajo que esté en estado 'Cotización'."))
+            if not record.group_ids:
+                raise ValidationError(_("Debes agregar al menos un 'Identificador del Grupo'"))
             for group in record.group_ids:
 
                 # Evitar duplicados
@@ -492,10 +500,11 @@ class CylinderSurvey(models.Model):
                     'group_requeriments_work_order': group.name,
                 })
 
-                # Guardar referencia en el grupo
+                    # Guardar referencia en el grupo
                 group.sale_order_id = sale_order.id
+                    
                 record.write({
-                    'state': 'quoted'
+                   'state': 'quoted'
                 })
 
     def action_set_draft(self):
