@@ -58,6 +58,10 @@ class CylinderSurvey(models.Model):
         domain=[('component', '=', 'barrel')]
     )
     
+    barrel_inner_diameter_main = fields.Float(string='Ø Interior Principal')
+    barrel_outer_diameter_main = fields.Float(string='Ø Exterior Principal')
+    barrel_length_main = fields.Float(string='Longitud Principal')
+    
     barrel_inner_diameter2 = fields.Float(string='Ø Interior 2')
     barrel_outer_diameter2 = fields.Float(string='Ø Exterior 2')
     barrel_length2 = fields.Float(string='Longitud 2')
@@ -208,7 +212,7 @@ class CylinderSurvey(models.Model):
     )
     state = fields.Selection([
         ('draft', 'Levantamiento'),
-        ('quoted', 'Cotización'),
+        ('quoted', 'APU'),
         ('confirmed', 'Orden de Trabajo'),
         ('cancel', 'Cancelado'),
     ], string='Estado', default='draft', tracking=True, copy=False, index=True)

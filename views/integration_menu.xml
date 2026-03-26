@@ -72,7 +72,7 @@
 
     <menuitem id="menu_cylinder_survey_draft" name="Levantamientos" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_draft" sequence="20"/>
 
-    <menuitem id="menu_cylinder_survey_quoted" name="Cotizaciones" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_quoted" sequence="30"/>
+    <menuitem id="menu_cylinder_survey_quoted" name="APUS" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_quoted" sequence="30"/>
 
     <menuitem id="menu_cylinder_survey_confirmed" name="Órdenes de Trabajo" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_confirmed" sequence="40"/>
 
