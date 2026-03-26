@@ -445,18 +445,21 @@ class CylinderSurvey(models.Model):
 
             # Extraer códigos de los empaques de este registro
             lines = record.cylinder_survey_line_ids
-            if any(not line.code_label for line in lines):
-                raise ValidationError("Una o más líneas de empaque no tienen código definido (code_label).")
+            
 
+            lines_with_code = lines.filtered(lambda l: l.code_label)
+            lines_without_code = lines.filtered(lambda l: not l.code_label)
+
+            
             # en vez de buscar producto por producto se hace una busqueda masiva
-            codes = lines.mapped('code_label')
+            codes = lines_with_code.mapped('code_label')
             existing_products = Product.search([('default_code', 'in', codes)])
             product_map = {p.default_code: p for p in existing_products}
             seen_codes = set(product_map.keys())
 
             # Preparar productos a crear
             products_to_create_vals = []
-            for line in lines:
+            for line in lines_with_code:
                 code = line.code_label
                 if code not in seen_codes:
                     seen_codes.add(code)
@@ -466,16 +469,35 @@ class CylinderSurvey(models.Model):
                         'type': 'consu', 
                         'categ_id': categ_id,
                     })
+                    
+            for line in lines_without_code:
+                # Si no tiene código, se le asigna un nombre genérico y se deja el código en blanco
+                products_to_create_vals.append({
+                    'name': line.description_label or "Empaque sin Código",
+                    'default_code': False,
+                    'type': 'consu', 
+                    'categ_id': categ_id,
+                })
 
             # Crear en lote
             if products_to_create_vals:
                 new_products = Product.create(products_to_create_vals)
                 for p in new_products:
                     product_map[p.default_code] = p
+            else:
+                new_products = self.env['product.product']
+                    
+            products_no_code_iter = iter([p for p in new_products if not p.default_code]) if products_to_create_vals else iter([])
 
             # Asignar productos a las líneas
+            """ for line in lines:
+                line.product_id = product_map[line.code_label] """
+                
             for line in lines:
-                line.product_id = product_map[line.code_label]
+                if line.code_label:
+                    line.product_id = product_map[line.code_label]
+                else:
+                    line.product_id = next(products_no_code_iter, False)
             
             if record.group_ids:
                 count_quotation=0
@@ -566,7 +588,7 @@ class CylinderSurvey(models.Model):
             })
             created_pos += po
             
-        self.purchase_order_create = True
+        self.purchase_order_create  = True
 
         # Retornar vista dinámica dependiendo si se creó 1 o varias POs
         if len(created_pos) == 1:

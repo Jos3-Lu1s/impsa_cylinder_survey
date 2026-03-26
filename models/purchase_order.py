@@ -1,4 +1,5 @@
-from odoo import models, fields
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
 
 class PurchaseCylinder(models.Model):
     _inherit = "purchase.order"
@@ -30,3 +31,22 @@ class PurchaseCylinder(models.Model):
             'view_mode': 'form',
             'res_id': self.survey_id.id,
         }
+        
+    def button_confirm(self):
+        for order in self:
+            products_without_code = order.order_line.filtered(
+                lambda l: not l.product_id.default_code
+            )
+
+            if products_without_code:
+                product_names = ", ".join(
+                    products_without_code.mapped('product_id.display_name')
+                )
+
+                raise ValidationError(_(
+                    "No puedes confirmar la Orden de Compra porque los siguientes productos no tienen código interno (default_code):\n%s"
+                ) % product_names)
+
+        return super().button_confirm()
+        
+    
