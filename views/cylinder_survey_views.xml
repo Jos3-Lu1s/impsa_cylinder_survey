@@ -293,9 +293,15 @@
                             <field name="head_length5" string="Longitud"/>
                         </group>
 
+                        <separator string="Carrea"
+                            invisible="cylinder_to_code != 'CE-T'"/>
+
                         <group string="Carrera">
                             <field name="stroke_length" string="Longitud"/>
                         </group>
+
+                        <separator string="Accesorios"
+                            invisible="cylinder_to_code != 'CE-T'"/>
                         
                         <group string="Accesorios">
                             <field name="rotula_id"/>
