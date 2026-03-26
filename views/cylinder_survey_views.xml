@@ -15,8 +15,9 @@
                             <div class="mt-2 p-2">
                                 <field name="name" class="fw-bolder"/>
                                 <div class="mt-1">
-                                    <span class="badge rounded-pill text-bg-primary me-1"><field name="component"/></span>
+                                    <span class="badge rounded-pill text-bg-secondary"><field name="group_id"/></span>
                                     <span class="badge rounded-pill text-bg-secondary">Cilindro <field name="cylinder_number"/></span>
+                                    <span class="badge rounded-pill text-bg-primary me-1"><field name="component"/></span>
                                 </div>
                             </div>
                         </div>
@@ -152,15 +153,15 @@
                             <group>
                                 <field name="cylinder_to" string="Cilindro de" options="{'no_open': True}"/>
                                 <field name="cylinder_to_code" invisible="1"/>
-                                <field name="description" rows="3" placeholder="Cilindro Hidráulico" />
                                 <field name="num_section" invisible="cylinder_to_code != 'CE-T'"/>
+                                <field name="description" rows="3" placeholder="Cilindro Hidráulico" />
                             </group>
                         </div>
                     </div>
                     <group string="Resumen Técnico" col="3">
 
-                        <separator string="Camisas"
-                            invisible="cylinder_to_code != 'CE-T'"/>
+                        <!-- <separator string="Camisas"
+                            invisible="cylinder_to_code != 'CE-T'"/> -->
 
                         <group string="Camisa">
                             <field name="barrel_inner_diameter"/>
@@ -204,8 +205,8 @@
                             </form>
                         </field> -->
 
-                        <separator string="Vástagos"
-                            invisible="cylinder_to_code != 'CE-T'"/>
+                        <!-- <separator string="Vástagos"
+                            invisible="cylinder_to_code != 'CE-T'"/> -->
 
                         <group string="Vástago">
                             <field name="diameter_rod"/>
@@ -237,8 +238,8 @@
                             <field name="rod_length5" string="Longitud"/>
                         </group>
 
-                        <separator string="Émbolos"
-                            invisible="cylinder_to_code != 'CE-T'"/>
+                        <!-- <separator string="Émbolos"
+                            invisible="cylinder_to_code != 'CE-T'"/> -->
 
                         <group string="Émbolo">
                             <field name="piston_diameter"/>
@@ -265,8 +266,8 @@
                             <field name="piston_length5" string="Longitud"/>
                         </group>
 
-                        <separator string="Cabezas"
-                            invisible="cylinder_to_code != 'CE-T'"/>
+                        <!-- <separator string="Cabezas"
+                            invisible="cylinder_to_code != 'CE-T'"/> -->
 
                         <group string="Cabeza">
                             <field name="head_diameter"/>
@@ -293,15 +294,15 @@
                             <field name="head_length5" string="Longitud"/>
                         </group>
 
-                        <separator string="Carrea"
-                            invisible="cylinder_to_code != 'CE-T'"/>
+                        <!-- <separator string="Carrea"
+                            invisible="cylinder_to_code != 'CE-T'"/> -->
 
                         <group string="Carrera">
                             <field name="stroke_length" string="Longitud"/>
                         </group>
 
-                        <separator string="Accesorios"
-                            invisible="cylinder_to_code != 'CE-T'"/>
+                        <!-- <separator string="Accesorios"
+                            invisible="cylinder_to_code != 'CE-T'"/> -->
                         
                         <group string="Accesorios">
                             <field name="rotula_id"/>
@@ -366,7 +367,7 @@
                         <page string="Resumen de Operaciones" name="all_operations_summary" invisible="not group_ids">
                             <field name="all_operational_record_ids">
                                 <list editable="bottom" default_order="group_id, sequence">
-                                    <field name="sequence" widget="handle"/>
+                                    <!-- <field name="sequence" widget="handle"/> -->
                                     <field name="group_id" string="Grupo" options="{'no_create': True, 'no_open': True}" domain="[('survey_id', '=', parent.id)]" decoration-bf="1"/>
                                     <field name="work_to_do"/>
                                     <field name="obs" optional="show"/>
