@@ -381,7 +381,7 @@
                         </page>
 
                         <page string="Galería Fotográfica Total" name="gallery">
-                            <field name="image_ids" widget="impsa_image_gallery" readonly="1">
+                            <field name="image_ids" widget="impsa_image_gallery" style="width:100%;" readonly="1">
                                 <list>
                                     <field name="name"/>
                                     <field name="component"/>

@@ -16,7 +16,7 @@
                         <div class="card h-100 shadow-sm cursor-pointer" t-on-click="() => this.openRecord(rec)">
                             
                             <t t-if="!props.readonly">
-                                <button class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 shadow" 
+                                <button class="btn btn-sm btn-secondary position-absolute top-0 end-0 m-1 shadow" 
                                         style="z-index: 2; border-radius: 50%; width: 32px; height: 32px; padding: 0;"
                                         t-on-click.stop="() => this.onDeleteImage(rec)"
                                         title="Eliminar Imagen">
