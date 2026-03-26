@@ -4,39 +4,41 @@
         <record id="view_crm_adition" model="ir.ui.view">
             <field name="name">crm.lead.form.inherit.cylinder_survey</field>
             <field name="model">crm.lead</field>
-            <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
+            <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor" />
             <field name="arch" type="xml">
 
-            <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_view_cylinder_surveys"
-                    type="object"
-                    class="oe_stat_button"
-                    icon="fa-cogs"
-                    invisible="cylinder_survey_count == 0">
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <button name="action_view_cylinder_surveys"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-cogs"
+                        invisible="cylinder_survey_count == 0">
 
-                    <field name="cylinder_survey_count" widget="statinfo" string="Levantamientos"/>
-                </button>
-            </xpath>
+                        <field name="cylinder_survey_count" widget="statinfo"
+                            string="Levantamientos" />
+                    </button>
+                </xpath>
 
-            <xpath expr="//field[@name='tag_ids']" position="after">
-                <field name="is_won_stage" invisible="1"/>
-                <field name="selection_crm"/>
-            </xpath>
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                    <field name="is_won_stage" invisible="1" />
+                    <field name="selection_crm"  readonly="stage_sequence > 2" />
+                </xpath>
 
-            <xpath expr="//header//button[@name='action_sale_quotations_new']" position="attributes">
-                <attribute name="invisible">
-                    not is_won_stage or selection_crm == True
-                </attribute>
-            </xpath>
+                <xpath expr="//header//button[@name='action_sale_quotations_new']"
+                    position="attributes">
+                    <attribute name="invisible">
+                        not is_won_stage or selection_crm == True
+                    </attribute>
+                </xpath>
 
-            <xpath expr="//header" position="inside">
-                <button name="action_open_cylinder_survey"
-                    string="Levantamiento"
-                    type="object"
-                    class="oe_highlight"
-                    invisible="not is_won_stage or selection_crm == False"/>
-            </xpath>
-    
+                <xpath expr="//header" position="inside">
+                    <button name="action_open_cylinder_survey"
+                        string="Levantamiento"
+                        type="object"
+                        class="oe_highlight"
+                        invisible="stage_sequence &lt; 2 or selection_crm == False" />
+                </xpath>
+
             </field>
         </record>
     </data>

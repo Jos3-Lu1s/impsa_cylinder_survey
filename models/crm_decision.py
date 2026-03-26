@@ -24,6 +24,11 @@ class CrmDecision(models.Model):
         compute="_compute_cylinder_survey_count"
     )
     
+    stage_sequence = fields.Integer(
+        related='stage_id.sequence',
+        store=True
+    )
+    
     def action_open_cylinder_survey(self):
         return {
             'type': 'ir.actions.act_window',
