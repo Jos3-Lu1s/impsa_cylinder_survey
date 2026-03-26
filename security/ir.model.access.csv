@@ -6,3 +6,4 @@ access_cylinder_survey_line,access_cylinder_survey_line,model_impsa_cylinder_sur
 access_cylinder_options,access_cylinder_options,model_impsa_cylinder_options,base.group_user,1,1,1,1
 access_cylinder_material,access_cylinder_material,model_impsa_cylinder_material,base.group_user,1,1,1,1
 access_impsa_cylinder_group,impsa.cylinder.group.access,model_impsa_cylinder_group,base.group_user,1,1,1,1
+access_impsa_cylinder_section,impsa.cylinder.section.access,model_impsa_cylinder_section,base.group_user,1,1,1,1
