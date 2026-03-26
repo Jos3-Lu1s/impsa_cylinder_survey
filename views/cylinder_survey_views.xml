@@ -170,7 +170,13 @@
                             <field name="barrel_length_main"/>
                         </group>
 
-                        <group string="Camisa" invisible="cylinder_to_code == 'CE-OT'">
+                        <group string="Camisa" invisible="cylinder_to_code == 'CE-OT' or cylinder_to_code == 'CE-T'">
+                            <field name="barrel_inner_diameter"/>
+                            <field name="barrel_outer_diameter"/>
+                            <field name="barrel_length"/>
+                        </group>
+
+                        <group string="Camisa 1" invisible="cylinder_to_code != 'CE-T'">
                             <field name="barrel_inner_diameter"/>
                             <field name="barrel_outer_diameter"/>
                             <field name="barrel_length"/>
@@ -248,7 +254,12 @@
                         <!-- <separator string="Émbolos"
                             invisible="cylinder_to_code != 'CE-T'"/> -->
 
-                        <group string="Émbolo" invisible="cylinder_to_code == 'CE-OT'">
+                        <group string="Émbolo" invisible="cylinder_to_code == 'CE-OT' or cylinder_to_code == 'CE-T'">
+                            <field name="piston_diameter"/>
+                            <field name="piston_length" string="Longitud"/>
+                        </group>
+
+                        <group string="Émbolo 1" invisible="cylinder_to_code != 'CE-T'">
                             <field name="piston_diameter"/>
                             <field name="piston_length" string="Longitud"/>
                         </group>
@@ -276,7 +287,12 @@
                         <!-- <separator string="Cabezas"
                             invisible="cylinder_to_code != 'CE-T'"/> -->
 
-                        <group string="Cabeza" invisible="cylinder_to_code == 'CE-OT'">
+                        <group string="Cabeza" invisible="cylinder_to_code == 'CE-OT' or cylinder_to_code == 'CE-T'">
+                            <field name="head_diameter"/>
+                            <field name="head_length" string="Longitud"/>
+                        </group>
+
+                        <group string="Cabeza 1" invisible="cylinder_to_code != 'CE-T'">
                             <field name="head_diameter"/>
                             <field name="head_length" string="Longitud"/>
                         </group>
