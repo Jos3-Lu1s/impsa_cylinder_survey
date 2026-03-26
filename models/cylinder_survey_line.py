@@ -51,8 +51,7 @@ class CylinderSurveyLine(models.Model):
     unit_quantity = fields.Integer(string="Cantidad por Cilindro", default=1, required=True)
     
     unit_total = fields.Integer(
-        string="Total a Requerir", 
-        compute="_compute_unit_total", 
+        string="Total",
         store=True
     )
 

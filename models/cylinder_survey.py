@@ -224,6 +224,11 @@ class CylinderSurvey(models.Model):
     
     num_section = fields.Integer(string='Número de Secciones')
     
+    purchase_order_create = fields.Boolean(
+        string='Orden de Compra Creada',
+        default=False,
+    )
+    
     section_ids = fields.One2many(
         'impsa.cylinder.section',
         'survey_id',
@@ -262,6 +267,7 @@ class CylinderSurvey(models.Model):
         string="Órdenes de Venta",
         compute="_compute_sale_count"
     )
+
 
     ''' ------------------------
         COMPUTE METHODS
@@ -502,10 +508,9 @@ class CylinderSurvey(models.Model):
 
                     # Guardar referencia en el grupo
                 group.sale_order_id = sale_order.id
-                    
-                record.write({
-                   'state': 'quoted'
-                })
+        record.write({
+               'state': 'quoted'
+           })         
 
     def action_set_draft(self):
         """Permite regresar a borrador"""
@@ -560,6 +565,8 @@ class CylinderSurvey(models.Model):
                 'date_planned': planned_datetime,
             })
             created_pos += po
+            
+        self.purchase_order_create = True
 
         # Retornar vista dinámica dependiendo si se creó 1 o varias POs
         if len(created_pos) == 1:
@@ -578,6 +585,7 @@ class CylinderSurvey(models.Model):
                 'view_mode': 'list,form',
                 'domain': [('id', 'in', created_pos.ids)],
             }
+
 
     @api.model_create_multi
     def create(self, vals_list):

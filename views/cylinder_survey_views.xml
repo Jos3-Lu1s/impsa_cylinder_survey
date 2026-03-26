@@ -71,13 +71,13 @@
         <field name="arch" type="xml">
             <form string="Levantamiento de Cilindro">
                 <header>
-                    <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed'"/>
+                    <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed' or purchase_order_create == True"/>
 
                     <button name="action_quoted" string="Confirmar Cotización" type="object" class="oe_highlight" invisible="state != 'draft'" />
 
                     <button name="action_confirm" string="Confirmar Levantamiento" type="object" class="oe_highlight" invisible="state != 'quoted'" />
 
-                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['draft', 'quoted', 'confirmed']" confirm="¿Está seguro de que desea cancelar este registro?" />
+                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['draft', 'quoted'] or purchase_order_create == True" confirm="¿Está seguro de que desea cancelar este registro?" />
 
                     <button name="action_set_draft" string="Volver a Levantamiento" type="object" invisible="state != 'cancel'" />
 
@@ -154,6 +154,7 @@
                                 <field name="cylinder_to_code" invisible="1"/>
                                 <field name="description" rows="3" placeholder="Cilindro Hidráulico" />
                                 <field name="num_section" invisible="cylinder_to_code != 'CE-T'"/>
+                                <field name="purchase_order_create" invisible="1"/>
                             </group>
                         </div>
                     </div>
@@ -311,7 +312,7 @@
 
                     <notebook>
                         <page string="Grupos y Operaciones" name="groups">
-                            <field name="group_ids">
+                            <field name="group_ids" readonly="state != 'draft'">
                                 <list string="Grupos de Cilindros">
                                     <field name="name"/>
                                     <field name="quantity" string="Total de cilindros" width="150"/>
@@ -395,6 +396,7 @@
                                     <field name="dimensions" optional="show" />
                                     <field name="type_piece" widget="radio" options="{'horizontal': True}" optional="show" width="220" />
                                     <field name="unit_quantity" optional="show" />
+                                    <field name="unit_total" widget="float" optional="show" />
                                 </list>
                             </field>
                             <group string="Proveedores">
