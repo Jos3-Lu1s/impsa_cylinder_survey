@@ -255,11 +255,10 @@ class CylinderSurvey(models.Model):
         ondelete='set null'
     )
     
-    sale_order_id = fields.One2many(
+    sale_order_ids = fields.One2many(
         'sale.order',
         'survey_id',
         string="Orden de Venta",
-        ondelete='set null'
     )
 
     lead_count = fields.Integer(
@@ -287,10 +286,10 @@ class CylinderSurvey(models.Model):
         for rec in self:
             rec.lead_count = 1 if rec.lead_id else 0
             
-    @api.depends('sale_order_id')
+    @api.depends('sale_order_ids')
     def _compute_sale_count(self):
         for rec in self:
-            rec.sale_count = len(rec.group_ids) if rec.sale_order_id else 0
+            rec.sale_count = len(rec.sale_order_ids)
 
     @api.depends('group_ids.operational_record_ids.hr', 'group_ids.operational_record_ids', 'group_ids.quantity')
     def _compute_operational_totals(self):
@@ -419,7 +418,7 @@ class CylinderSurvey(models.Model):
     def action_view_sale_order(self):
         self.ensure_one()
         
-        if self.sale_order_id:
+        if self.sale_order_ids:
             return {
                 'type': 'ir.actions.act_window',
                 'name': 'Orden de Venta',
@@ -499,7 +498,7 @@ class CylinderSurvey(models.Model):
                 
             for line in lines:
                 if line.code_label:
-                    line.product_id = product_map[line.code_label]
+                    line.product_id = product_map.get(line.code_label, False)
                 else:
                     line.product_id = next(products_no_code_iter, False)
             
@@ -516,39 +515,33 @@ class CylinderSurvey(models.Model):
     
     def action_quoted(self):
         """Pasa de Cotización a Orden de Trabajo"""
+        sale_order_env = self.env['sale.order']
         for record in self:
             if not record.group_ids:
                 raise ValidationError(_("Debes agregar al menos un 'Identificador del Grupo'"))
             for group in record.group_ids:
-
-                # Evitar duplicados
                 if group.sale_order_id:
                     continue
 
-                sale_order = self.env['sale.order'].create({
-                    'survey_id': self.id,
+                sale_order = sale_order_env.create({
+                    'survey_id': record.id,
                     'partner_id': record.partner_id.id,
                     'requeriments_work_order': record.name,
                     'group_requeriments_work_order': group.name,
                 })
 
-                    # Guardar referencia en el grupo
                 group.sale_order_id = sale_order.id
-        record.write({
-               'state': 'quoted'
-           })         
+        self.write({'state': 'quoted'})       
 
     def action_set_draft(self):
         """Permite regresar a borrador"""
-        for record in self: 
-            record.write({'state': 'draft'})
+        self.write({'state': 'draft'})
 
     def action_cancel(self):
         """Cancela el registro"""
-        for record in self:
-            if record.state == 'confirmed':
-                raise ValidationError(_("No puedes cancelar un registro que ya es una Orden de Trabajo confirmada. Reviértelo primero."))
-            record.write({'state': 'cancel'})
+        if any(record.state == 'confirmed' for record in self):
+            raise ValidationError(_("No puedes cancelar un registro que ya es una Orden de Trabajo confirmada. Reviértelo primero."))
+        self.write({'state': 'cancel'})
 
     def action_create_purchase_order(self):
         """Crea Órdenes de Compra agrupadas por proveedor del empaque."""

@@ -15,7 +15,7 @@
                             <div class="mt-2 p-2">
                                 <field name="name" class="fw-bolder"/>
                                 <div class="mt-1">
-                                    <span class="badge rounded-pill text-bg-secondary"><field name="group_id"/></span>
+                                    <!-- <span class="badge rounded-pill text-bg-secondary"><field name="group_id"/></span> -->
                                     <span class="badge rounded-pill text-bg-secondary">Cilindro <field name="cylinder_number"/></span>
                                     <span class="badge rounded-pill text-bg-primary me-1"><field name="component"/></span>
                                 </div>
@@ -99,7 +99,7 @@
                         <button name="action_view_lead" type="object" class="oe_stat_button" icon="fa-star" invisible="not lead_id">
                             <field name="lead_count" widget="statinfo" string="Oportunidad"/>
                         </button>
-                        <button name="action_view_sale_order" type="object" class="oe_stat_button" icon="fa-shopping-cart" invisible="not sale_order_id">
+                        <button name="action_view_sale_order" type="object" class="oe_stat_button" icon="fa-shopping-cart" invisible="not sale_order_ids">
                             <field name="sale_count" widget="statinfo" string="Ventas"/>
                         </button>
                     </div>
@@ -352,7 +352,6 @@
                                             string="Ver Cotización"
                                             invisible="sale_order_id == False">
                                     </button>
-
 
                                 </list>
 
