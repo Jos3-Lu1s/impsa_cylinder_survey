@@ -1,4 +1,4 @@
-from odoo import models, fields, api, _
+from odoo import models, fields, api, Command, _
 from odoo.exceptions import ValidationError, UserError
 
 class CylinderSurvey(models.Model):
@@ -57,26 +57,6 @@ class CylinderSurvey(models.Model):
         string="Imágenes de la Camisa", 
         domain=[('component', '=', 'barrel')]
     )
-    
-    barrel_inner_diameter_main = fields.Float(string='Ø Interior Principal')
-    barrel_outer_diameter_main = fields.Float(string='Ø Exterior Principal')
-    barrel_length_main = fields.Float(string='Longitud Principal')
-    
-    barrel_inner_diameter2 = fields.Float(string='Ø Interior 2')
-    barrel_outer_diameter2 = fields.Float(string='Ø Exterior 2')
-    barrel_length2 = fields.Float(string='Longitud 2')
-    
-    barrel_inner_diameter3 = fields.Float(string='Ø Interior 3')
-    barrel_outer_diameter3 = fields.Float(string='Ø Exterior 3')
-    barrel_length3 = fields.Float(string='Longitud 3')
-    
-    barrel_inner_diameter4 = fields.Float(string='Ø Interior 4')
-    barrel_outer_diameter4 = fields.Float(string='Ø Exterior 4')
-    barrel_length4 = fields.Float(string='Longitud 4')
-    
-    barrel_inner_diameter5 = fields.Float(string='Ø Interior 5')
-    barrel_outer_diameter5 = fields.Float(string='Ø Exterior 5')
-    barrel_length5 = fields.Float(string='Longitud 5')
 
     # Vástago (Rod)
     diameter_rod = fields.Float(string="Ø Vástago")
@@ -86,21 +66,8 @@ class CylinderSurvey(models.Model):
         string="Imágenes del Vástago", 
         domain=[('component', '=', 'rod')]
     )
-    
     diameter_rod2 = fields.Float(string="Ø Vástago 2")
     rod_length2 = fields.Float(string='Longitud de Vástago 2')
-    
-    diameter_rod3 = fields.Float(string="Ø Vástago 3")
-    rod_length3 = fields.Float(string='Longitud de Vástago 3')
-    
-    diameter_rod4 = fields.Float(string="Ø Vástago 4")
-    rod_length4 = fields.Float(string='Longitud de Vástago 4')
-    
-    diameter_rod5 = fields.Float(string="Ø Vástago 5")
-    rod_length5 = fields.Float(string='Longitud de Vástago 5')
-    
-    diameter_rod6 = fields.Float(string="Ø Vástago 2")
-    rod_length6 = fields.Float(string='Longitud de Vástago 2')
 
     # Émbolo (Piston)
     piston_diameter = fields.Float(string='Ø Émbolo') 
@@ -110,18 +77,6 @@ class CylinderSurvey(models.Model):
         string="Imágenes del Émbolo", 
         domain=[('component', '=', 'piston')]
     )
-    
-    piston_diameter2 = fields.Float(string='Ø Émbolo 2')
-    piston_length2 = fields.Float(string='Longitud de Émbolo 2')
-    
-    piston_diameter3 = fields.Float(string='Ø Émbolo 3')
-    piston_length3 = fields.Float(string='Longitud de Émbolo 3')
-    
-    piston_diameter4 = fields.Float(string='Ø Émbolo 4')
-    piston_length4 = fields.Float(string='Longitud de Émbolo 4')
-    
-    piston_diameter5 = fields.Float(string='Ø Émbolo 5')
-    piston_length5 = fields.Float(string='Longitud de Émbolo 5')
 
     # Cabeza (Head)
     head_diameter = fields.Float(string='Ø Cabeza')
@@ -131,18 +86,6 @@ class CylinderSurvey(models.Model):
         string="Imágenes de la Cabeza", 
         domain=[('component', '=', 'head')]
     )
-    
-    head_diameter2 = fields.Float(string='Ø Cabeza 2')
-    head_length2 = fields.Float(string='Longitud de Cabeza 2')
-    
-    head_diameter3 = fields.Float(string='Ø Cabeza 3')
-    head_length3 = fields.Float(string='Longitud de Cabeza 3')
-    
-    head_diameter4 = fields.Float(string='Ø Cabeza 4')
-    head_length4 = fields.Float(string='Longitud de Cabeza 4')
-    
-    head_diameter5 = fields.Float(string='Ø Cabeza 5')
-    head_length5 = fields.Float(string='Longitud de Cabeza 5')
 
     # Carrera (Stroke)
     stroke_length = fields.Float(string='Longitud de Carrera')
@@ -310,12 +253,56 @@ class CylinderSurvey(models.Model):
         for survey in self:
             survey.allocated_qty = sum(survey.group_ids.mapped('quantity'))
             
-    @api.onchange('num_section')
-    def _onchange_num_section_limit(self):
+    @api.onchange('num_section', 'cylinder_to')
+    def _onchange_generate_sections(self):
+        """
+        Genera dinámicamente las líneas del cilindro telescópico 
+        basado en el número de secciones indicadas.
+        """
+        # 1. Si no es Telescópico, limpiamos las secciones y salimos.
+        if self.cylinder_to and self.cylinder_to.code != 'CE-T':
+            self.num_section = 0
+            self.section_ids = [Command.clear()]
+            return
+
+        # 2. Limitamos el número de secciones
         if self.num_section <= 0:
             self.num_section = 1
         elif self.num_section > 5:
             self.num_section = 5
+
+        # 3. Preparar la creación de líneas usando odoo.Command
+        commands = [Command.clear()] # Primero limpiamos lo que haya
+        
+        # Diccionario para automatizar nombres (Soporta hasta 5 extensiones)
+        ordinales = {1: 'Primera', 2: 'Segunda', 3: 'Tercera', 4: 'Cuarta', 5: 'Quinta'}
+        
+        # Total de registros a crear = 1 (Principal) + num_section
+        total_records = self.num_section + 1
+        
+        for i in range(total_records):
+            if i == 0:
+                # Índice 0 siempre es la Camisa Principal
+                name = 'Camisa Principal'
+                sec_type = 'main'
+            elif i == total_records - 1:
+                # El último índice siempre es la Última Extensión
+                name = f'{ordinales.get(i, str(i) + "a")} Extensión (Última)'
+                sec_type = 'last'
+            else:
+                # Cualquier cosa en medio son Extensiones Intermedias
+                name = f'{ordinales.get(i, str(i) + "a")} Extensión'
+                sec_type = 'intermediate'
+                
+            # Agregamos el comando de creación a la lista
+            commands.append(Command.create({
+                'sequence': (i + 1) * 10, # 10, 20, 30... para mantener el orden
+                'name': name,
+                'section_type': sec_type,
+            }))
+            
+        # Asignamos la lista de comandos al campo One2many
+        self.section_ids = commands
 
     ''' ------------------------
         CONSTRAINS
@@ -341,7 +328,7 @@ class CylinderSurvey(models.Model):
     @api.constrains(
         'cylinder_to', 'barrel_inner_diameter', 'barrel_outer_diameter', 'barrel_length',
         'diameter_rod', 'rod_length', 'piston_diameter', 'piston_length', 
-        'head_diameter', 'head_length', 'stroke_length'
+        'head_diameter', 'head_length', 'stroke_length', 'section_ids'
     )
     def _check_required_dimensions_by_type(self):
         for rec in self:
@@ -351,12 +338,12 @@ class CylinderSurvey(models.Model):
             code = rec.cylinder_to.code
             missing_components = []
 
-            # Evaluamos por bloque de pieza en lugar de campo por campo
+            # Evaluamos por bloque de pieza
             if code == 'CE-OT':
                 if rec.barrel_inner_diameter <= 0.0:
                     missing_components.append('Diámetro Interior de la Camisa')
 
-            elif code in ['CE-DE', 'CE-SE']:
+            elif code in ['CE-DE', 'CE-SE', 'CE-DV']: # Agregamos el Doble Vástago por si acaso
                 if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0 or rec.barrel_length <= 0.0:
                     missing_components.append('Camisa')
                 if rec.diameter_rod <= 0.0 or rec.rod_length <= 0.0:
@@ -368,15 +355,41 @@ class CylinderSurvey(models.Model):
                 if rec.stroke_length <= 0.0:
                     missing_components.append('Carrera')
                     
-            elif code in ['CE-T']:
-                if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0 or rec.barrel_length <= 0.0:
-                    missing_components.append('Camisa')
+            elif code == 'CE-T':
+                # 1. Validar la carrera global (compartida por todas las secciones)
+                if rec.stroke_length <= 0.0:
+                    missing_components.append('Carrera Total')
+                    
+                # 2. Validar cada sección generada en la tabla dinámicamente
+                for section in rec.section_ids:
+                    sec_name = section.name  # Ej: "Camisa Principal" o "Segunda Extensión"
+                    
+                    if section.section_type == 'main':
+                        if section.inner_diameter <= 0.0 or section.outer_diameter <= 0.0 or section.length <= 0.0:
+                            missing_components.append(f'Medidas de Camisa en "{sec_name}"')
+                        if section.head_diameter <= 0.0 or section.head_length <= 0.0:
+                            missing_components.append(f'Medidas de Cabeza en "{sec_name}"')
+                            
+                    elif section.section_type == 'intermediate':
+                        if section.inner_diameter <= 0.0 or section.outer_diameter <= 0.0 or section.length <= 0.0:
+                            missing_components.append(f'Medidas de Tubo en "{sec_name}"')
+                        if section.piston_diameter <= 0.0 or section.piston_length <= 0.0:
+                            missing_components.append(f'Medidas de Émbolo en "{sec_name}"')
+                        if section.head_diameter <= 0.0 or section.head_length <= 0.0:
+                            missing_components.append(f'Medidas de Cabeza en "{sec_name}"')
+                            
+                    elif section.section_type == 'last':
+                        if section.outer_diameter <= 0.0 or section.length <= 0.0:
+                            missing_components.append(f'Medidas de Vástago (Ø Ext) en "{sec_name}"')
+                        if section.piston_diameter <= 0.0 or section.piston_length <= 0.0:
+                            missing_components.append(f'Medidas de Émbolo en "{sec_name}"')
 
+            # Si se recolectaron errores, lanzar la excepción
             if missing_components:
-                componentes = ", ".join(missing_components)
+                componentes = "\n- ".join(missing_components)
                 raise ValidationError(
-                    f"Faltan medidas para el cilindro '{rec.cylinder_to.name}'.\n\n"
-                    f"Asegúrate de registrar valores mayores a 0 en: {componentes}."
+                    f"Faltan medidas mayores a 0 para el cilindro '{rec.cylinder_to.name}'.\n"
+                    f"Por favor revisa lo siguiente:\n- {componentes}"
                 )
                 
     @api.constrains('num_section')
