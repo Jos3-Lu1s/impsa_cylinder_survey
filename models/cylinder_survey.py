@@ -146,13 +146,7 @@ class CylinderSurvey(models.Model):
         help="Suma total de líneas en el registro operativo.",
         readonly=True
     )
-    total_hours = fields.Float(
-        string='Total de Horas',
-        compute='_compute_operational_totals',
-        store=True,
-        help="Suma total de horas de todas las tareas.",
-        readonly=True
-    )
+
     state = fields.Selection([
         ('draft', 'Levantamiento'),
         ('apu', 'APU'),
@@ -238,19 +232,13 @@ class CylinderSurvey(models.Model):
         for rec in self:
             rec.sale_count = len(rec.sale_order_ids)
 
-    @api.depends('group_ids.operational_record_ids.hr', 'group_ids.operational_record_ids', 'group_ids.quantity')
+    @api.depends('group_ids.operational_record_ids', 'group_ids.quantity')
     def _compute_operational_totals(self):
         for record in self:
             total_tasks = 0
-            total_h = 0.0
             for group in record.group_ids:
-                lines = group.operational_record_ids
-                total_tasks += len(lines)
-                group_hours = sum(lines.mapped('hr'))
-                total_h += (group_hours * group.quantity)
-            
+                total_tasks += len(group.operational_record_ids)
             record.total_tasks = total_tasks
-            record.total_hours = total_h
         
     @api.depends('group_ids.quantity')
     def _compute_allocated_qty(self):
@@ -268,6 +256,9 @@ class CylinderSurvey(models.Model):
             self.num_section = 0
             self.section_ids = [Command.clear()]
             return
+
+        if self.num_section == 0:
+            self.num_section = 1
 
         # 2. Limitamos el número de secciones
         if self.num_section < 1 or self.num_section > 5:
@@ -572,28 +563,48 @@ class CylinderSurvey(models.Model):
             record.write({'state': 'confirmed'})
     
     def action_to_apu(self):
-        """Pasa de Levantamiento a APU (Análisis de Precios)"""
+        """Pasa de Levantamiento a APU"""
         for record in self:
+            # Validación de existencia de grupos
+            if not record.group_ids:
+                raise ValidationError(_(
+                    "No puedes enviar a APU un levantamiento sin grupos. "
+                    "Por favor, define al menos un 'Identificador del Grupo' "
+                    "en la pestaña de Grupos y Operaciones."
+                ))
+            
+            # Validación de consistencia
+            if record.allocated_qty != record.cylinder_qty:
+                raise ValidationError(_(
+                    "La cantidad de cilindros asignados en los grupos (%s) "
+                    "no coincide con el total declarado (%s)."
+                ) % (record.allocated_qty, record.cylinder_qty))
+
             record.write({'state': 'apu'})
 
     def action_quoted(self):
-        """Pasa de APU a Cotización (Genera Orden de Venta)"""
+        """Pasa de APU a Cotización"""
         for record in self:
-            # Los grupos deben estar listos
             if not record.group_ids:
-                raise ValidationError(_("Debes agregar al menos un 'Identificador del Grupo'"))
+                raise ValidationError(_("Operación inválida: No hay grupos definidos."))
             
+            # Cada grupo debe tener al menos una tarea operativa
             for group in record.group_ids:
-                if group.sale_order_id:
-                    continue
+                if not group.operational_record_ids:
+                    raise ValidationError(_(
+                        "El grupo '%s' no tiene tareas operativas asignadas. "
+                        "APU requiere el listado de trabajos para costear."
+                    ) % group.name)
 
-                sale_order = self.env['sale.order'].create({
-                    'survey_id': self.id,
-                    'partner_id': record.partner_id.id,
-                    'requeriments_work_order': record.name,
-                    'group_requeriments_work_order': group.name,
-                })
-                group.sale_order_id = sale_order.id
+            for group in record.group_ids:
+                if not group.sale_order_id:
+                    sale_order = self.env['sale.order'].create({
+                        'survey_id': self.id,
+                        'partner_id': record.partner_id.id,
+                        'requeriments_work_order': record.name,
+                        'group_requeriments_work_order': group.name,
+                    })
+                    group.sale_order_id = sale_order.id
                 
             record.write({'state': 'quoted'})
 

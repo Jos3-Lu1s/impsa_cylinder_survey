@@ -16,10 +16,11 @@
     'category': 'Services/Field Service',
     'version': '19.0.1.0.0',
 
-    'depends': ['base', "crm", "mail", 'purchase', 'sale_crm', 'sale'],
+    'depends': ['base', "crm", "mail", 'purchase', 'sale_management'],
 
     "data": [
         "security/ir.model.access.csv",
+        'data/cylinder_data.xml',
         # 'data/paper_format.xml',
         # 'reports/report_actions.xml',
         # 'reports/cylinder_survey_report.xml',

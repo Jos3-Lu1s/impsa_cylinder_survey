@@ -31,13 +31,6 @@ class CylinderGroup(models.Model):
         string="Registro Operativo",
     )
 
-    group_total_hours = fields.Float(
-        string="Subtotal de Horas",
-        compute="_compute_group_total_hours",
-        store=True,
-        help="Tiempo total estimado para este grupo (Suma de horas de sus operaciones multiplicada por la cantidad de cilindros)."
-    )
-
     image_ids = fields.One2many(
         'impsa.cylinder.image', 
         'group_id', 
@@ -57,12 +50,6 @@ class CylinderGroup(models.Model):
         string="Estado",
         store=True
     )
-
-    @api.depends('operational_record_ids.hr', 'quantity')
-    def _compute_group_total_hours(self):
-        for group in self:
-            base_hours = sum(group.operational_record_ids.mapped('hr'))
-            group.group_total_hours = base_hours * group.quantity
 
     @api.constrains('quantity')
     def _check_group_quantity(self):

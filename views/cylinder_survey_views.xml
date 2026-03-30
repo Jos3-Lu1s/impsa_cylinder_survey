@@ -148,14 +148,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-6">
-                                    <div class="card shadow-sm border-0 bg-success-light text-center p-2">
-                                        <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.7rem;">Tiempo Estimado</div>
-                                        <div class="h4 mb-0 text-success">
-                                            <field name="total_hours" widget="float_time" readonly="1" nolabel="1" />
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
 
                             <group>
@@ -202,36 +194,41 @@
                                 <field name="name" readonly="1" force_save="1" decoration-bf="1" width="200px"/>
                                 
                                 <field name="inner_diameter" 
+                                       force_save="1"
                                        readonly="section_type == 'last'" 
                                        decoration-warning="section_type == 'last'"
                                        string="Ø Interior"/>
                                        
-                                <field name="outer_diameter" string="Ø Vástago (Ext)" decoration-bf="1"/>
+                                <field name="outer_diameter" force_save="1" string="Ø Vástago (Ext)" decoration-bf="1"/>
                                 
-                                <field name="length" string="Longitud"/>
+                                <field name="length" string="Longitud" force_save="1"/>
                                 
                                 <field name="piston_diameter" 
+                                       force_save="1"
                                        readonly="section_type == 'main'" 
                                        decoration-warning="section_type == 'main'"/>
                                        
                                 <field name="piston_length" 
                                        string="Long. Émbolo"
                                        readonly="section_type == 'main'" 
+                                       force_save="1"
                                        decoration-warning="section_type == 'main'"/>
                                 
                                 <field name="head_diameter" 
                                        readonly="section_type in ('last', 'main')" 
+                                       force_save="1"
                                        decoration-warning="section_type in ('last', 'main')"/>
                                        
                                 <field name="head_length" 
                                        string="Long. Cabeza"
+                                       force_save="1"
                                        readonly="section_type in ('last', 'main')" 
                                        decoration-warning="section_type in ('last', 'main')"/>
                             </list>
                         </field>
 
                         <group string="Carrera" invisible="cylinder_to_code == 'CE-OT'">
-                            <field name="stroke_length" string="Longitud Total de Carrera"/>
+                            <field name="stroke_length" string="Longitud Total"/>
                         </group>
                     
                         <group string="Accesorios" invisible="cylinder_to_code != 'CE-OT'">
@@ -246,24 +243,30 @@
 
                     <notebook>
                         <page string="Grupos y Operaciones" name="groups">
-                            <field name="group_ids" readonly="state != 'draft'">
+                            <field name="group_ids" readonly="state not in ('draft', 'apu')">
                                 <list string="Grupos de Cilindros">
                                     <field name="name"/>
-                                    <field name="quantity" string="Total de cilindros" width="150"/>
-                                    <field name="group_total_hours" string="Horas del Grupo" widget="float_time"/>
-                                    <field name="sale_order_id" string="Cotización" widget="badge" decoration-success="True"/>
-                                    <field name="sale_state" string="Estado Cot." widget="badge"
-                                        decoration-warning="sale_state == 'draft'"
-                                        decoration-info="sale_state == 'sent'"
-                                        decoration-success="sale_state == 'sale'"
-                                        decoration-danger="sale_state == 'cancel'"/>
-                                    <button name="action_open_sale_order"
+                                    <field name="quantity" string="Total de cilindros"/>
+                                    <field name="sale_order_id" 
+                                           string="Cotización" 
+                                           widget="badge" 
+                                           decoration-success="True" 
+                                           column_invisible="not parent.sale_order_ids"/>
+                                    <field name="sale_state" 
+                                           string="Estado Cot." 
+                                           widget="badge" 
+                                           column_invisible="not parent.sale_order_ids"
+                                           decoration-warning="sale_state == 'draft'"
+                                           decoration-info="sale_state == 'sent'"
+                                           decoration-success="sale_state == 'sale'"
+                                           decoration-danger="sale_state == 'cancel'"/>
+                                    <button name="action_open_sale_order" 
+                                            column_invisible="not parent.sale_order_ids"
+                                            invisible="not sale_order_id"
                                             type="object"
                                             class="oe_link"
-                                            string="Ver Cotización"
-                                            invisible="sale_order_id == False">
+                                            string="Ver Cotización">
                                     </button>
-
                                 </list>
 
                                 <form string="Detalle del Grupo">
@@ -279,7 +282,6 @@
                                                         <field name="sequence" widget="handle"/>
                                                         <field name="work_to_do"/>
                                                         <field name="obs" optional="show"/>
-                                                        <field name="hr" widget="float_time"/>
                                                     </list>
                                                 </field>
                                             </page>
@@ -298,13 +300,12 @@
                         </page>
 
                         <page string="Resumen de Operaciones" name="all_operations_summary" invisible="not group_ids">
-                            <field name="all_operational_record_ids">
+                            <field name="all_operational_record_ids" readonly="state not in ('draft', 'apu')">
                                 <list editable="bottom" default_order="group_id, sequence">
                                     <!-- <field name="sequence" widget="handle"/> -->
                                     <field name="group_id" string="Grupo" options="{'no_create': True, 'no_open': True}" domain="[('survey_id', '=', parent.id)]" decoration-bf="1"/>
                                     <field name="work_to_do"/>
                                     <field name="obs" optional="show"/>
-                                    <field name="hr" widget="float_time"/>
                                 </list>
                             </field>
                         </page>
