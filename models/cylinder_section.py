@@ -33,6 +33,7 @@ class CylinderSection(models.Model):
     # ----------------------------------------------------
     inner_diameter = fields.Float(
         string="Ø Interior", 
+        required=True,
         help="Aplica para Camisa Principal y Extensiones Intermedias."
     )
     outer_diameter = fields.Float(
@@ -51,9 +52,11 @@ class CylinderSection(models.Model):
     # ----------------------------------------------------
     piston_diameter = fields.Float(
         string="Ø Émbolo", 
+        required=True,
         help="No aplica en la camisa principal."
     )
     piston_length = fields.Float(
+        required=True,
         string="Longitud de Émbolo"
     )
 
@@ -62,8 +65,10 @@ class CylinderSection(models.Model):
     # ----------------------------------------------------
     head_diameter = fields.Float(
         string="Ø Cabeza", 
+        required=True,
         help="No aplica en la última extensión."
     )
     head_length = fields.Float(
+        required=True,
         string="Longitud de Cabeza"
     )
