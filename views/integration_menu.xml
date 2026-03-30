@@ -26,6 +26,20 @@
       </field>
     </record>
 
+    <record id="action_impsa_cylinder_survey_apu" model="ir.actions.act_window">
+      <field name="name">APUS Activas</field>
+      <field name="res_model">impsa.cylinder.survey</field>
+      <field name="view_mode">list,form</field>
+      <field name="domain">[('state', '=', 'apu')]</field>
+      <field name="context">{'hide_state': True}</field>
+      <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+                    No hay APUS en este momento.
+        </p>
+        <p>Las órdenes aparecerán aquí cuando se genere una APU.</p>
+      </field>
+    </record>
+    
     <record id="action_impsa_cylinder_survey_quoted" model="ir.actions.act_window">
       <field name="name">Cotizaciones Activas</field>
       <field name="res_model">impsa.cylinder.survey</field>
@@ -72,15 +86,17 @@
 
     <menuitem id="menu_cylinder_survey_draft" name="Levantamientos" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_draft" sequence="20"/>
 
-    <menuitem id="menu_cylinder_survey_quoted" name="APUS" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_quoted" sequence="30"/>
+    <menuitem id="menu_cylinder_survey_apus" name="APUS" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_apu" sequence="30"/>
 
-    <menuitem id="menu_cylinder_survey_confirmed" name="Órdenes de Trabajo" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_confirmed" sequence="40"/>
+    <menuitem id="menu_cylinder_survey_quoted" name="Cotizaciones" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_quoted" sequence="40"/>
 
-    <menuitem id="menu_cylinder_catalogos" name="Catálogos" parent="menu_crm_cylinder_survey_root" sequence="50"/>
+    <menuitem id="menu_cylinder_survey_confirmed" name="Órdenes de Trabajo" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_confirmed" sequence="50"/>
+
+    <menuitem id="menu_cylinder_catalogos" name="Catálogos" parent="menu_crm_cylinder_survey_root" sequence="60"/>
     
-    <menuitem id="menu_cylinder_options" name="Catálogo de cilindros" parent="menu_cylinder_catalogos" action="action_cylinder_options" sequence="50"/>
+    <menuitem id="menu_cylinder_options" name="Catálogo de cilindros" parent="menu_cylinder_catalogos" action="action_cylinder_options" sequence="70"/>
 
-    <menuitem id="menu_cylinder_material" name="Catálogo de materiales" parent="menu_cylinder_catalogos" action="action_cylinder_material" sequence="60"/>
+    <menuitem id="menu_cylinder_material" name="Catálogo de materiales" parent="menu_cylinder_catalogos" action="action_cylinder_material" sequence="80"/>
 
   </data>
 </odoo>

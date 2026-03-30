@@ -61,7 +61,13 @@
                 <field name="activity_ids" string="Actividades" widget="list_activity" />
                 <field name="description" optional="hide" />
                 <field name="cylinder_type" optional="show" />
-                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'quoted'" decoration-success="state == 'confirmed'" decoration-danger="state == 'cancel'" column_invisible="context.get('hide_state', False)" />
+                <field name="state" widget="badge" 
+                        decoration-info="state == 'draft'" 
+                        decoration-primary="state == 'apu'" 
+                        decoration-warning="state == 'quoted'" 
+                        decoration-success="state == 'confirmed'" 
+                        decoration-danger="state == 'cancel'" 
+                        column_invisible="context.get('hide_state', False)" />
             </list>
         </field>
     </record>
@@ -72,17 +78,19 @@
         <field name="arch" type="xml">
             <form string="Levantamiento de Cilindro">
                 <header>
-                    <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed' or purchase_order_create == True"/>
+                    <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed'"/>
 
-                    <button name="action_quoted" string="Confirmar APU" type="object" class="oe_highlight" invisible="state != 'draft'" />
+                    <button name="action_to_apu" string="Enviar a APU" type="object" class="oe_highlight" invisible="state != 'draft'" />
+
+                    <button name="action_quoted" string="Confirmar Cotización" type="object" class="oe_highlight" invisible="state != 'apu'" />
 
                     <button name="action_confirm" string="Confirmar Levantamiento" type="object" class="oe_highlight" invisible="state != 'quoted'" />
 
-                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['draft', 'quoted'] or purchase_order_create == True" confirm="¿Está seguro de que desea cancelar este registro?" />
+                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['draft', 'apu', 'quoted']" confirm="¿Está seguro de que desea cancelar este registro?" />
 
                     <button name="action_set_draft" string="Volver a Levantamiento" type="object" invisible="state != 'cancel'" />
 
-                    <field name="state" widget="statusbar" statusbar_visible="draft,quoted,confirmed" />
+                    <field name="state" widget="statusbar" statusbar_visible="draft,apu,quoted,confirmed" />
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -160,13 +168,13 @@
                         </div>
                     </div>
                     <group string="Resumen Técnico" col="3">
-                        <group string="Camisa" invisible="cylinder_to_code == 'CE-T'">
+                        <group string="Camisa" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
                             <field name="barrel_inner_diameter"/>
                             <field name="barrel_outer_diameter"/>
                             <field name="barrel_length"/>
                         </group>
 
-                        <group string="Vástago" invisible="cylinder_to_code == 'CE-T'">
+                        <group string="Vástago" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
                             <field name="diameter_rod"/>
                             <field name="rod_length" string="Longitud"/>
                         </group>
@@ -176,12 +184,12 @@
                             <field name="rod_length2" string="Longitud"/>
                         </group>
 
-                        <group string="Émbolo" invisible="cylinder_to_code == 'CE-T'">
+                        <group string="Émbolo" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
                             <field name="piston_diameter"/>
                             <field name="piston_length" string="Longitud"/>
                         </group>
 
-                        <group string="Cabeza" invisible="cylinder_to_code == 'CE-T'">
+                        <group string="Cabeza" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
                             <field name="head_diameter"/>
                             <field name="head_length" string="Longitud"/>
                         </group>
@@ -193,19 +201,36 @@
                                 
                                 <field name="name" readonly="1" force_save="1" decoration-bf="1" width="200px"/>
                                 
-                                <field name="inner_diameter" readonly="section_type == 'last'" decoration-muted="section_type == 'last'"/>
-                                <field name="outer_diameter" string="Ø Vástago (Ext)"/>
-                                <field name="length"/>
+                                <field name="inner_diameter" 
+                                       readonly="section_type == 'last'" 
+                                       decoration-warning="section_type == 'last'"
+                                       string="Ø Interior"/>
+                                       
+                                <field name="outer_diameter" string="Ø Vástago (Ext)" decoration-bf="1"/>
                                 
-                                <field name="piston_diameter" readonly="section_type == 'main'" decoration-muted="section_type == 'main'"/>
-                                <field name="piston_length" readonly="section_type == 'main'" decoration-muted="section_type == 'main'"/>
+                                <field name="length" string="Longitud"/>
                                 
-                                <field name="head_diameter" readonly="section_type == 'last'" decoration-muted="section_type == 'last'"/>
-                                <field name="head_length" readonly="section_type == 'last'" decoration-muted="section_type == 'last'"/>
+                                <field name="piston_diameter" 
+                                       readonly="section_type == 'main'" 
+                                       decoration-warning="section_type == 'main'"/>
+                                       
+                                <field name="piston_length" 
+                                       string="Long. Émbolo"
+                                       readonly="section_type == 'main'" 
+                                       decoration-warning="section_type == 'main'"/>
+                                
+                                <field name="head_diameter" 
+                                       readonly="section_type in ('last', 'main')" 
+                                       decoration-warning="section_type in ('last', 'main')"/>
+                                       
+                                <field name="head_length" 
+                                       string="Long. Cabeza"
+                                       readonly="section_type in ('last', 'main')" 
+                                       decoration-warning="section_type in ('last', 'main')"/>
                             </list>
                         </field>
 
-                        <group string="Carrera">
+                        <group string="Carrera" invisible="cylinder_to_code == 'CE-OT'">
                             <field name="stroke_length" string="Longitud Total de Carrera"/>
                         </group>
                     

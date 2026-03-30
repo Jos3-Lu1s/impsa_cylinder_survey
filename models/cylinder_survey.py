@@ -155,7 +155,8 @@ class CylinderSurvey(models.Model):
     )
     state = fields.Selection([
         ('draft', 'Levantamiento'),
-        ('quoted', 'APU'),
+        ('apu', 'APU'),
+        ('quoted', 'Cotización'),
         ('confirmed', 'Orden de Trabajo'),
         ('cancel', 'Cancelado'),
     ], string='Estado', default='draft', tracking=True, copy=False, index=True)
@@ -169,7 +170,10 @@ class CylinderSurvey(models.Model):
         string='Normalizado'
     )
     
-    num_section = fields.Integer(string='Número de Secciones')
+    num_section = fields.Integer(
+        string='Número de Secciones',
+        default=1, 
+    )
     
     purchase_order_create = fields.Boolean(
         string='Orden de Compra Creada',
@@ -266,10 +270,15 @@ class CylinderSurvey(models.Model):
             return
 
         # 2. Limitamos el número de secciones
-        if self.num_section <= 0:
-            self.num_section = 1
-        elif self.num_section > 5:
-            self.num_section = 5
+        if self.num_section < 1 or self.num_section > 5:
+            # Limpiamos las líneas para no generar basura o colapsar la vista con 1000 líneas
+            self.section_ids = [Command.clear()] 
+            return {
+                'warning': {
+                    'title': "Límite de Secciones Excedido",
+                    'message': "Por cuestiones de diseño, un cilindro telescópico no puede tener menos de 1 ni más de 5 secciones. Por favor, corrige el número."
+                }
+            }
 
         # 3. Preparar la creación de líneas usando odoo.Command
         commands = [Command.clear()] # Primero limpiamos lo que haya
@@ -328,7 +337,8 @@ class CylinderSurvey(models.Model):
     @api.constrains(
         'cylinder_to', 'barrel_inner_diameter', 'barrel_outer_diameter', 'barrel_length',
         'diameter_rod', 'rod_length', 'piston_diameter', 'piston_length', 
-        'head_diameter', 'head_length', 'stroke_length', 'section_ids'
+        'head_diameter', 'head_length', 'stroke_length', 'section_ids',
+        'accessories', 'rotula_id'
     )
     def _check_required_dimensions_by_type(self):
         for rec in self:
@@ -340,8 +350,11 @@ class CylinderSurvey(models.Model):
 
             # Evaluamos por bloque de pieza
             if code == 'CE-OT':
-                if rec.barrel_inner_diameter <= 0.0:
-                    missing_components.append('Diámetro Interior de la Camisa')
+                if not rec.accessories and not rec.rotula_id:
+                    raise ValidationError(
+                        f"Para el tipo de registro '{rec.cylinder_to.name}', es obligatorio "
+                        "detallar la información en el campo de 'Accesorios' o seleccionar una 'Rotula'."
+                    )
 
             elif code in ['CE-DE', 'CE-SE', 'CE-DV']: # Agregamos el Doble Vástago por si acaso
                 if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0 or rec.barrel_length <= 0.0:
@@ -367,8 +380,6 @@ class CylinderSurvey(models.Model):
                     if section.section_type == 'main':
                         if section.inner_diameter <= 0.0 or section.outer_diameter <= 0.0 or section.length <= 0.0:
                             missing_components.append(f'Medidas de Camisa en "{sec_name}"')
-                        if section.head_diameter <= 0.0 or section.head_length <= 0.0:
-                            missing_components.append(f'Medidas de Cabeza en "{sec_name}"')
                             
                     elif section.section_type == 'intermediate':
                         if section.inner_diameter <= 0.0 or section.outer_diameter <= 0.0 or section.length <= 0.0:
@@ -391,14 +402,48 @@ class CylinderSurvey(models.Model):
                     f"Faltan medidas mayores a 0 para el cilindro '{rec.cylinder_to.name}'.\n"
                     f"Por favor revisa lo siguiente:\n- {componentes}"
                 )
+    
+    @api.constrains('section_ids')
+    def _check_telescopic_physics(self):
+        """
+        Valida que las secciones de un cilindro telescópico sean físicamente posibles.
+        El diámetro exterior de la etapa N debe caber dentro del diámetro interior de la etapa N-1.
+        """
+        for survey in self:
+            if survey.cylinder_to_code == 'CE-T' and len(survey.section_ids) > 1:
+                # Asegurarnos de que iteramos en el orden correcto (de fuera hacia adentro)
+                sections = survey.section_ids.sorted(lambda s: s.sequence)
                 
-    @api.constrains('num_section')
-    def _check_num_section(self):
+                for i in range(1, len(sections)):
+                    prev_sec = sections[i-1] # Etapa exterior (ej. Camisa Principal)
+                    curr_sec = sections[i]   # Etapa interior (ej. Primera Extensión)
+                    
+                    # 1. Validación básica que mencionaste (OD actual < OD anterior)
+                    if curr_sec.outer_diameter >= prev_sec.outer_diameter:
+                        raise ValidationError(
+                            f"Incoherencia física: El Ø Exterior de la '{curr_sec.name}' ({curr_sec.outer_diameter}) "
+                            f"no puede ser mayor o igual al Ø Exterior de su antecesor '{prev_sec.name}' ({prev_sec.outer_diameter})."
+                        )
+                    
+                    # 2. Validación estricta de ensamble (OD actual < ID anterior)
+                    # prev_sec siempre tendrá inner_diameter porque no puede ser la 'last'
+                    if prev_sec.inner_diameter and curr_sec.outer_diameter >= prev_sec.inner_diameter:
+                        raise ValidationError(
+                            f"Error de Ensamble: La '{curr_sec.name}' tiene un Ø Exterior ({curr_sec.outer_diameter}) "
+                            f"que no cabe en el Ø Interior de su antecesor '{prev_sec.name}' ({prev_sec.inner_diameter}).\n"
+                            f"¡Revisa las medidas!"
+                        )
+                
+    @api.constrains('num_section', 'cylinder_to')
+    def _check_num_section_limits(self):
         for record in self:
-            if record.num_section <= 0 or record.num_section > 5:
-                raise ValidationError(
-                    "El número de secciones debe ser mayor a 0 y máximo 5."
-                )
+            # Solo aplicamos la regla estricta si es Telescópico
+            if record.cylinder_to and record.cylinder_to.code == 'CE-T':
+                if record.num_section < 1 or record.num_section > 5:
+                    raise ValidationError(
+                        "Integridad de datos: El número de secciones para un "
+                        "cilindro telescópico debe estar estrictamente entre 1 y 5."
+                    )
 
     ''' ------------------------
         ACTIONS
@@ -526,35 +571,44 @@ class CylinderSurvey(models.Model):
             # 3. Cambio de Estado                
             record.write({'state': 'confirmed'})
     
-    def action_quoted(self):
-        """Pasa de Cotización a Orden de Trabajo"""
-        sale_order_env = self.env['sale.order']
+    def action_to_apu(self):
+        """Pasa de Levantamiento a APU (Análisis de Precios)"""
         for record in self:
+            record.write({'state': 'apu'})
+
+    def action_quoted(self):
+        """Pasa de APU a Cotización (Genera Orden de Venta)"""
+        for record in self:
+            # Los grupos deben estar listos
             if not record.group_ids:
                 raise ValidationError(_("Debes agregar al menos un 'Identificador del Grupo'"))
+            
             for group in record.group_ids:
                 if group.sale_order_id:
                     continue
 
-                sale_order = sale_order_env.create({
-                    'survey_id': record.id,
+                sale_order = self.env['sale.order'].create({
+                    'survey_id': self.id,
                     'partner_id': record.partner_id.id,
                     'requeriments_work_order': record.name,
                     'group_requeriments_work_order': group.name,
                 })
-
                 group.sale_order_id = sale_order.id
-        self.write({'state': 'quoted'})       
+                
+            record.write({'state': 'quoted'})
 
     def action_set_draft(self):
-        """Permite regresar a borrador"""
-        self.write({'state': 'draft'})
+        """Permite regresar a borrador desde cualquier estado cancelado o APU"""
+        for record in self: 
+            record.write({'state': 'draft'})
 
     def action_cancel(self):
         """Cancela el registro"""
-        if any(record.state == 'confirmed' for record in self):
-            raise ValidationError(_("No puedes cancelar un registro que ya es una Orden de Trabajo confirmada. Reviértelo primero."))
-        self.write({'state': 'cancel'})
+        for record in self:
+            # Bloqueamos la cancelación solo si ya es Orden de Trabajo
+            if record.state == 'confirmed':
+                raise ValidationError(_("No puedes cancelar un registro que ya es una Orden de Trabajo confirmada. Reviértelo primero."))
+            record.write({'state': 'cancel'})
 
     def action_create_purchase_order(self):
         """Crea Órdenes de Compra agrupadas por proveedor del empaque."""
