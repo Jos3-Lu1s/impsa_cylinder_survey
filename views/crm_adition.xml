@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+
+        <record id="crm.stage_lead2" model="crm.stage">
+            <field name="name">Levantamiento</field> 
+        </record>
+
         <record id="view_crm_adition" model="ir.ui.view">
             <field name="name">crm.lead.form.inherit.cylinder_survey</field>
             <field name="model">crm.lead</field>

@@ -1,31 +1,69 @@
+# odoo19/addons/modules/impsa_cylinder_survey/models/cylinder_section.py
+
 from odoo import models, fields
 
 class CylinderSection(models.Model):
     _name = 'impsa.cylinder.section'
-    _description = 'Cylinder Section'
+    _description = 'Sección de Cilindro Telescópico'
+    _order = 'sequence, id'
 
     survey_id = fields.Many2one(
         'impsa.cylinder.survey', 
-        string='Survey', 
+        string='Levantamiento', 
         required=True, 
-        ondelete='cascade')
-    
-    sequence = fields.Integer(
-        string="No. Camisa"
+        ondelete='cascade'
     )
     
-    barrel_length = fields.Float(
-        string="Longitud de la Camisa"
-    ) 
+    sequence = fields.Integer(string="Secuencia", default=10)
     
-    barrel_inner_diameter = fields.Float(
-        string="Diámetro Interno"
+    name = fields.Char(
+        string="Descripción", 
+        required=True,
+        help="Ej: Camisa Principal, Primera Extensión, etc."
     )
     
-    barrel_outer_diameter = fields.Float(
-        string="Diámetro Externo"
+    section_type = fields.Selection([
+        ('main', 'Camisa Principal'),
+        ('intermediate', 'Extensión Intermedia'),
+        ('last', 'Última Extensión')
+    ], string="Tipo de Sección", required=True)
+
+    # ----------------------------------------------------
+    # Dimensiones Generales
+    # ----------------------------------------------------
+    inner_diameter = fields.Float(
+        string="Ø Interior", 
+        help="Aplica para Camisa Principal y Extensiones Intermedias."
     )
-    
-    is_last = fields.Boolean(
-        string="Es última sección"
+    outer_diameter = fields.Float(
+        string="Ø Exterior (Vástago)", 
+        required=True,
+        help="Todas las secciones tienen un diámetro exterior/vástago."
+    )
+    length = fields.Float(
+        string="Longitud", 
+        required=True,
+        help="Todas las secciones tienen longitud."
+    )
+
+    # ----------------------------------------------------
+    # Dimensiones del Émbolo
+    # ----------------------------------------------------
+    piston_diameter = fields.Float(
+        string="Ø Émbolo", 
+        help="No aplica en la camisa principal."
+    )
+    piston_length = fields.Float(
+        string="Longitud de Émbolo"
+    )
+
+    # ----------------------------------------------------
+    # Dimensiones de la Cabeza
+    # ----------------------------------------------------
+    head_diameter = fields.Float(
+        string="Ø Cabeza", 
+        help="No aplica en la última extensión."
+    )
+    head_length = fields.Float(
+        string="Longitud de Cabeza"
     )
