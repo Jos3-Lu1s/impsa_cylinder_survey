@@ -2,7 +2,7 @@ from odoo import models, fields
 
 class CylinderOptions(models.Model):
     _name = 'impsa.cylinder.options'
-    _description = 'Catálogo de valores'
+    _description = 'Catálogo de Tipos de Cilindros'
     _order = 'name'
 
     name = fields.Char(string="Nombre", required=True)

@@ -7,7 +7,7 @@
       <field name="view_mode">list,form</field>
       <field name="help" type="html">
         <p class="o_view_nocontent_smiling_face">
-                    Crear nuevo levantamiento (F-05-01)
+          Crear nuevo levantamiento (F-05-01)
         </p>
         <p>Aquí verás el histórico completo del taller.</p>
       </field>
@@ -21,7 +21,7 @@
       <field name="context">{'hide_state': True}</field>
       <field name="help" type="html">
         <p class="o_view_nocontent_smiling_face">
-                    No hay levantamientos pendientes. ¡Buen trabajo!
+          No hay levantamientos pendientes. ¡Buen trabajo!
         </p>
       </field>
     </record>
@@ -34,7 +34,7 @@
       <field name="context">{'hide_state': True}</field>
       <field name="help" type="html">
         <p class="o_view_nocontent_smiling_face">
-                    No hay APUS en este momento.
+          No hay APUS en este momento.
         </p>
         <p>Las órdenes aparecerán aquí cuando se genere una APU.</p>
       </field>
@@ -48,7 +48,7 @@
       <field name="context">{'hide_state': True}</field>
       <field name="help" type="html">
         <p class="o_view_nocontent_smiling_face">
-                    No hay cotizaciones en este momento.
+          No hay cotizaciones en este momento.
         </p>
         <p>Las órdenes aparecerán aquí cuando se genere una cotización.</p>
       </field>
@@ -62,16 +62,10 @@
       <field name="context">{'hide_state': True}</field>
       <field name="help" type="html">
         <p class="o_view_nocontent_smiling_face">
-                    No hay órdenes de trabajo activas en este momento.
+          No hay órdenes de trabajo activas en este momento.
         </p>
         <p>Las órdenes aparecerán aquí cuando confirmes un levantamiento.</p>
       </field>
-    </record>
-
-    <record id="action_cylinder_options" model="ir.actions.act_window">
-      <field name="name">Catálogo de cilindros</field>
-      <field name="res_model">impsa.cylinder.options</field>
-      <field name="view_mode">list,form</field>
     </record>
 
     <record id="action_cylinder_material" model="ir.actions.act_window">
@@ -86,26 +80,23 @@
       <field name="view_mode">list,form</field>
     </record>
 
-    <menuitem id="menu_crm_cylinder_survey_root" name="Taller de Cilindros" parent="crm.crm_menu_root" sequence="15"/>
 
+    <menuitem id="menu_crm_cylinder_survey_root" name="Taller de Cilindros" parent="crm.crm_menu_root" sequence="15"/>
     <menuitem id="menu_sale_apu_survey_root" name="APU" parent="sale.sale_order_menu" action="action_apu_survey_all" sequence="5"/>
     
     <menuitem id="menu_cylinder_survey_all" name="Todos los Registros" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_all" sequence="10"/>
-
     <menuitem id="menu_cylinder_survey_draft" name="Levantamientos" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_draft" sequence="20"/>
-
     <menuitem id="menu_cylinder_survey_apus" name="APUS" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_apu" sequence="30"/>
-
     <menuitem id="menu_cylinder_survey_quoted" name="Cotizaciones" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_quoted" sequence="40"/>
-
     <menuitem id="menu_cylinder_survey_confirmed" name="Órdenes de Trabajo" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_confirmed" sequence="50"/>
 
     <menuitem id="menu_cylinder_catalogos" name="Catálogos" parent="menu_crm_cylinder_survey_root" sequence="60"/>
     
-    <menuitem id="menu_cylinder_options" name="Catálogo de cilindros" parent="menu_cylinder_catalogos" action="action_cylinder_options" sequence="70"/>
-
+    <menuitem id="menu_cylinder_options" name="Catálogo de cilindros" parent="menu_cylinder_catalogos" action="action_impsa_cylinder_options" sequence="70"/>
+    
     <menuitem id="menu_cylinder_material" name="Catálogo de materiales" parent="menu_cylinder_catalogos" action="action_cylinder_material" sequence="80"/>
 
+    <menuitem id="menu_cylinder_accessory_type" name="Catálogo de accesorios" parent="menu_cylinder_catalogos" action="action_impsa_accessory_type" sequence="90"/>
 
   </data>
 </odoo>

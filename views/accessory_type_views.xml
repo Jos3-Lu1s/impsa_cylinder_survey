@@ -43,7 +43,4 @@
             </p>
         </field>
     </record>
-
-    <menuitem id="menu_impsa_accessory_type" name="Tipos de Accesorios" parent="menu_cylinder_catalogos" action="action_impsa_accessory_type" sequence="20"/>
-
 </odoo>
