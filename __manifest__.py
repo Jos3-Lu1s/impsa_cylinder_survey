@@ -33,6 +33,7 @@
         "views/saler_view.xml",
         "views/purchase_views.xml",
         "views/apu_survey_views.xml",
+        "views/accessory_type_views.xml",
     ],
 
     'demo': [

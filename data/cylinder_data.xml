@@ -60,5 +60,52 @@
             <field name="active">True</field>
         </record>
 
+        <!-- Catalogo de accesorios -->
+
+        <record id="accessory_type_rotula" model="impsa.accessory.type">
+            <field name="name">Rótula</field>
+            <field name="tech_template">Ø Pin: ___&#10;Rosca: ___&#10;Ancho: ___</field>
+        </record>
+
+        <record id="accessory_type_clevis" model="impsa.accessory.type">
+            <field name="name">Clevis / Horquilla</field>
+            <field name="tech_template">Ø Pin: ___&#10;Rosca: ___&#10;Apertura (Gap): ___&#10;Profundidad: ___</field>
+        </record>
+
+        <record id="accessory_type_buje" model="impsa.accessory.type">
+            <field name="name">Buje</field>
+            <field name="tech_template">Ø Int: ___&#10;Ø Ext: ___&#10;Longitud: ___</field>
+        </record>
+
+        <record id="accessory_type_munon" model="impsa.accessory.type">
+            <field name="name">Muñón</field>
+            <field name="tech_template">Ø Pin: ___&#10;Longitud Pin: ___&#10;Ancho Total: ___</field>
+        </record>
+
+        <record id="accessory_type_brida" model="impsa.accessory.type">
+            <field name="name">Brida</field>
+            <field name="tech_template">Tipo (Frontal/Trasera): ___&#10;Ø Exterior: ___&#10;Espesor: ___&#10;Barrenos (Cant y Ø): ___</field>
+        </record>
+
+        <record id="accessory_type_oreja" model="impsa.accessory.type">
+            <field name="name">Oreja de Fijación</field>
+            <field name="tech_template">Ø Agujero: ___&#10;Espesor: ___&#10;Radio Exterior: ___</field>
+        </record>
+
+        <record id="accessory_type_puerto" model="impsa.accessory.type">
+            <field name="name">Puerto de Conexión</field>
+            <field name="tech_template">Tipo (NPT/SAE/BSP): ___&#10;Medida: ___&#10;Posición (Grados): ___</field>
+        </record>
+
+        <record id="accessory_type_valvula" model="impsa.accessory.type">
+            <field name="name">Válvula Integrada</field>
+            <field name="tech_template">Tipo (Ej. Sobrecentro/Check): ___&#10;Presión de taraje: ___&#10;Caudal: ___</field>
+        </record>
+
+        <record id="accessory_type_sensor" model="impsa.accessory.type">
+            <field name="name">Sensor</field>
+            <field name="tech_template">Tipo (Inductivo/Lineal): ___&#10;Señal: ___&#10;Rango de lectura: ___</field>
+        </record>
+
     </data>
 </odoo>

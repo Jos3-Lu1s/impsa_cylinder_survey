@@ -254,13 +254,26 @@
                             
                         </group>
                     </group>
-                    <group string="Accesorios" invisible="cylinder_to_code != 'CE-OT'">
-                        <field name="accessories"
-                            nolabel="1" 
-                            colspan="2"
-                            style="min-height: 250px;"
-                            placeholder="Ej:&#10;- 2 Rótulas de 2 pulgadas&#10;- 1 Válvula de retención..."
-                            options="{'collaborative': true, 'resizable': true}"/>
+
+                    <group string="Configuración de Accesorios / Características" invisible="cylinder_to_code != 'CE-OT'">
+                        <field name="accessory_line_ids" nolabel="1" colspan="2">
+                            <list editable="bottom">
+                                <field name="accessory_type_id" 
+                                    options="{'no_create_edit': True, 'no_open': True}" 
+                                    width="200px"/>
+                                                                
+                                <field name="tech_details" 
+                                    widget="text"
+                                    placeholder="Ej: Ø Int 2 pulg, Rosca M30x2..." 
+                                    width="350px"/>
+                                
+                                <field name="observations" 
+                                    optional="show" 
+                                    placeholder="Notas de montaje o ensamble..."/>
+
+                                <field name="quantity" width="80px"/>
+                            </list>
+                        </field>
                     </group>
 
                     <notebook>

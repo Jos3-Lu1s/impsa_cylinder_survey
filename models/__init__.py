@@ -11,3 +11,4 @@ from . import sale_order_smart
 from . import cylinder_section
 from . import apu_survey
 from . import apu_survey_line
+from . import cylinder_accessory

@@ -96,11 +96,6 @@ class CylinderSurvey(models.Model):
         domain=[('component', '=', 'stroke')]
     )
     
-    # Accesorios
-    accessories = fields.Html(
-        string='Accesorios y Especificaciones',
-        help="Detalla los accesorios usando viñetas, negritas o tablas si es necesario."
-    )
     accessory_image_ids  = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes de accesorios", 
@@ -142,6 +137,20 @@ class CylinderSurvey(models.Model):
         store=True,
         help="Suma total de líneas en el registro operativo.",
         readonly=True
+    )
+
+    total_groups = fields.Integer(
+        string='Total Grupos',
+        compute='_compute_dashboard_totals',
+        store=True,
+        help="Cantidad de grupos de cilindros definidos."
+    )
+
+    total_packings = fields.Integer(
+        string='Total Empaques',
+        compute='_compute_dashboard_totals',
+        store=True,
+        help="Cantidad de líneas de empaques solicitados."
     )
 
     state = fields.Selection([
@@ -209,33 +218,22 @@ class CylinderSurvey(models.Model):
         compute="_compute_sale_count"
     )
 
-    # ... (debajo de tu campo total_tasks) ...
-
-    total_groups = fields.Integer(
-        string='Total Grupos',
-        compute='_compute_dashboard_totals',
-        store=True,
-        help="Cantidad de grupos de cilindros definidos."
+    accessory_line_ids = fields.One2many(
+        "impsa.cylinder.accessory",
+        "survey_id",
+        string="Lista de Accesorios y Características"
     )
 
-    total_packings = fields.Integer(
-        string='Total Empaques',
-        compute='_compute_dashboard_totals',
-        store=True,
-        help="Cantidad de líneas de empaques solicitados."
-    )
-
+    ''' ------------------------
+        COMPUTE METHODS
+    -------------------------'''
+    
     @api.depends('group_ids', 'cylinder_survey_line_ids')
     def _compute_dashboard_totals(self):
         """Calcula las métricas rápidas para las tarjetas superiores en la vista form."""
         for rec in self:
             rec.total_groups = len(rec.group_ids)
             rec.total_packings = len(rec.cylinder_survey_line_ids)
-
-
-    ''' ------------------------
-        COMPUTE METHODS
-    -------------------------'''
 
     @api.depends('purchase_order_ids')
     def _compute_purchase_order_count(self):
@@ -349,7 +347,7 @@ class CylinderSurvey(models.Model):
         'cylinder_to', 'barrel_inner_diameter', 'barrel_outer_diameter', 'barrel_length',
         'diameter_rod', 'rod_length', 'piston_diameter', 'piston_length', 
         'head_diameter', 'head_length', 'stroke_length', 'section_ids',
-        'accessories'
+        'accessory_line_ids'
     )
     def _check_required_dimensions_by_type(self):
         for rec in self:
@@ -361,13 +359,13 @@ class CylinderSurvey(models.Model):
 
             # Evaluamos por bloque de pieza
             if code == 'CE-OT':
-                if is_html_empty(rec.accessories):
+                if not rec.accessory_line_ids:
                     raise ValidationError(
                         f"Para el tipo de registro '{rec.cylinder_to.name}', es obligatorio "
                         "detallar la información en el campo de 'Accesorios' o seleccionar una 'Rotula'."
                     )
 
-            elif code in ['CE-DE', 'CE-SE', 'CE-DV']: # Agregamos el Doble Vástago por si acaso
+            elif code in ['CE-DE', 'CE-SE', 'CE-DV']:
                 if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0 or rec.barrel_length <= 0.0:
                     missing_components.append('Camisa')
                 if rec.diameter_rod <= 0.0 or rec.rod_length <= 0.0:
