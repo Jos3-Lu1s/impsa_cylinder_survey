@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_impsa_apu_survey_tree" model="ir.ui.view">
+        <field name="name">impsa.apu.survey.tree</field>
+        <field name="model">impsa.apu.survey</field>
+        <field name="arch" type="xml">
+            <list string="Levantamientos" decoration-muted="state == 'cancel'">
+                <field name="name" decoration-bf="1" />
+                <field name="date" />
+                <field name="partner_id" widget="many2one_avatar" />
+                <field name="activity_ids" string="Actividades" widget="list_activity" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_impsa_apu_survey_form" model="ir.ui.view">
+        <field name="name">impsa.apu.survey.form</field>
+        <field name="model">impsa.apu.survey</field>
+        <field name="arch" type="xml">
+            <form string="APU">
+                 <header>
+                    <!-- <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed'"/>
+
+                    <button name="action_to_apu" string="Enviar a APU" type="object" class="oe_highlight" invisible="state != 'draft'" />
+
+                    <button name="action_quoted" string="Confirmar Cotización" type="object" class="oe_highlight" invisible="state != 'apu'" />
+
+                    <button name="action_confirm" string="Confirmar Levantamiento" type="object" class="oe_highlight" invisible="state != 'quoted'" />
+
+                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['draft', 'apu', 'quoted']" confirm="¿Está seguro de que desea cancelar este registro?" />
+
+                    <button name="action_set_draft" string="Volver a Levantamiento" type="object" invisible="state != 'cancel'" />
+ -->
+                    <field name="state" widget="statusbar" statusbar_visible="draft,apu,quoted,confirmed" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" placeholder="Referencia" />
+                        </h1>
+                    </div>
+                </sheet>
+                <chatter>
+                    <field name="message_follower_ids" />
+                    <field name="activity_ids" />
+                    <field name="message_ids" />
+                </chatter>
+            </form>
+        </field>
+    </record>
+</odoo>
