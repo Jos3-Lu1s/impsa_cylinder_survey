@@ -140,11 +140,29 @@
 
                         <div class="col-12 col-md-6">
                             <div class="row g-2 mb-3 ms-md-2">
-                                <div class="col-6">
-                                    <div class="card shadow-sm border-0 bg-primary-light text-center p-2">
-                                        <div class="text-muted small fw-bold text-uppercase" style="font-size: 0.7rem;">Total Tareas</div>
-                                        <div class="h4 mb-0 text-primary">
+                                <div class="col-4">
+                                    <div class="card shadow-sm border-0 text-center p-2 h-100" style="background-color: #f8f9fa;">
+                                        <div class="small fw-bold text-uppercase" style="color: #6c757d; font-size: 0.65rem;">Tareas</div>
+                                        <div class="h4 mb-0 fw-bolder" style="color: #495057;">
                                             <field name="total_tasks" readonly="1" nolabel="1" />
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-4">
+                                    <div class="card shadow-sm border-0 text-center p-2 h-100" style="background-color: #cfe2ff;">
+                                        <div class="small fw-bold text-uppercase" style="color: #4b6a9b; font-size: 0.65rem;">Grupos</div>
+                                        <div class="h4 mb-0 fw-bolder" style="color: #084298;">
+                                            <field name="total_groups" readonly="1" nolabel="1" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="card shadow-sm border-0 text-center p-2 h-100" style="background-color: #fff3cd;">
+                                        <div class="small fw-bold text-uppercase" style="color: #856404; font-size: 0.65rem;">Empaques</div>
+                                        <div class="h4 mb-0 fw-bolder" style="color: #664d03;">
+                                            <field name="total_packings" readonly="1" nolabel="1" />
                                         </div>
                                     </div>
                                 </div>
@@ -159,7 +177,7 @@
                             </group>
                         </div>
                     </div>
-                    <group string="Resumen Técnico" col="3">
+                    <group string="Resumen Técnico" col="3" invisible="cylinder_to_code == 'CE-OT'">
                         <group string="Camisa" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
                             <field name="barrel_inner_diameter"/>
                             <field name="barrel_outer_diameter"/>
@@ -231,14 +249,18 @@
                             <field name="stroke_length" string="Longitud Total"/>
                         </group>
                     
-                        <group string="Accesorios" invisible="cylinder_to_code != 'CE-OT'">
-                            <field name="rotula_id"/>
-                            <field name="accessories" nolabel="1" placeholder="Detalle los accesorios aquí..." colspan="2"/>
-                        </group>
 
                         <group>
                             
                         </group>
+                    </group>
+                    <group string="Accesorios" invisible="cylinder_to_code != 'CE-OT'">
+                        <field name="accessories"
+                            nolabel="1" 
+                            colspan="2"
+                            style="min-height: 250px;"
+                            placeholder="Ej:&#10;- 2 Rótulas de 2 pulgadas&#10;- 1 Válvula de retención..."
+                            options="{'collaborative': true, 'resizable': true}"/>
                     </group>
 
                     <notebook>
@@ -246,7 +268,7 @@
                             <field name="group_ids" readonly="state not in ('draft', 'apu')">
                                 <list string="Grupos de Cilindros">
                                     <field name="name"/>
-                                    <field name="quantity" string="Total de cilindros"/>
+                                    <field name="quantity" string="Total de cilindros" width="220"/>
                                     <field name="sale_order_id" 
                                            string="Cotización" 
                                            widget="badge" 

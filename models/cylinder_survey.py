@@ -1,5 +1,6 @@
 from odoo import models, fields, api, Command, _
 from odoo.exceptions import ValidationError, UserError
+from odoo.tools import is_html_empty
 
 class CylinderSurvey(models.Model):
     _name = "impsa.cylinder.survey"
@@ -96,7 +97,10 @@ class CylinderSurvey(models.Model):
     )
     
     # Accesorios
-    accessories  = fields.Text(string='Accesorios')
+    accessories = fields.Html(
+        string='Accesorios y Especificaciones',
+        help="Detalla los accesorios usando viñetas, negritas o tablas si es necesario."
+    )
     accessory_image_ids  = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes de accesorios", 
@@ -105,13 +109,6 @@ class CylinderSurvey(models.Model):
 
     date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True)
     description = fields.Text(string="Descripción")
-
-    rotula_id = fields.Many2one(
-        "product.product",
-        string="Rotula",
-        domain="[('categ_id.name', '=', 'FERRETERIA')]",
-        ondelete='restrict'
-    )
     
     date_delivery = fields.Date(string="Fecha de Entrega")
 
@@ -211,6 +208,29 @@ class CylinderSurvey(models.Model):
         string="Órdenes de Venta",
         compute="_compute_sale_count"
     )
+
+    # ... (debajo de tu campo total_tasks) ...
+
+    total_groups = fields.Integer(
+        string='Total Grupos',
+        compute='_compute_dashboard_totals',
+        store=True,
+        help="Cantidad de grupos de cilindros definidos."
+    )
+
+    total_packings = fields.Integer(
+        string='Total Empaques',
+        compute='_compute_dashboard_totals',
+        store=True,
+        help="Cantidad de líneas de empaques solicitados."
+    )
+
+    @api.depends('group_ids', 'cylinder_survey_line_ids')
+    def _compute_dashboard_totals(self):
+        """Calcula las métricas rápidas para las tarjetas superiores en la vista form."""
+        for rec in self:
+            rec.total_groups = len(rec.group_ids)
+            rec.total_packings = len(rec.cylinder_survey_line_ids)
 
 
     ''' ------------------------
@@ -329,7 +349,7 @@ class CylinderSurvey(models.Model):
         'cylinder_to', 'barrel_inner_diameter', 'barrel_outer_diameter', 'barrel_length',
         'diameter_rod', 'rod_length', 'piston_diameter', 'piston_length', 
         'head_diameter', 'head_length', 'stroke_length', 'section_ids',
-        'accessories', 'rotula_id'
+        'accessories'
     )
     def _check_required_dimensions_by_type(self):
         for rec in self:
@@ -341,7 +361,7 @@ class CylinderSurvey(models.Model):
 
             # Evaluamos por bloque de pieza
             if code == 'CE-OT':
-                if not rec.accessories and not rec.rotula_id:
+                if is_html_empty(rec.accessories):
                     raise ValidationError(
                         f"Para el tipo de registro '{rec.cylinder_to.name}', es obligatorio "
                         "detallar la información en el campo de 'Accesorios' o seleccionar una 'Rotula'."
