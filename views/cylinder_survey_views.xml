@@ -50,6 +50,76 @@
         </field>
     </record>
 
+    <record id="view_impsa_cylinder_survey_kanban" model="ir.ui.view">
+        <field name="name">impsa.cylinder.survey.kanban</field>
+        <field name="model">impsa.cylinder.survey</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_mobile" sample="1" quick_create="false">                
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click d-flex flex-column h-100">
+                            
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <field class="fs-5 fw-bolder text-dark text-truncate me-2" name="name"/>
+                                
+                                <div t-if="record.cylinder_type.raw_value" class="flex-shrink-0">
+                                    <field name="cylinder_type" widget="badge" 
+                                            decoration-info="cylinder_type == 'hydraulic'" 
+                                            decoration-warning="cylinder_type == 'pneumatic'"/>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="text-muted d-flex align-items-center mb-1 text-truncate" title="Cliente">
+                                    <i class="fa fa-building-o me-2 text-primary"/>
+                                    <field name="partner_id" class="text-truncate"/>
+                                </div>
+                                
+                                <div class="text-muted d-flex justify-content-between align-items-center mb-1 text-truncate" title="Tipo de Cilindro Base">
+    
+                                    <div>
+                                        <i class="fa fa-cogs me-2"/>
+                                        <field name="cylinder_to" class="fw-bold text-dark text-truncate"/>
+                                    </div>
+                                    
+                                    <div>
+                                        <span t-attf-class="fw-bold text-truncate #{record.allocated_qty.raw_value == record.cylinder_qty.raw_value ? 'text-success' : 'text-danger'}">
+                                            <field name="allocated_qty"/>
+                                        </span>
+                                        
+                                        <span class="fw-bold mx-1 text-muted">/</span>
+                                        
+                                        <field name="cylinder_qty" class="fw-bold text-dark text-truncate"/>
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
+                                
+                                <div class="d-flex align-items-center">
+                                    <field name="activity_ids" widget="kanban_activity" class="me-2"/>
+                                    <span class="text-muted small">
+                                        <span class="text-muted small d-inline-flex align-items-center">
+                                            <i class="fa fa-calendar-o me-1"></i>
+                                            <field name="date" widget="date" options="{'numeric': true}"/>
+                                        </span>
+                                    </span>
+                                </div>
+                                
+                                <div class="flex-shrink-0">
+                                    <field name="partner_id" widget="many2one_avatar" options="{'size': [24, 24]}"/>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
     <record id="view_impsa_cylinder_survey_tree" model="ir.ui.view">
         <field name="name">impsa.cylinder.survey.tree</field>
         <field name="model">impsa.cylinder.survey</field>
@@ -451,7 +521,7 @@
     <record id="action_impsa_cylinder_survey_all" model="ir.actions.act_window">
         <field name="name">Todos los Registros</field>
         <field name="res_model">impsa.cylinder.survey</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">list,kanban,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Crear nuevo levantamiento (F-05-01)

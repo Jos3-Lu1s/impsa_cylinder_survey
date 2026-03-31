@@ -1,6 +1,5 @@
 from odoo import models, fields, api, Command, _
 from odoo.exceptions import ValidationError, UserError
-from odoo.tools import is_html_empty
 
 class CylinderSurvey(models.Model):
     _name = "impsa.cylinder.survey"
@@ -165,7 +164,7 @@ class CylinderSurvey(models.Model):
         ('quoted', 'Cotización'),
         ('confirmed', 'Orden de Trabajo'),
         ('cancel', 'Cancelado'),
-    ], string='Estado', default='draft', tracking=True, copy=False, index=True)
+    ], string='Estado', default='draft', tracking=True, copy=False, index=True, group_expand='_expand_states')
 
     cylinder_type = fields.Selection([
         ('hydraulic', 'Hidráulico'),
@@ -189,7 +188,8 @@ class CylinderSurvey(models.Model):
     section_ids = fields.One2many(
         'impsa.cylinder.section',
         'survey_id',
-        string='Secciones del Cilindro'
+        string='Secciones del Cilindro',
+        copy=True
     )
     
     purchase_order_ids = fields.One2many(
@@ -227,7 +227,8 @@ class CylinderSurvey(models.Model):
     accessory_line_ids = fields.One2many(
         "impsa.cylinder.accessory",
         "survey_id",
-        string="Lista de Accesorios y Características"
+        string="Lista de Accesorios y Características",
+        copy=True
     )
 
     ''' ------------------------
@@ -268,6 +269,16 @@ class CylinderSurvey(models.Model):
     def _compute_allocated_qty(self):
         for survey in self:
             survey.allocated_qty = sum(survey.group_ids.mapped('quantity'))
+
+    @api.model
+    def _expand_states(self, states, domain, order=None):
+        """
+        Fuerza a la vista Kanban a cargar las columnas en este orden exacto,
+        garantizando que aparezcan incluso si no tienen registros (Count = 0).
+        """
+
+        return ['draft', 'apu', 'quoted', 'confirmed'] 
+        # return ['draft', 'apu', 'quoted', 'confirmed', 'cancel']
             
     @api.onchange('num_section', 'cylinder_to')
     def _onchange_generate_sections(self):
@@ -409,8 +420,15 @@ class CylinderSurvey(models.Model):
             if code == 'CE-OT':
                 if not rec.accessory_line_ids:
                     raise ValidationError(
-                        f"Para el tipo de registro '{rec.cylinder_to.name}', es obligatorio "
-                        "detallar la información en el campo de 'Accesorios' o seleccionar una 'Rotula'."
+                        _("Para el tipo '%s', es obligatorio agregar al menos una "
+                          "línea en la tabla de 'Accesorios / Características'.") 
+                        % rec.cylinder_to.name
+                    )
+
+            elif code == 'CE-T':
+                if not rec.section_ids:
+                    raise ValidationError(
+                        _("Para cilindros Telescópicos, debe agregar al menos una sección.")
                     )
 
             elif code in ['CE-DE', 'CE-SE', 'CE-DV']:
