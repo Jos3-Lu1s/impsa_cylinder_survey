@@ -9,3 +9,5 @@ from . import crm_decision
 from . import cylinder_group
 from . import sale_order_smart
 from . import cylinder_section
+from . import apu_survey
+from . import apu_survey_line

@@ -16,7 +16,7 @@
     'category': 'Services/Field Service',
     'version': '19.0.1.0.0',
 
-    'depends': ['base', "crm", "mail", 'purchase', 'sale_management'],
+    'depends': ['base', "crm", "mail", 'purchase', 'sale_crm', 'sale_management','mrp','hr'],
 
     "data": [
         "security/ir.model.access.csv",
@@ -32,6 +32,7 @@
         "views/crm_adition.xml",
         "views/saler_view.xml",
         "views/purchase_views.xml",
+        "views/apu_survey_views.xml",
     ],
 
     'demo': [
