@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Tipos de cilindro -->
+        <record id="cylinder_option_ce_de" model="impsa.cylinder.options">
+            <field name="name">Doble efecto</field>
+            <field name="code">CE-DE</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cylinder_option_ce_se" model="impsa.cylinder.options">
+            <field name="name">Simple efecto</field>
+            <field name="code">CE-SE</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cylinder_option_ce_t" model="impsa.cylinder.options">
+            <field name="name">Telescópico</field>
+            <field name="code">CE-T</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cylinder_option_ce_dv" model="impsa.cylinder.options">
+            <field name="name">Doble vástago</field>
+            <field name="code">CE-DV</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cylinder_option_ce_ot" model="impsa.cylinder.options">
+            <field name="name">Otros</field>
+            <field name="code">CE-OT</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- Materiales -->
+
+        <record id="cylinder_material_nbr" model="impsa.cylinder.material">
+            <field name="name">NBR</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cylinder_material_poliuretano" model="impsa.cylinder.material">
+            <field name="name">Poliuretano</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cylinder_material_viton" model="impsa.cylinder.material">
+            <field name="name">Viton</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cylinder_material_teflon" model="impsa.cylinder.material">
+            <field name="name">Teflon</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cylinder_material_otro" model="impsa.cylinder.material">
+            <field name="name">Otro</field>
+            <field name="active">True</field>
+        </record>
+
+    </data>
+</odoo>
