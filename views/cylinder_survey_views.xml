@@ -54,20 +54,35 @@
         <field name="name">impsa.cylinder.survey.tree</field>
         <field name="model">impsa.cylinder.survey</field>
         <field name="arch" type="xml">
-            <list string="Levantamientos" decoration-muted="state == 'cancel'">
-                <field name="name" decoration-bf="1" />
-                <field name="date" />
-                <field name="partner_id" widget="many2one_avatar" />
-                <field name="activity_ids" string="Actividades" widget="list_activity" />
-                <field name="description" optional="hide" />
+            <list string="Levantamientos" 
+                multi_edit="1" 
+                sample="1" 
+                default_order="date desc, id desc" 
+                decoration-muted="state == 'cancel'">
+                
+                <field name="name" decoration-bf="1" readonly="1" />
+                <field name="date" readonly="1" />
+                <field name="partner_id" widget="many2one_avatar" readonly="1" />
+                
+                <field name="cylinder_to" optional="show" string="Cilindro Base" readonly="1"/>
                 <field name="cylinder_type" optional="show" />
+                <field name="is_standardized" optional="hide" widget="boolean_toggle" readonly="1"/>
+                
+                <field name="total_groups" optional="hide" sum="Total Grupos" decoration-bf="1" width="95px"/>
+                <field name="total_packings" optional="hide" sum="Total Empaques" decoration-bf="1" width="110px"/>
+                <field name="total_tasks" optional="hide" sum="Total Tareas" decoration-bf="1" width="100px"/>
+
+                <field name="description" optional="hide" />
+                <field name="activity_ids" string="Actividades" widget="list_activity" optional="show" />
+                
                 <field name="state" widget="badge" 
-                        decoration-info="state == 'draft'" 
-                        decoration-primary="state == 'apu'" 
-                        decoration-warning="state == 'quoted'" 
-                        decoration-success="state == 'confirmed'" 
-                        decoration-danger="state == 'cancel'" 
-                        column_invisible="context.get('hide_state', False)" />
+                    decoration-info="state == 'draft'" 
+                    decoration-primary="state == 'apu'" 
+                    decoration-warning="state == 'quoted'" 
+                    decoration-success="state == 'confirmed'" 
+                    decoration-danger="state == 'cancel'" 
+                    column_invisible="context.get('hide_state', False)"
+                    readonly="1" />
             </list>
         </field>
     </record>
@@ -115,6 +130,7 @@
                         <div class="col-12 col-md-6 border-end">
                             <group>
                                 <field name="partner_id" widget="res_partner_many2one"/>
+                                <field name="partner_email" widget="email" string="" colspan="2" invisible="not partner_email"/>
                                 <field name="date" options="{'numeric': true}"/>
                                 <label for="cylinder_qty" string="Cilindros"/>
 
@@ -131,7 +147,7 @@
                                     <field name="cylinder_qty"
                                         nolabel="1"
                                         class="flex-grow-0 fs-5 ms-1 w-auto"
-                                        style="width: 60px;"/>
+                                        width="60px;"/>
                                 </div>
                                 <field name="is_standardized" widget="boolean_toggle"/>
                                 <field name="cylinder_type" widget="selection_badge"/>
@@ -393,13 +409,41 @@
         <field name="model">impsa.cylinder.survey</field>
         <field name="arch" type="xml">
             <search string="Buscar Levantamiento">
-                <field name="name" />
-                <field name="partner_id" />
-                <filter string="Fecha" name="date" date="date" />
+                <field name="name" 
+                    string="Referencia / Descripción" 
+                    filter_domain="['|', ('name', 'ilike', self), ('description', 'ilike', self)]" />
+                
+                <field name="partner_id" operator="child_of"/>
+                <field name="cylinder_to" string="Cilindro Base"/>
+                
+                <separator/>
+
+                <filter string="Mis Levantamientos" name="my_surveys" domain="[('create_uid', '=', uid)]" />
+                <separator/>
+                
+                <filter string="En Levantamiento" name="filter_draft" domain="[('state', '=', 'draft')]" />
+                <filter string="En APU" name="filter_apu" domain="[('state', '=', 'apu')]" />
+                <filter string="Cotizado" name="filter_quoted" domain="[('state', '=', 'quoted')]" />
+                <filter string="Orden de Trabajo" name="filter_confirmed" domain="[('state', '=', 'confirmed')]" />
+                <separator/>
+                
+                <filter string="Hidráulicos" name="filter_hydraulic" domain="[('cylinder_type', '=', 'hydraulic')]" />
+                <filter string="Neumáticos" name="filter_pneumatic" domain="[('cylinder_type', '=', 'pneumatic')]" />
+                <separator/>
+                
+                <filter string="Fecha de creación" name="date" date="date" />
+
                 <group>
-                    <filter string="Fecha" name="group_date" context="{'group_by': 'date'}" />
                     <filter string="Cliente" name="group_partner" context="{'group_by': 'partner_id'}" />
+                    <filter string="Estado" name="group_state" context="{'group_by': 'state'}" />
+                    <filter string="Tipo de Cilindro" name="group_cylinder_to" context="{'group_by': 'cylinder_to'}" />
+                    <filter string="Fecha" name="group_date" context="{'group_by': 'date'}" />
                 </group>
+
+                <searchpanel>
+                    <field name="state" enable_counters="1" icon="fa-tasks" select="multi"/>
+                    <field name="cylinder_to" enable_counters="1" icon="fa-cogs" select="multi"/>
+                </searchpanel>
             </search>
         </field>
     </record>

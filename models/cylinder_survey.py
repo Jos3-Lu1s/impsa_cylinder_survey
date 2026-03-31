@@ -15,6 +15,12 @@ class CylinderSurvey(models.Model):
         "res.partner", string="Cliente", required=True, tracking=True, ondelete='restrict'
     )
 
+    partner_email = fields.Char(
+        string="Correo Electrónico",
+        related="partner_id.email",
+        readonly=True
+    )
+
     cylinder_qty = fields.Integer(
         string="Cantidad", 
         default=1, 
