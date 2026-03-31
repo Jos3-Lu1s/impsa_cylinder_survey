@@ -68,12 +68,6 @@
       </field>
     </record>
 
-    <record id="action_cylinder_material" model="ir.actions.act_window">
-      <field name="name">Catálogo de materiales</field>
-      <field name="res_model">impsa.cylinder.material</field>
-      <field name="view_mode">list,form</field>
-    </record>
-
     <record id="action_apu_survey_all" model="ir.actions.act_window">
       <field name="name">Análisis de Precios Unitarios</field>
       <field name="res_model">impsa.apu.survey</field>
