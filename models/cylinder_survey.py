@@ -107,7 +107,7 @@ class CylinderSurvey(models.Model):
         domain=[('component', '=', 'accessory')]
     )
 
-    date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True)
+    date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True, required=True)
     description = fields.Text(string="Descripción")
     
     date_delivery = fields.Date(string="Fecha de Entrega")
@@ -169,7 +169,7 @@ class CylinderSurvey(models.Model):
     cylinder_type = fields.Selection([
         ('hydraulic', 'Hidráulico'),
         ('pneumatic', 'Neumático')
-    ],string='Tipo de Cilindro')
+    ],string='Tipo de Cilindro', required=True)
 
     is_standardized = fields.Boolean(
         string='Normalizado'

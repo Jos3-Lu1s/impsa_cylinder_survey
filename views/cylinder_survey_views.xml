@@ -54,7 +54,7 @@
         <field name="name">impsa.cylinder.survey.kanban</field>
         <field name="model">impsa.cylinder.survey</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="state" class="o_kanban_mobile" sample="1" quick_create="false">                
+            <kanban default_group_by="state" class="o_kanban_mobile" sample="1" quick_create="false" records_draggable="0">                
                 <templates>
                     <t t-name="card">
                         <div class="oe_kanban_global_click d-flex flex-column h-100">
@@ -120,6 +120,20 @@
         </field>
     </record>
 
+    <record id="view_impsa_cylinder_survey_graph" model="ir.ui.view">
+        <field name="name">impsa.cylinder.survey.graph</field>
+        <field name="model">impsa.cylinder.survey</field>
+        <field name="arch" type="xml">
+            <graph string="Análisis de Levantamientos" type="bar" sample="1">
+                <field name="date" interval="month"/>
+                
+                <field name="state"/>
+                
+                <field name="cylinder_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
     <record id="view_impsa_cylinder_survey_tree" model="ir.ui.view">
         <field name="name">impsa.cylinder.survey.tree</field>
         <field name="model">impsa.cylinder.survey</field>
@@ -131,7 +145,7 @@
                 decoration-muted="state == 'cancel'">
                 
                 <field name="name" decoration-bf="1" readonly="1" />
-                <field name="date" readonly="1" />
+                <field name="date" options="{'numeric': true}" readonly="1" />
                 <field name="partner_id" widget="many2one_avatar" readonly="1" />
                 
                 <field name="cylinder_to" optional="show" string="Cilindro Base" readonly="1"/>
@@ -507,6 +521,7 @@
                     <filter string="Cliente" name="group_partner" context="{'group_by': 'partner_id'}" />
                     <filter string="Estado" name="group_state" context="{'group_by': 'state'}" />
                     <filter string="Tipo de Cilindro" name="group_cylinder_to" context="{'group_by': 'cylinder_to'}" />
+                    <filter string="Tipo de Sistema" name="group_cylinderType_to" context="{'group_by': 'cylinder_type'}" />
                     <filter string="Fecha" name="group_date" context="{'group_by': 'date'}" />
                 </group>
 
@@ -521,7 +536,7 @@
     <record id="action_impsa_cylinder_survey_all" model="ir.actions.act_window">
         <field name="name">Todos los Registros</field>
         <field name="res_model">impsa.cylinder.survey</field>
-        <field name="view_mode">list,kanban,form</field>
+        <field name="view_mode">list,kanban,graph,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Crear nuevo levantamiento (F-05-01)
