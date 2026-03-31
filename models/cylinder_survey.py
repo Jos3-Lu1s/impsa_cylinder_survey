@@ -322,6 +322,48 @@ class CylinderSurvey(models.Model):
         # Asignamos la lista de comandos al campo One2many
         self.section_ids = commands
 
+    @api.onchange('cylinder_to')
+    def _onchange_clear_hidden_fields(self):
+        """
+        Evita guardar 'datos fantasma'. Cuando el usuario cambia el tipo de cilindro,
+        resetea los valores de las pestañas o campos que quedarán ocultos.
+        """
+        for rec in self:
+            if not rec.cylinder_to or not rec.cylinder_to.code:
+                continue
+
+            code = rec.cylinder_to.code
+
+            # 1. Si NO es Telescópico, limpiamos sus secciones
+            if code != 'CE-T':
+                rec.num_section = 1
+                rec.section_ids = [Command.clear()]
+                
+            # 2. Si NO es Doble Vástago, limpiamos las medidas del Vástago 2
+            if code != 'CE-DV':
+                rec.diameter_rod2 = 0.0
+                rec.rod_length2 = 0.0
+
+            # 3. Si NO es Otros (CE-OT), vaciamos la tabla de accesorios especiales
+            if code != 'CE-OT':
+                rec.accessory_line_ids = [Command.clear()]
+                
+            # 4. Si ES Telescópico o ES Otros, limpiamos las medidas de un cilindro estándar
+            if code in ['CE-T', 'CE-OT']:
+                rec.barrel_inner_diameter = 0.0
+                rec.barrel_outer_diameter = 0.0
+                rec.barrel_length = 0.0
+                rec.diameter_rod = 0.0
+                rec.rod_length = 0.0
+                rec.piston_diameter = 0.0
+                rec.piston_length = 0.0
+                rec.head_diameter = 0.0
+                rec.head_length = 0.0
+                
+                # El Telescópico SÍ usa carrera global, pero OTROS no.
+                if code == 'CE-OT':
+                    rec.stroke_length = 0.0
+
     ''' ------------------------
         CONSTRAINS
     -------------------------'''

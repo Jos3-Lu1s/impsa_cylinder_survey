@@ -14,6 +14,10 @@ class CylinderAccessoryType(models.Model):
         help="Plantilla que se autocompletará al seleccionar este accesorio. Ej: 'Ø Int: __, Ø Ext: __'"
     )
 
+    _name_unique = models.Constraint(
+        'UNIQUE(name)',
+        'El nombre debe ser único',
+    )
 
 class CylinderSurveyAccessory(models.Model):
     """Líneas de accesorios dentro del levantamiento"""
