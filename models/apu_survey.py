@@ -49,6 +49,22 @@ class ApuSurvey(models.Model):
         #compute="_compute_tiene_producto_linea",
         store=False
     )
+
+    survey_id = fields.Many2one(
+        "impsa.cylinder.survey",
+        string="Levantamiento",
+        ondelete="cascade",
+        index=True,
+        help="Levantamiento técnico origen de este APU."
+    )
+
+    group_id = fields.Many2one(
+        "impsa.cylinder.group",
+        string="Grupo de Cilindros",
+        ondelete="cascade",
+        index=True,
+        help="Grupo de cilindros específico que se está costeando."
+    )
     
     
     #CAMPOS PARA LOS COSTOS TOTALES DE LOS MATERIALES#

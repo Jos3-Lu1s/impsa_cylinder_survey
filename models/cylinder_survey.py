@@ -208,10 +208,10 @@ class CylinderSurvey(models.Model):
         ondelete='set null'
     )
     
-    sale_order_ids = fields.One2many(
-        'sale.order',
+    apu_ids = fields.One2many(
+        'impsa.apu.survey',
         'survey_id',
-        string="Orden de Venta",
+        string="Análisis de Precios (APUs)"
     )
 
     lead_count = fields.Integer(
@@ -219,9 +219,9 @@ class CylinderSurvey(models.Model):
         compute="_compute_lead_count"
     )
     
-    sale_count = fields.Integer(
-        string="Órdenes de Venta",
-        compute="_compute_sale_count"
+    apu_count = fields.Integer(
+        string="Cantidad de APUs",
+        compute="_compute_apu_count"
     )
 
     accessory_line_ids = fields.One2many(
@@ -252,10 +252,10 @@ class CylinderSurvey(models.Model):
         for rec in self:
             rec.lead_count = 1 if rec.lead_id else 0
             
-    @api.depends('sale_order_ids')
-    def _compute_sale_count(self):
+    @api.depends('apu_ids')
+    def _compute_apu_count(self):
         for rec in self:
-            rec.sale_count = len(rec.sale_order_ids)
+            rec.apu_count = len(rec.apu_ids)
 
     @api.depends('group_ids.operational_record_ids', 'group_ids.quantity')
     def _compute_operational_totals(self):
@@ -548,16 +548,16 @@ class CylinderSurvey(models.Model):
                 'target': 'current',
             }
             
-    def action_view_sale_order(self):
+    def action_view_apus(self):
         self.ensure_one()
-        
-        if self.sale_order_ids:
+        if self.apu_ids:
             return {
                 'type': 'ir.actions.act_window',
-                'name': 'Orden de Venta',
-                'res_model': 'sale.order',
+                'name': 'Análisis de Precios Unitarios',
+                'res_model': 'impsa.apu.survey',
                 'view_mode': 'list,form',
                 'domain': [('survey_id', '=', self.id)],
+                'context': {'default_survey_id': self.id, 'default_partner_id': self.partner_id.id}
             }
 
     def action_confirm(self):
@@ -636,60 +636,56 @@ class CylinderSurvey(models.Model):
                     line.product_id = next(products_no_code_iter, False)
             
             if record.group_ids:
-                count_quotation=0
+                count_apu_confirmed = 0
                 for group in record.group_ids:
-                    if group.sale_order_id and group.sale_order_id.state == 'sale':
-                        count_quotation+=1
-                if count_quotation == 0:
-                    raise ValidationError("Debe existir al menos 1 cotización (orden de venta) aceptada por el cliente.")
+                    if group.apu_id and group.apu_id.state == 'confirmed':
+                        count_apu_confirmed += 1
+                if count_apu_confirmed == 0:
+                    raise ValidationError(_("Debe existir al menos 1 APU en estado 'Para Cotizar' (aprobado) para poder confirmar la Orden de Trabajo."))
 
             # 3. Cambio de Estado                
             record.write({'state': 'confirmed'})
     
     def action_to_apu(self):
-        """Pasa de Levantamiento a APU"""
+        """Pasa de Levantamiento a APU y genera los registros de costeo."""
         for record in self:
-            # Validación de existencia de grupos
             if not record.group_ids:
-                raise ValidationError(_(
-                    "No puedes enviar a APU un levantamiento sin grupos. "
-                    "Por favor, define al menos un 'Identificador del Grupo' "
-                    "en la pestaña de Grupos y Operaciones."
-                ))
+                raise ValidationError(_("No puedes enviar a APU un levantamiento sin grupos."))
             
-            # Validación de consistencia
             if record.allocated_qty != record.cylinder_qty:
                 raise ValidationError(_(
                     "La cantidad de cilindros asignados en los grupos (%s) "
                     "no coincide con el total declarado (%s)."
                 ) % (record.allocated_qty, record.cylinder_qty))
 
+            # Lógica de creación de APU por cada grupo
+            for group in record.group_ids:
+                # Evitar duplicar APUs si el usuario regresó a borrador y volvió a avanzar
+                if not group.apu_id:
+                    apu_vals = {
+                        'survey_id': record.id,
+                        'group_id': group.id,
+                        'partner_id': record.partner_id.id,
+                        # Puedes inyectar más campos iniciales aquí si lo deseas
+                    }
+                    new_apu = self.env['impsa.apu.survey'].create(apu_vals)
+                    group.apu_id = new_apu.id
+
             record.write({'state': 'apu'})
 
     def action_quoted(self):
-        """Pasa de APU a Cotización"""
+        """Pasa de APU a Cotización."""
         for record in self:
             if not record.group_ids:
                 raise ValidationError(_("Operación inválida: No hay grupos definidos."))
             
-            # Cada grupo debe tener al menos una tarea operativa
             for group in record.group_ids:
                 if not group.operational_record_ids:
                     raise ValidationError(_(
                         "El grupo '%s' no tiene tareas operativas asignadas. "
                         "APU requiere el listado de trabajos para costear."
                     ) % group.name)
-
-            for group in record.group_ids:
-                if not group.sale_order_id:
-                    sale_order = self.env['sale.order'].create({
-                        'survey_id': self.id,
-                        'partner_id': record.partner_id.id,
-                        'requeriments_work_order': record.name,
-                        'group_requeriments_work_order': group.name,
-                    })
-                    group.sale_order_id = sale_order.id
-                
+            
             record.write({'state': 'quoted'})
 
     def action_set_draft(self):
