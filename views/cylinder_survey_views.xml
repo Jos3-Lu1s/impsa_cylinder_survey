@@ -206,8 +206,8 @@
                         <button name="action_view_lead" type="object" class="oe_stat_button" icon="fa-star" invisible="not lead_id">
                             <field name="lead_count" widget="statinfo" string="Oportunidad"/>
                         </button>
-                        <button name="action_view_sale_order" type="object" class="oe_stat_button" icon="fa-shopping-cart" invisible="not sale_order_ids">
-                            <field name="sale_count" widget="statinfo" string="Ventas"/>
+                        <button name="action_view_apus" type="object" class="oe_stat_button" icon="fa-calculator" invisible="not apu_ids">
+                            <field name="apu_count" widget="statinfo" string="APUs"/>
                         </button>
                     </div>
                     <div class="row">
@@ -382,25 +382,28 @@
                                 <list string="Grupos de Cilindros">
                                     <field name="name"/>
                                     <field name="quantity" string="Total de cilindros" width="220"/>
-                                    <field name="sale_order_id" 
-                                           string="Cotización" 
-                                           widget="badge" 
-                                           decoration-success="True" 
-                                           column_invisible="not parent.sale_order_ids"/>
-                                    <field name="sale_state" 
-                                           string="Estado Cot." 
-                                           widget="badge" 
-                                           column_invisible="not parent.sale_order_ids"
-                                           decoration-warning="sale_state == 'draft'"
-                                           decoration-info="sale_state == 'sent'"
-                                           decoration-success="sale_state == 'sale'"
-                                           decoration-danger="sale_state == 'cancel'"/>
-                                    <button name="action_open_sale_order" 
-                                            column_invisible="not parent.sale_order_ids"
-                                            invisible="not sale_order_id"
+                                    
+                                    <field name="apu_id" 
+                                        string="Doc. APU" 
+                                        widget="badge" 
+                                        decoration-info="True" 
+                                        column_invisible="not parent.apu_ids"/>
+                                        
+                                    <field name="apu_state" 
+                                        string="Estado APU" 
+                                        widget="badge" 
+                                        column_invisible="not parent.apu_ids"
+                                        decoration-warning="apu_state == 'draft'"
+                                        decoration-success="apu_state == 'confirmed'"
+                                        decoration-danger="apu_state == 'cancel'"/>
+                                        
+                                    <button name="action_open_apu" 
+                                            column_invisible="not parent.apu_ids"
+                                            invisible="not apu_id"
                                             type="object"
                                             class="oe_link"
-                                            string="Ver Cotización">
+                                            icon="fa-external-link"
+                                            string="Ver APU">
                                     </button>
                                 </list>
 

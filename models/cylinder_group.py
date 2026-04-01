@@ -40,14 +40,16 @@ class CylinderGroup(models.Model):
     ''' ------------------------
         SALE FIELDS RELATED
     -------------------------'''
-    sale_order_id = fields.Many2one(
-        'sale.order',
-        string="Cotización"
+    apu_id = fields.Many2one(
+        'impsa.apu.survey',
+        string="Análisis de Precio (APU)",
+        readonly=True,
+        help="APU generado para este grupo de cilindros."
     )
 
-    sale_state = fields.Selection(
-        related='sale_order_id.state',
-        string="Estado",
+    apu_state = fields.Selection(
+        related='apu_id.state',
+        string="Estado APU",
         store=True
     )
 
@@ -57,15 +59,15 @@ class CylinderGroup(models.Model):
             if group.quantity < 1:
                 raise ValidationError(_("Un grupo debe contener al menos 1 cilindro."))
                 
-    def action_open_sale_order(self):
+    def action_open_apu(self):
+        """Abre el APU relacionado a este grupo desde la vista del levantamiento"""
         self.ensure_one()
-        
-        if self.sale_order_id:
+        if self.apu_id:
             return {
                 'type': 'ir.actions.act_window',
-                'name': 'Orden de Venta',
-                'res_model': 'sale.order',
+                'name': 'Análisis de Precio Unitario',
+                'res_model': 'impsa.apu.survey',
                 'view_mode': 'form',
-                'res_id': self.sale_order_id.id,
+                'res_id': self.apu_id.id,
                 'target': 'current',
             }
