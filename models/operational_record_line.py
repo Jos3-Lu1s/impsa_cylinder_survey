@@ -24,7 +24,7 @@ class OperationalRecordLine(models.Model):
 
     sequence = fields.Integer(string='Secuencia', default=0)
     
-    work_to_do = fields.Char(
+    work_to_do = fields.Text(
         string='Trabajos a realizar', 
         required=True,
         help="Describe la tarea o trabajo específico a realizar en esta línea."

@@ -1,6 +1,5 @@
 from odoo import models, fields, api, Command, _
 from odoo.exceptions import ValidationError, UserError
-from odoo.tools import is_html_empty
 
 class CylinderSurvey(models.Model):
     _name = "impsa.cylinder.survey"
@@ -13,6 +12,12 @@ class CylinderSurvey(models.Model):
 
     partner_id = fields.Many2one(
         "res.partner", string="Cliente", required=True, tracking=True, ondelete='restrict'
+    )
+
+    partner_email = fields.Char(
+        string="Correo Electrónico",
+        related="partner_id.email",
+        readonly=True
     )
 
     cylinder_qty = fields.Integer(
@@ -96,18 +101,13 @@ class CylinderSurvey(models.Model):
         domain=[('component', '=', 'stroke')]
     )
     
-    # Accesorios
-    accessories = fields.Html(
-        string='Accesorios y Especificaciones',
-        help="Detalla los accesorios usando viñetas, negritas o tablas si es necesario."
-    )
     accessory_image_ids  = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes de accesorios", 
         domain=[('component', '=', 'accessory')]
     )
 
-    date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True)
+    date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True, required=True)
     description = fields.Text(string="Descripción")
     
     date_delivery = fields.Date(string="Fecha de Entrega")
@@ -144,18 +144,32 @@ class CylinderSurvey(models.Model):
         readonly=True
     )
 
+    total_groups = fields.Integer(
+        string='Total Grupos',
+        compute='_compute_dashboard_totals',
+        store=True,
+        help="Cantidad de grupos de cilindros definidos."
+    )
+
+    total_packings = fields.Integer(
+        string='Total Empaques',
+        compute='_compute_dashboard_totals',
+        store=True,
+        help="Cantidad de líneas de empaques solicitados."
+    )
+
     state = fields.Selection([
         ('draft', 'Levantamiento'),
         ('apu', 'APU'),
         ('quoted', 'Cotización'),
         ('confirmed', 'Orden de Trabajo'),
         ('cancel', 'Cancelado'),
-    ], string='Estado', default='draft', tracking=True, copy=False, index=True)
+    ], string='Estado', default='draft', tracking=True, copy=False, index=True, group_expand='_expand_states')
 
     cylinder_type = fields.Selection([
         ('hydraulic', 'Hidráulico'),
         ('pneumatic', 'Neumático')
-    ],string='Tipo de Cilindro')
+    ],string='Tipo de Cilindro', required=True)
 
     is_standardized = fields.Boolean(
         string='Normalizado'
@@ -174,7 +188,8 @@ class CylinderSurvey(models.Model):
     section_ids = fields.One2many(
         'impsa.cylinder.section',
         'survey_id',
-        string='Secciones del Cilindro'
+        string='Secciones del Cilindro',
+        copy=True
     )
     
     purchase_order_ids = fields.One2many(
@@ -209,33 +224,23 @@ class CylinderSurvey(models.Model):
         compute="_compute_sale_count"
     )
 
-    # ... (debajo de tu campo total_tasks) ...
-
-    total_groups = fields.Integer(
-        string='Total Grupos',
-        compute='_compute_dashboard_totals',
-        store=True,
-        help="Cantidad de grupos de cilindros definidos."
+    accessory_line_ids = fields.One2many(
+        "impsa.cylinder.accessory",
+        "survey_id",
+        string="Lista de Accesorios y Características",
+        copy=True
     )
 
-    total_packings = fields.Integer(
-        string='Total Empaques',
-        compute='_compute_dashboard_totals',
-        store=True,
-        help="Cantidad de líneas de empaques solicitados."
-    )
-
+    ''' ------------------------
+        COMPUTE METHODS
+    -------------------------'''
+    
     @api.depends('group_ids', 'cylinder_survey_line_ids')
     def _compute_dashboard_totals(self):
         """Calcula las métricas rápidas para las tarjetas superiores en la vista form."""
         for rec in self:
             rec.total_groups = len(rec.group_ids)
             rec.total_packings = len(rec.cylinder_survey_line_ids)
-
-
-    ''' ------------------------
-        COMPUTE METHODS
-    -------------------------'''
 
     @api.depends('purchase_order_ids')
     def _compute_purchase_order_count(self):
@@ -264,6 +269,16 @@ class CylinderSurvey(models.Model):
     def _compute_allocated_qty(self):
         for survey in self:
             survey.allocated_qty = sum(survey.group_ids.mapped('quantity'))
+
+    @api.model
+    def _expand_states(self, states, domain, order=None):
+        """
+        Fuerza a la vista Kanban a cargar las columnas en este orden exacto,
+        garantizando que aparezcan incluso si no tienen registros (Count = 0).
+        """
+
+        return ['draft', 'apu', 'quoted', 'confirmed'] 
+        # return ['draft', 'apu', 'quoted', 'confirmed', 'cancel']
             
     @api.onchange('num_section', 'cylinder_to')
     def _onchange_generate_sections(self):
@@ -324,6 +339,48 @@ class CylinderSurvey(models.Model):
         # Asignamos la lista de comandos al campo One2many
         self.section_ids = commands
 
+    @api.onchange('cylinder_to')
+    def _onchange_clear_hidden_fields(self):
+        """
+        Evita guardar 'datos fantasma'. Cuando el usuario cambia el tipo de cilindro,
+        resetea los valores de las pestañas o campos que quedarán ocultos.
+        """
+        for rec in self:
+            if not rec.cylinder_to or not rec.cylinder_to.code:
+                continue
+
+            code = rec.cylinder_to.code
+
+            # 1. Si NO es Telescópico, limpiamos sus secciones
+            if code != 'CE-T':
+                rec.num_section = 1
+                rec.section_ids = [Command.clear()]
+                
+            # 2. Si NO es Doble Vástago, limpiamos las medidas del Vástago 2
+            if code != 'CE-DV':
+                rec.diameter_rod2 = 0.0
+                rec.rod_length2 = 0.0
+
+            # 3. Si NO es Otros (CE-OT), vaciamos la tabla de accesorios especiales
+            if code != 'CE-OT':
+                rec.accessory_line_ids = [Command.clear()]
+                
+            # 4. Si ES Telescópico o ES Otros, limpiamos las medidas de un cilindro estándar
+            if code in ['CE-T', 'CE-OT']:
+                rec.barrel_inner_diameter = 0.0
+                rec.barrel_outer_diameter = 0.0
+                rec.barrel_length = 0.0
+                rec.diameter_rod = 0.0
+                rec.rod_length = 0.0
+                rec.piston_diameter = 0.0
+                rec.piston_length = 0.0
+                rec.head_diameter = 0.0
+                rec.head_length = 0.0
+                
+                # El Telescópico SÍ usa carrera global, pero OTROS no.
+                if code == 'CE-OT':
+                    rec.stroke_length = 0.0
+
     ''' ------------------------
         CONSTRAINS
     -------------------------'''
@@ -349,7 +406,7 @@ class CylinderSurvey(models.Model):
         'cylinder_to', 'barrel_inner_diameter', 'barrel_outer_diameter', 'barrel_length',
         'diameter_rod', 'rod_length', 'piston_diameter', 'piston_length', 
         'head_diameter', 'head_length', 'stroke_length', 'section_ids',
-        'accessories'
+        'accessory_line_ids'
     )
     def _check_required_dimensions_by_type(self):
         for rec in self:
@@ -361,13 +418,20 @@ class CylinderSurvey(models.Model):
 
             # Evaluamos por bloque de pieza
             if code == 'CE-OT':
-                if is_html_empty(rec.accessories):
+                if not rec.accessory_line_ids:
                     raise ValidationError(
-                        f"Para el tipo de registro '{rec.cylinder_to.name}', es obligatorio "
-                        "detallar la información en el campo de 'Accesorios' o seleccionar una 'Rotula'."
+                        _("Para el tipo '%s', es obligatorio agregar al menos una "
+                          "línea en la tabla de 'Accesorios / Características'.") 
+                        % rec.cylinder_to.name
                     )
 
-            elif code in ['CE-DE', 'CE-SE', 'CE-DV']: # Agregamos el Doble Vástago por si acaso
+            elif code == 'CE-T':
+                if not rec.section_ids:
+                    raise ValidationError(
+                        _("Para cilindros Telescópicos, debe agregar al menos una sección.")
+                    )
+
+            elif code in ['CE-DE', 'CE-SE', 'CE-DV']:
                 if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0 or rec.barrel_length <= 0.0:
                     missing_components.append('Camisa')
                 if rec.diameter_rod <= 0.0 or rec.rod_length <= 0.0:

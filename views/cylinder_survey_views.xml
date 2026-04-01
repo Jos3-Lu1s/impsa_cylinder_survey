@@ -50,24 +50,123 @@
         </field>
     </record>
 
+    <record id="view_impsa_cylinder_survey_kanban" model="ir.ui.view">
+        <field name="name">impsa.cylinder.survey.kanban</field>
+        <field name="model">impsa.cylinder.survey</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_mobile" sample="1" quick_create="false" records_draggable="0">                
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click d-flex flex-column h-100">
+                            
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <field class="fs-5 fw-bolder text-dark text-truncate me-2" name="name"/>
+                                
+                                <div t-if="record.cylinder_type.raw_value" class="flex-shrink-0">
+                                    <field name="cylinder_type" widget="badge" 
+                                            decoration-info="cylinder_type == 'hydraulic'" 
+                                            decoration-warning="cylinder_type == 'pneumatic'"/>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="text-muted d-flex align-items-center mb-1 text-truncate" title="Cliente">
+                                    <i class="fa fa-building-o me-2 text-primary"/>
+                                    <field name="partner_id" class="text-truncate"/>
+                                </div>
+                                
+                                <div class="text-muted d-flex justify-content-between align-items-center mb-1 text-truncate" title="Tipo de Cilindro Base">
+    
+                                    <div>
+                                        <i class="fa fa-cogs me-2"/>
+                                        <field name="cylinder_to" class="fw-bold text-dark text-truncate"/>
+                                    </div>
+                                    
+                                    <div>
+                                        <span t-attf-class="fw-bold text-truncate #{record.allocated_qty.raw_value == record.cylinder_qty.raw_value ? 'text-success' : 'text-danger'}">
+                                            <field name="allocated_qty"/>
+                                        </span>
+                                        
+                                        <span class="fw-bold mx-1 text-muted">/</span>
+                                        
+                                        <field name="cylinder_qty" class="fw-bold text-dark text-truncate"/>
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
+                                
+                                <div class="d-flex align-items-center">
+                                    <field name="activity_ids" widget="kanban_activity" class="me-2"/>
+                                    <span class="text-muted small">
+                                        <span class="text-muted small d-inline-flex align-items-center">
+                                            <i class="fa fa-calendar-o me-1"></i>
+                                            <field name="date" widget="date" options="{'numeric': true}"/>
+                                        </span>
+                                    </span>
+                                </div>
+                                
+                                <div class="flex-shrink-0">
+                                    <field name="partner_id" widget="many2one_avatar" options="{'size': [24, 24]}"/>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_impsa_cylinder_survey_graph" model="ir.ui.view">
+        <field name="name">impsa.cylinder.survey.graph</field>
+        <field name="model">impsa.cylinder.survey</field>
+        <field name="arch" type="xml">
+            <graph string="Análisis de Levantamientos" type="bar" sample="1">
+                <field name="date" interval="month"/>
+                
+                <field name="state"/>
+                
+                <field name="cylinder_qty" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
     <record id="view_impsa_cylinder_survey_tree" model="ir.ui.view">
         <field name="name">impsa.cylinder.survey.tree</field>
         <field name="model">impsa.cylinder.survey</field>
         <field name="arch" type="xml">
-            <list string="Levantamientos" decoration-muted="state == 'cancel'">
-                <field name="name" decoration-bf="1" />
-                <field name="date" />
-                <field name="partner_id" widget="many2one_avatar" />
-                <field name="activity_ids" string="Actividades" widget="list_activity" />
-                <field name="description" optional="hide" />
+            <list string="Levantamientos" 
+                multi_edit="1" 
+                sample="1" 
+                default_order="date desc, id desc" 
+                decoration-muted="state == 'cancel'">
+                
+                <field name="name" decoration-bf="1" readonly="1" />
+                <field name="date" options="{'numeric': true}" readonly="1" />
+                <field name="partner_id" widget="many2one_avatar" readonly="1" />
+                
+                <field name="cylinder_to" optional="show" string="Cilindro Base" readonly="1"/>
                 <field name="cylinder_type" optional="show" />
+                <field name="is_standardized" optional="hide" widget="boolean_toggle" readonly="1"/>
+                
+                <field name="total_groups" optional="hide" sum="Total Grupos" decoration-bf="1" width="95px"/>
+                <field name="total_packings" optional="hide" sum="Total Empaques" decoration-bf="1" width="110px"/>
+                <field name="total_tasks" optional="hide" sum="Total Tareas" decoration-bf="1" width="100px"/>
+
+                <field name="description" optional="hide" />
+                <field name="activity_ids" string="Actividades" widget="list_activity" optional="show" />
+                
                 <field name="state" widget="badge" 
-                        decoration-info="state == 'draft'" 
-                        decoration-primary="state == 'apu'" 
-                        decoration-warning="state == 'quoted'" 
-                        decoration-success="state == 'confirmed'" 
-                        decoration-danger="state == 'cancel'" 
-                        column_invisible="context.get('hide_state', False)" />
+                    decoration-info="state == 'draft'" 
+                    decoration-primary="state == 'apu'" 
+                    decoration-warning="state == 'quoted'" 
+                    decoration-success="state == 'confirmed'" 
+                    decoration-danger="state == 'cancel'" 
+                    column_invisible="context.get('hide_state', False)"
+                    readonly="1" />
             </list>
         </field>
     </record>
@@ -115,6 +214,7 @@
                         <div class="col-12 col-md-6 border-end">
                             <group>
                                 <field name="partner_id" widget="res_partner_many2one"/>
+                                <field name="partner_email" widget="email" string="" colspan="2" invisible="not partner_email"/>
                                 <field name="date" options="{'numeric': true}"/>
                                 <label for="cylinder_qty" string="Cilindros"/>
 
@@ -131,7 +231,7 @@
                                     <field name="cylinder_qty"
                                         nolabel="1"
                                         class="flex-grow-0 fs-5 ms-1 w-auto"
-                                        style="width: 60px;"/>
+                                        width="60px;"/>
                                 </div>
                                 <field name="is_standardized" widget="boolean_toggle"/>
                                 <field name="cylinder_type" widget="selection_badge"/>
@@ -254,13 +354,26 @@
                             
                         </group>
                     </group>
-                    <group string="Accesorios" invisible="cylinder_to_code != 'CE-OT'">
-                        <field name="accessories"
-                            nolabel="1" 
-                            colspan="2"
-                            style="min-height: 250px;"
-                            placeholder="Ej:&#10;- 2 Rótulas de 2 pulgadas&#10;- 1 Válvula de retención..."
-                            options="{'collaborative': true, 'resizable': true}"/>
+
+                    <group string="Configuración de Accesorios / Características" invisible="cylinder_to_code != 'CE-OT'">
+                        <field name="accessory_line_ids" nolabel="1" colspan="2">
+                            <list editable="bottom">
+                                <field name="accessory_type_id" 
+                                    options="{'no_create_edit': True, 'no_open': True}" 
+                                    width="200px"/>
+                                                                
+                                <field name="tech_details" 
+                                    widget="text"
+                                    placeholder="Ej: Ø Int 2 pulg, Rosca M30x2..." 
+                                    width="350px"/>
+                                
+                                <field name="observations" 
+                                    optional="show" 
+                                    placeholder="Notas de montaje o ensamble..."/>
+
+                                <field name="quantity" width="80px"/>
+                            </list>
+                        </field>
                     </group>
 
                     <notebook>
@@ -380,14 +493,127 @@
         <field name="model">impsa.cylinder.survey</field>
         <field name="arch" type="xml">
             <search string="Buscar Levantamiento">
-                <field name="name" />
-                <field name="partner_id" />
-                <filter string="Fecha" name="date" date="date" />
+                <field name="name" 
+                    string="Referencia / Descripción" 
+                    filter_domain="['|', ('name', 'ilike', self), ('description', 'ilike', self)]" />
+                
+                <field name="partner_id" operator="child_of"/>
+                <field name="cylinder_to" string="Cilindro Base"/>
+                
+                <separator/>
+
+                <filter string="Mis Levantamientos" name="my_surveys" domain="[('create_uid', '=', uid)]" />
+                <separator/>
+                
+                <filter string="En Levantamiento" name="filter_draft" domain="[('state', '=', 'draft')]" />
+                <filter string="En APU" name="filter_apu" domain="[('state', '=', 'apu')]" />
+                <filter string="Cotizado" name="filter_quoted" domain="[('state', '=', 'quoted')]" />
+                <filter string="Orden de Trabajo" name="filter_confirmed" domain="[('state', '=', 'confirmed')]" />
+                <separator/>
+                
+                <filter string="Hidráulicos" name="filter_hydraulic" domain="[('cylinder_type', '=', 'hydraulic')]" />
+                <filter string="Neumáticos" name="filter_pneumatic" domain="[('cylinder_type', '=', 'pneumatic')]" />
+                <separator/>
+                
+                <filter string="Fecha de creación" name="date" date="date" />
+
                 <group>
-                    <filter string="Fecha" name="group_date" context="{'group_by': 'date'}" />
                     <filter string="Cliente" name="group_partner" context="{'group_by': 'partner_id'}" />
+                    <filter string="Estado" name="group_state" context="{'group_by': 'state'}" />
+                    <filter string="Tipo de Cilindro" name="group_cylinder_to" context="{'group_by': 'cylinder_to'}" />
+                    <filter string="Tipo de Sistema" name="group_cylinderType_to" context="{'group_by': 'cylinder_type'}" />
+                    <filter string="Fecha" name="group_date" context="{'group_by': 'date'}" />
                 </group>
+
+                <searchpanel>
+                    <field name="state" enable_counters="1" icon="fa-tasks" select="multi"/>
+                    <field name="cylinder_to" enable_counters="1" icon="fa-cogs" select="multi"/>
+                </searchpanel>
             </search>
         </field>
     </record>
+
+    <record id="action_impsa_cylinder_survey_all" model="ir.actions.act_window">
+        <field name="name">Todos los Registros</field>
+        <field name="res_model">impsa.cylinder.survey</field>
+        <field name="view_mode">list,kanban,graph,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear nuevo levantamiento (F-05-01)
+            </p>
+            <p>
+                Aquí verás el histórico completo del taller. Registra un nuevo cilindro 
+                para comenzar su evaluación, dimensionamiento y lista de materiales.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_impsa_cylinder_survey_draft" model="ir.actions.act_window">
+        <field name="name">Levantamientos Pendientes</field>
+        <field name="res_model">impsa.cylinder.survey</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'draft')]</field>
+        <field name="context">{'hide_state': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay levantamientos pendientes. ¡Buen trabajo!
+            </p>
+            <p>
+                Los cilindros que acaban de ingresar al taller y están en proceso 
+                de desarme y toma de medidas aparecerán aquí.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_impsa_cylinder_survey_apu" model="ir.actions.act_window">
+        <field name="name">APUS Activas</field>
+        <field name="res_model">impsa.cylinder.survey</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'apu')]</field>
+        <field name="context">{'hide_state': True}</field> 
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay APUS en este momento.
+            </p>
+            <p>
+                Los levantamientos aparecerán aquí automáticamente cuando el equipo 
+                técnico los envíe a costeo (Análisis de Precios Unitarios).
+            </p>
+        </field>
+    </record>
+    
+    <record id="action_impsa_cylinder_survey_quoted" model="ir.actions.act_window">
+        <field name="name">Cotizaciones Activas</field>
+        <field name="res_model">impsa.cylinder.survey</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'quoted')]</field>
+        <field name="context">{'hide_state': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay cotizaciones pendientes de aprobación.
+            </p>
+            <p>
+                Aquí se mostrarán los trabajos que ya fueron costeados y enviados 
+                al cliente, a la espera de su orden de compra o autorización.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_impsa_cylinder_survey_confirmed" model="ir.actions.act_window">
+        <field name="name">Órdenes de Trabajo Activas</field>
+        <field name="res_model">impsa.cylinder.survey</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'confirmed')]</field>
+        <field name="context">{'hide_state': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay órdenes de trabajo activas en este momento.
+            </p>
+            <p>
+                Cuando el cliente apruebe la cotización y confirmes el trabajo, 
+                el registro se moverá a esta vista para que planta inicie la reparación.
+            </p>
+        </field>
+    </record>
+
 </odoo>

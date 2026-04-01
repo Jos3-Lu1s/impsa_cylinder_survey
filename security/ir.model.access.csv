@@ -9,3 +9,5 @@ access_impsa_cylinder_group,impsa.cylinder.group.access,model_impsa_cylinder_gro
 access_impsa_cylinder_section,impsa.cylinder.section.access,model_impsa_cylinder_section,base.group_user,1,1,1,1
 access_impsa_apu_survey,impsa.apu.survey,model_impsa_apu_survey,base.group_user,1,1,1,1
 access_apu_survey_line,access_apu_survey_line,model_impsa_apu_survey_line,base.group_user,1,1,1,1
+access_impsa_cylinder_accessory,access_impsa_cylinder_accessory,model_impsa_cylinder_accessory,base.group_user,1,1,1,1
+access_impsa_accessory_type,access_impsa_accessory_type,model_impsa_accessory_type,base.group_user,1,1,1,1

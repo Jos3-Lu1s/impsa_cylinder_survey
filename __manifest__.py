@@ -26,13 +26,14 @@
         # 'reports/cylinder_survey_report.xml',
         "data/ir_sequence_data.xml",
         "views/cylinder_survey_views.xml",
-        "views/integration_menu.xml",
         "views/cylinder_options_views.xml",
         "views/cylinder_materials_views.xml",
+        "views/accessory_type_views.xml",
         "views/crm_adition.xml",
         "views/saler_view.xml",
         "views/purchase_views.xml",
         "views/apu_survey_views.xml",
+        "views/integration_menu.xml",
     ],
 
     'demo': [
