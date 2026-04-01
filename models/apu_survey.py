@@ -14,6 +14,8 @@ class ApuSurvey(models.Model):
         "res.partner", string="Cliente", required=True, tracking=True, ondelete='restrict'
     )
 
+    apu_product_id=fields.Many2one('product.template',string='Cilindro a trabajar')
+
     date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True)
 
     state = fields.Selection([
@@ -29,7 +31,7 @@ class ApuSurvey(models.Model):
     )
     tipo_costo_mo = fields.Selection([
         ('costo_fijo_mo', 'Fijo'),
-        ('costo_empleado_mo', 'Por Empleado')
+        ('costo_empleado_mo', 'Por Área')
     ], string='Costo de MO')
 
     currency_id = fields.Many2one(
@@ -93,9 +95,20 @@ class ApuSurvey(models.Model):
             order.gran_subtotal_lm=order.total_material_lm+order.total_mo_lm
             order.gran_total_lm = order.gran_subtotal_lm + (order.gran_subtotal_lm*0.16)
 
-            if order.order_line:
-                line = order.order_line[0]
-                line.price_unit = order.gran_subtotal_lm
+            """ if order.order_line:
+                line = order.order_line
+                line.price_unit = order.gran_subtotal_lm """
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get("name", "Nuevo") == "Nuevo":
+                vals["name"] = (
+                    self.env["ir.sequence"].next_by_code("impsa.apu.survey")
+                    or "Nuevo"
+                )
+
+        return super(ApuSurvey, self).create(vals_list)
 
 
     #@api.depends('order_line.product_template_id')
