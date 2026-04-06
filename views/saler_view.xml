@@ -30,6 +30,16 @@
                         </button>
 
                 </xpath>
+
+                <xpath expr="//header" position="inside">
+
+                    <button name="action_print_proforma_custom"
+                        type="object"
+                        string="Proforma"
+                        class="btn-primary"/>
+
+                </xpath>
+
             </field>
         </record>
     </data>

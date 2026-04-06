@@ -26,13 +26,14 @@
 
                 <xpath expr="//field[@name='tag_ids']" position="after">
                     <field name="is_won_stage" invisible="1" />
-                    <field name="selection_crm"  readonly="stage_sequence > 2" />
+                    <!-- <field name="selection_crm"  readonly="stage_sequence > 2" /> -->
+                    <field name="selection_type"  readonly="stage_sequence > 2" widget="selection_badge"/>
                 </xpath>
 
                 <xpath expr="//header//button[@name='action_sale_quotations_new']"
                     position="attributes">
                     <attribute name="invisible">
-                        not is_won_stage or selection_crm == True
+                        not is_won_stage or selection_type == 'repair'
                     </attribute>
                 </xpath>
 
@@ -41,7 +42,7 @@
                         string="Levantamiento"
                         type="object"
                         class="oe_highlight"
-                        invisible="stage_sequence &lt; 2 or selection_crm == False" />
+                        invisible="stage_sequence &lt; 2 or selection_type == 'manufacturing'" />
                 </xpath>
 
             </field>
