@@ -231,9 +231,25 @@ class CylinderSurvey(models.Model):
         copy=True
     )
 
+    sale_order_ids = fields.One2many(
+        "sale.order",
+        "survey_id",
+        string="Cotizaciones"
+    )
+
+    sale_order_count = fields.Integer(
+        string="Cantidad de Cotizaciones",
+        compute="_compute_sale_order_count"
+    )
+
     ''' ------------------------
         COMPUTE METHODS
     -------------------------'''
+
+    @api.depends('sale_order_ids')
+    def _compute_sale_order_count(self):
+        for rec in self:
+            rec.sale_order_count = len(rec.sale_order_ids)
     
     @api.depends('group_ids', 'cylinder_survey_line_ids')
     def _compute_dashboard_totals(self):
@@ -560,6 +576,20 @@ class CylinderSurvey(models.Model):
                 'context': {'default_survey_id': self.id, 'default_partner_id': self.partner_id.id}
             }
 
+    def action_view_sale_orders(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Cotizaciones'),
+            'res_model': 'sale.order',
+            'view_mode': 'list,form',
+            'domain': [('survey_id', '=', self.id)],
+            'context': {
+                'default_survey_id': self.id, 
+                'default_partner_id': self.partner_id.id
+            }
+        }
+
     def action_confirm(self):
         """Valida e inicializa productos para pasar a Orden de Trabajo."""
         for record in self:
@@ -674,11 +704,56 @@ class CylinderSurvey(models.Model):
             record.write({'state': 'apu'})
 
     def action_quoted(self):
-        """Pasa de APU a Cotización."""
+        """Pasa de APU a Cotización y genera el Sale Order automáticamente."""
         for record in self:
             if not record.group_ids:
                 raise ValidationError(_("Operación inválida: No hay grupos definidos."))
             
+            # Extraer APUs que estén en estado 'confirmed'
+            confirmed_apus = record.apu_ids.filtered(lambda a: a.state == 'confirmed')
+            
+            if not confirmed_apus:
+                raise ValidationError(_("Para generar una cotización, debe existir al menos una APU en estado 'Para Cotizar' (Confirmada)."))
+
+            # Validación de Productos en APU
+            apus_without_product = confirmed_apus.filtered(lambda a: not a.apu_product_id)
+            if apus_without_product:
+                apu_names = ", ".join(apus_without_product.mapped('name'))
+                raise ValidationError(
+                    _("Las siguientes APUs no tienen un 'Cilindro a trabajar' asignado: %s. "
+                      "Debe asignar un producto para poder cotizar.") % apu_names
+                )
+
+            # Preparar Líneas de Venta
+            order_lines = []
+            for apu in confirmed_apus:
+                # sale.order.line requiere product.product, no product.template
+                product_variant = apu.apu_product_id.product_variant_id
+                if not product_variant:
+                    raise ValidationError(_("El producto de la APU '%s' no tiene variantes activas válidas.") % apu.name)
+
+                # gran_subtotal_lm es el costo total del grupo.
+                # Si el grupo tiene N cilindros, dividimos el precio para que el total de la línea sea exacto.
+                qty = apu.group_id.quantity or 1.0
+                unit_price = apu.gran_subtotal_lm / qty if qty > 0 else apu.gran_subtotal_lm
+
+                order_lines.append(Command.create({
+                    'product_id': product_variant.id,
+                    'name': f"Reparación / Fabricación: {product_variant.name} (Ref: {apu.name})",
+                    'product_uom_qty': qty,
+                    'price_unit': unit_price,
+                }))
+
+            # Crear el Sale Order (Cotización)
+            so_vals = {
+                'partner_id': record.partner_id.id,
+                'survey_id': record.id, # Enlace trazable
+                'origin': record.name,  # Documento origen estándar
+                'order_line': order_lines,
+            }
+            
+            self.env['sale.order'].sudo().create(so_vals)
+
             for group in record.group_ids:
                 if not group.operational_record_ids:
                     raise ValidationError(_(

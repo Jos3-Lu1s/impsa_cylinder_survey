@@ -209,6 +209,9 @@
                         <button name="action_view_apus" type="object" class="oe_stat_button" icon="fa-calculator" invisible="not apu_ids">
                             <field name="apu_count" widget="statinfo" string="APUs"/>
                         </button>
+                        <button name="action_view_sale_orders" type="object" class="oe_stat_button" icon="fa-usd" invisible="sale_order_count == 0">
+                            <field name="sale_order_count" widget="statinfo" string="Cotizaciones"/>
+                        </button>
                     </div>
                     <div class="row">
                         <div class="col-12 col-md-6 border-end">

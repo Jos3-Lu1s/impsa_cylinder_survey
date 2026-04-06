@@ -1,11 +1,14 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
 class SaleOrderSmart(models.Model):
     _inherit = 'sale.order'
 
     survey_id = fields.Many2one(
-        'impsa.cylinder.survey',
-        string='Levantamiento'
+        "impsa.cylinder.survey",
+        string="Levantamiento de Origen",
+        ondelete="set null",
+        copy=False,
+        help="Levantamiento técnico del cual se generó esta cotización."
     )
     
     cylinder_survey_count = fields.Integer(
