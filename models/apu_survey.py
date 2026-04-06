@@ -67,9 +67,20 @@ class ApuSurvey(models.Model):
         help="Grupo de cilindros específico que se está costeando."
     )
 
+    quote_id = fields.One2many(
+        'sale.order',
+        'apu_id',
+        string="Cotización",
+        ondelete='set null'
+    )
+
     cylinder_survey_count = fields.Integer(
         string="Levantamientos",
         compute="_compute_cylinder_survey_count"
+    )
+    quote_count = fields.Integer(
+        string="Cotizacion",
+        compute="_compute_quote_count"
     )
     
     
@@ -117,9 +128,6 @@ class ApuSurvey(models.Model):
             order.gran_subtotal_lm=order.total_material_lm+order.total_mo_lm
             order.gran_total_lm = order.gran_subtotal_lm + (order.gran_subtotal_lm*0.16)
 
-            """ if order.order_line:
-                line = order.order_line
-                line.price_unit = order.gran_subtotal_lm """
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -132,11 +140,6 @@ class ApuSurvey(models.Model):
 
         return super(ApuSurvey, self).create(vals_list)
 
-
-    #@api.depends('order_line.product_template_id')
-    #def _compute_tiene_producto_linea(self):
-        #for order in self:
-            #order.tiene_producto_linea = any(order.order_line.mapped('product_template_id'))
     def _get_domain_product(self):
         for record in self:
             if not record.survey_id:
@@ -145,11 +148,37 @@ class ApuSurvey(models.Model):
                 return [('categ_id', '==', 'FCH' )]
 
     def action_to_confirmed(self):
-        """Pasa de Levantamiento a APU y genera los registros de costeo."""
         for record in self:
-            pass
+            if not record.survey_id:
+                order_lines = []
+                    # sale.order.line requiere product.product, no product.template
+                    product_variant = apu.apu_product_id.product_variant_id
+                    if not product_variant:
+                        raise ValidationError(_("El producto de la APU '%s' no tiene variantes activas válidas.") % apu.name)
+
+                    # gran_subtotal_lm es el costo total del grupo.
+                    # Si el grupo tiene N cilindros, dividimos el precio para que el total de la línea sea exacto.
+                    qty = apu.group_id.quantity or 1.0
+                    unit_price = apu.gran_subtotal_lm / qty if qty > 0 else apu.gran_subtotal_lm
+
+                    order_lines.append(Command.create({
+                        'product_id': product_variant.id,
+                        'name': f"Reparación / Fabricación: {product_variant.name} (Ref: {apu.name})",
+                        'product_uom_qty': qty,
+                        'price_unit': unit_price,
+                    }))
+
+                # Crear el Sale Order (Cotización)
+                so_vals = {
+                    'partner_id': record.partner_id.id,
+                    'apu_id': record.id, # Enlace trazable
+                    'origin': record.name,  # Documento origen estándar
+                    'order_line': order_lines,
+                }
+                
+                self.env['sale.order'].sudo().create(so_vals)
         record.write({'state': 'confirmed'})
-        
+         
     def action_cancel(self):
         """Cancela el registro"""
         for record in self:
@@ -169,6 +198,10 @@ class ApuSurvey(models.Model):
         for record in self:
             record.cylinder_survey_count = len(record.survey_id)
 
+    def _compute_quote_count(self):
+        for record in self:
+            record.quote_count = len(record.quote_id)
+
     def action_view_survey(self):
         self.ensure_one()
 
@@ -179,3 +212,18 @@ class ApuSurvey(models.Model):
             'view_mode': 'form',
             'res_id': self.survey_id.id,
         }
+    
+    def action_view_quote(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': ('Cotizaciones'),
+            'res_model': 'sale.order',
+            'view_mode': 'list,form',
+            'domain': [('apu_id', '=', self.id)],
+            'context': {
+                'default_apu_id': self.id, 
+                'default_partner_id': self.partner_id.id
+            }
+        }
+    

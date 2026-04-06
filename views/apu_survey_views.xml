@@ -14,6 +14,10 @@
                        decoration-bf="1" />
                 <field name="group_id"
                        decoration-bf="1" />
+                <field name="gran_subtotal_lm"
+                       decoration-bf="1" />
+                <field name="gran_total_lm"
+                       decoration-bf="1" />
                 <field name="date" />
                 <field name="partner_id"
                        widget="many2one_avatar" />
@@ -30,15 +34,10 @@
         <field name="arch"
                type="xml">
             <form string="APU">
-                <header>
+                <header> 
                     <button name="action_to_confirmed" string="Confirmar APU" type="object" class="oe_highlight" invisible="state != 'draft'" />
                     <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['confirmed']" confirm="¿Está seguro de que desea cancelar este registro?" />
                     <button name="action_set_draft" string="Establece a Borrador" type="object" invisible="state != 'cancel'" />
-                    <!-- <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed'"/>
-
-
-
-                    <button name="action_set_draft" string="Volver a Levantamiento" type="object" invisible="state != 'cancel'" /> -->
                     <field name="state"
                            widget="statusbar"
                            statusbar_visible="draft,confirmed,cancel" />
@@ -55,6 +54,9 @@
                      <div class="oe_button_box" name="button_box">
                         <button name="action_view_survey" type="object" class="oe_stat_button" icon="fa-gears" invisible="not survey_id">
                             <field name="cylinder_survey_count" widget="statinfo" string="Levantamiento"/>
+                        </button>
+                        <button name="action_view_quote" type="object" class="oe_stat_button" icon="fa-shopping-cart" invisible="not quote_id">
+                            <field name="quote_count" widget="statinfo" string="Cotización"/>
                         </button>
                     </div>
                     <group>
@@ -97,6 +99,7 @@
                         <group name="Información General"
                                string="Información General">
                             <field name="partner_id" />
+                            <field name="quote_id" invisible="True"/>
                             <field name="tipo_costo_mo" />
                             <field name="costo_fijo_lm"
                                    invisible="tipo_costo_mo != 'costo_fijo_mo'" />

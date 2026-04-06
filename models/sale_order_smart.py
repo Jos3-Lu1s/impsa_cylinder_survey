@@ -16,12 +16,22 @@ class SaleOrderSmart(models.Model):
         compute="_compute_cylinder_survey_count"
     )
     
-    requeriments_work_order=fields.Text(string="Levantamiento/OT", store=True, readonly=True)
-    group_requeriments_work_order=fields.Text(string="Grupo Relacionado", store=True, readonly=True)
+    apu_id = fields.Many2one(
+        'impsa.apu.survey',
+        string="APU Relacionado"
+    )
+    apu_survey_count = fields.Integer(
+        string="APU",
+        compute="_compute_cylinder_survey_count"
+    )
 
     def _compute_cylinder_survey_count(self):
         for record in self:
             record.cylinder_survey_count = len(record.survey_id)
+
+    def _compute_cylinder_survey_count(self):
+        for record in self:
+            record.apu_survey_count = len(record.apu_id)
 
     def action_view_survey(self):
         self.ensure_one()
@@ -32,4 +42,14 @@ class SaleOrderSmart(models.Model):
             'res_model': 'impsa.cylinder.survey',
             'view_mode': 'form',
             'res_id': self.survey_id.id,
+        }
+    def action_view_apu_survey(self):
+        self.ensure_one()
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'APU',
+            'res_model': 'impsa.apu.survey',
+            'view_mode': 'form',
+            'res_id': self.apu_id.id,
         }
