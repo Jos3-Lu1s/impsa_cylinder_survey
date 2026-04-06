@@ -1,3 +1,4 @@
+# odoo19/addons/modules/impsa_cylinder_survey/models/sale_order_smart.py
 from odoo import models, fields, api
 
 class SaleOrderSmart(models.Model):
@@ -18,24 +19,28 @@ class SaleOrderSmart(models.Model):
     
     apu_id = fields.Many2one(
         'impsa.apu.survey',
-        string="APU Relacionado"
+        string="APU Relacionado",
+        ondelete="set null",
+        copy=False
     )
+    
     apu_survey_count = fields.Integer(
         string="APU",
         compute="_compute_apu_survey_count"
     )
 
+    @api.depends('survey_id')
     def _compute_cylinder_survey_count(self):
         for record in self:
-            record.cylinder_survey_count = len(record.survey_id)
+            record.cylinder_survey_count = 1 if record.survey_id else 0
 
+    @api.depends('apu_id')
     def _compute_apu_survey_count(self):
         for record in self:
-            record.apu_survey_count = len(record.apu_id)
+            record.apu_survey_count = 1 if record.apu_id else 0
 
     def action_view_survey(self):
         self.ensure_one()
-
         return {
             'type': 'ir.actions.act_window',
             'name': 'Levantamiento',
@@ -43,9 +48,9 @@ class SaleOrderSmart(models.Model):
             'view_mode': 'form',
             'res_id': self.survey_id.id,
         }
+
     def action_view_apu_survey(self):
         self.ensure_one()
-
         return {
             'type': 'ir.actions.act_window',
             'name': 'APU',

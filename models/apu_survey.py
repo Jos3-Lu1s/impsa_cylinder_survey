@@ -15,7 +15,9 @@ class ApuSurvey(models.Model):
         "res.partner", string="Cliente", required=True, tracking=True, ondelete='restrict'
     )
 
-    apu_product_id=fields.Many2one('product.template',string='Cilindro a trabajar', domain=lambda self: self._get_domain_product())
+    apu_product_id = fields.Many2one(
+        'product.template', string='Cilindro a trabajar'
+    )
 
     date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True)
 
@@ -67,11 +69,10 @@ class ApuSurvey(models.Model):
         help="Grupo de cilindros específico que se está costeando."
     )
 
-    quote_id = fields.One2many(
+    quote_ids = fields.One2many(
         'sale.order',
         'apu_id',
         string="Cotización",
-        ondelete='set null'
     )
 
     cylinder_survey_count = fields.Integer(
@@ -86,20 +87,20 @@ class ApuSurvey(models.Model):
     
     
     #CAMPOS PARA LOS COSTOS TOTALES DE LOS MATERIALES#
-    subtotal_material_lm = fields.Monetary(string="Subtotal",store=True,currency_field="currency_id", readonly=True,compute='_compute_totales_lm')
-    costos_indirectos_material_lm = fields.Monetary(string="Costos Indirectos",store=True,currency_field="currency_id", readonly=True)
-    utilidad_impuestos_material_lm = fields.Monetary(string="utilidad antes de Impuestos",store=True,currency_field="currency_id", readonly=True)
-    total_material_lm = fields.Monetary(string="Total",store=True,currency_field="currency_id", readonly=True)
+    subtotal_material_lm = fields.Monetary(string="Subtotal", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    costos_indirectos_material_lm = fields.Monetary(string="Costos Indirectos", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    utilidad_impuestos_material_lm = fields.Monetary(string="Utilidad antes de Impuestos", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    total_material_lm = fields.Monetary(string="Total", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
 
     #CAMPOS PARA LOS COSTOS TOTALES DE LA MANO DE OBRA#
-    subtotal_mo_lm = fields.Monetary(string="Subtotal",store=True,currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
-    costos_indirectos_mo_lm = fields.Monetary(string="Costos Indirectos",store=True,currency_field="currency_id", readonly=True)
-    utilidad_impuestos_mo_lm = fields.Monetary(string="utilidad antes de Impuestos",store=True,currency_field="currency_id", readonly=True)
-    total_mo_lm = fields.Monetary(string="Total",store=True,currency_field="currency_id", readonly=True)
+    subtotal_mo_lm = fields.Monetary(string="Subtotal", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    costos_indirectos_mo_lm = fields.Monetary(string="Costos Indirectos", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    utilidad_impuestos_mo_lm = fields.Monetary(string="Utilidad antes de Impuestos", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    total_mo_lm = fields.Monetary(string="Total", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
 
     #CAMPOS PARA LOS COSTOS TOTALES#
-    gran_subtotal_lm = fields.Monetary(string="Gran Subtotal",store=True,currency_field="currency_id", readonly=True)
-    gran_total_lm = fields.Monetary(string="Gran Total",store=True,currency_field="currency_id", readonly=True)
+    gran_subtotal_lm = fields.Monetary(string="Gran Subtotal", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    gran_total_lm = fields.Monetary(string="Gran Total", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
 
     #CAMPOS DE PORCENTAJES PARA MARGENES DE COSTOS
     porcentaje_cindirectos_material=fields.Float(string="Margen C. Indirectos",digits=(16, 2))
@@ -108,6 +109,12 @@ class ApuSurvey(models.Model):
     porcentaje_cindirectos_mo=fields.Float(string="Margen C. Indirectos",digits=(16, 2))
     porcentaje_utaimp_mo=fields.Float(string="Margen Utilidad",digits=(16, 2))
 
+    @api.onchange('survey_id')
+    def _onchange_survey_id_domain(self):
+        if not self.survey_id:
+            return {'domain': {'apu_product_id': [('categ_id', '=', 'RCH')]}}
+        else:
+            return {'domain': {'apu_product_id': [('categ_id', '=', 'FCH')]}}
 
     @api.depends('lm_ids','costo_fijo_lm','tipo_costo_mo','porcentaje_cindirectos_material','porcentaje_utaimp_material','porcentaje_cindirectos_mo','porcentaje_utaimp_mo')
     def _compute_totales_lm(self):
@@ -150,15 +157,13 @@ class ApuSurvey(models.Model):
 
     def action_to_confirmed(self):
         for record in self:
-            if not record.survey_id and not record.quote_id:
+            if not record.quote_ids:
                 order_lines = []
-                # sale.order.line requiere product.product, no product.template
                 product_variant = record.apu_product_id.product_variant_id
+                
                 if not product_variant:
                     raise ValidationError(_("El producto de la APU '%s' no tiene variantes activas válidas.") % record.name)
 
-                # gran_subtotal_lm es el costo total del grupo.
-                # Si el grupo tiene N cilindros, dividimos el precio para que el total de la línea sea exacto.
                 qty = record.group_id.quantity or 1.0
                 unit_price = record.gran_subtotal_lm / qty if qty > 0 else record.gran_subtotal_lm
 
@@ -169,29 +174,30 @@ class ApuSurvey(models.Model):
                     'price_unit': unit_price,
                 }))
 
-                # Crear el Sale Order (Cotización)
                 so_vals = {
                     'partner_id': record.partner_id.id,
-                    'apu_id': record.id, # Enlace trazable
-                    'origin': record.name,  # Documento origen estándar
+                    'apu_id': record.id, 
+                    'survey_id': record.survey_id.id,
+                    'origin': record.name,  
                     'order_line': order_lines,
                 }
                 
                 self.env['sale.order'].sudo().create(so_vals)
-        record.write({'state': 'confirmed'})
+                
+            record.write({'state': 'confirmed'})
          
     def action_cancel(self):
         """Cancela el registro"""
         for record in self:
-            # Bloqueamos la cancelación solo si ya es Orden de Trabajo
             if record.survey_id:
-                state_label = dict(record.survey_id._fields['state'].selection).get(record.survey_id.state)
+                selection_options = dict(self.env['impsa.cylinder.survey'].fields_get(allfields=['state'])['state']['selection'])
+                state_label = selection_options.get(record.survey_id.state, record.survey_id.state)
                 if record.survey_id.state not in ['draft' ,'apu']:
-                    raise ValidationError(f"No puedes cancelar el {record.name}, ya que, el '{record.survey_id.name}' esta en estatus {state_label}")
+                    raise ValidationError(f"No puedes cancelar el {record.name}, ya que el '{record.survey_id.name}' está en estatus {state_label}")
             else:
-                if record.quote_id.state not in ['draft']:
-                    #state_quote_label = dict(record.quote_id._fields['state'].selection).get(record.quote_id.state)
-                    raise ValidationError(f"No puedes cancelar el {record.name}, ya que, la cotización '{record.quote_id.name}' esta en estatus 'Cotización'")
+                if any(quote.state != 'draft' for quote in record.quote_ids):
+                    raise ValidationError(f"No puedes cancelar el {record.name}, ya que tiene cotizaciones fuera de estado 'Borrador'.")
+            
             record.write({'state': 'cancel'})
 
     def action_set_draft(self):
@@ -199,13 +205,15 @@ class ApuSurvey(models.Model):
         for record in self: 
             record.write({'state': 'draft'})
 
+    @api.depends('survey_id')
     def _compute_cylinder_survey_count(self):
         for record in self:
-            record.cylinder_survey_count = len(record.survey_id)
+            record.cylinder_survey_count = 1 if record.survey_id else 0
 
+    @api.depends('quote_ids')
     def _compute_quote_count(self):
         for record in self:
-            record.quote_count = len(record.quote_id)
+            record.quote_count = len(record.quote_ids)
 
     def action_view_survey(self):
         self.ensure_one()
@@ -222,12 +230,13 @@ class ApuSurvey(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': ('Cotizaciones'),
+            'name': 'Cotizaciones',
             'res_model': 'sale.order',
             'view_mode': 'list,form',
             'domain': [('apu_id', '=', self.id)],
             'context': {
                 'default_apu_id': self.id, 
+                'default_survey_id': self.survey_id.id,
                 'default_partner_id': self.partner_id.id
             }
         }
