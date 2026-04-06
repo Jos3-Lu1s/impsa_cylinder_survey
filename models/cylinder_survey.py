@@ -1,4 +1,4 @@
-from odoo import models, fields, api, _
+from odoo import models, fields, api, Command, _
 from odoo.exceptions import ValidationError, UserError
 
 class CylinderSurvey(models.Model):
@@ -12,6 +12,12 @@ class CylinderSurvey(models.Model):
 
     partner_id = fields.Many2one(
         "res.partner", string="Cliente", required=True, tracking=True, ondelete='restrict'
+    )
+
+    partner_email = fields.Char(
+        string="Correo Electrónico",
+        related="partner_id.email",
+        readonly=True
     )
 
     cylinder_qty = fields.Integer(
@@ -57,26 +63,6 @@ class CylinderSurvey(models.Model):
         string="Imágenes de la Camisa", 
         domain=[('component', '=', 'barrel')]
     )
-    
-    barrel_inner_diameter_main = fields.Float(string='Ø Interior Principal')
-    barrel_outer_diameter_main = fields.Float(string='Ø Exterior Principal')
-    barrel_length_main = fields.Float(string='Longitud Principal')
-    
-    barrel_inner_diameter2 = fields.Float(string='Ø Interior 2')
-    barrel_outer_diameter2 = fields.Float(string='Ø Exterior 2')
-    barrel_length2 = fields.Float(string='Longitud 2')
-    
-    barrel_inner_diameter3 = fields.Float(string='Ø Interior 3')
-    barrel_outer_diameter3 = fields.Float(string='Ø Exterior 3')
-    barrel_length3 = fields.Float(string='Longitud 3')
-    
-    barrel_inner_diameter4 = fields.Float(string='Ø Interior 4')
-    barrel_outer_diameter4 = fields.Float(string='Ø Exterior 4')
-    barrel_length4 = fields.Float(string='Longitud 4')
-    
-    barrel_inner_diameter5 = fields.Float(string='Ø Interior 5')
-    barrel_outer_diameter5 = fields.Float(string='Ø Exterior 5')
-    barrel_length5 = fields.Float(string='Longitud 5')
 
     # Vástago (Rod)
     diameter_rod = fields.Float(string="Ø Vástago")
@@ -86,21 +72,8 @@ class CylinderSurvey(models.Model):
         string="Imágenes del Vástago", 
         domain=[('component', '=', 'rod')]
     )
-    
     diameter_rod2 = fields.Float(string="Ø Vástago 2")
     rod_length2 = fields.Float(string='Longitud de Vástago 2')
-    
-    diameter_rod3 = fields.Float(string="Ø Vástago 3")
-    rod_length3 = fields.Float(string='Longitud de Vástago 3')
-    
-    diameter_rod4 = fields.Float(string="Ø Vástago 4")
-    rod_length4 = fields.Float(string='Longitud de Vástago 4')
-    
-    diameter_rod5 = fields.Float(string="Ø Vástago 5")
-    rod_length5 = fields.Float(string='Longitud de Vástago 5')
-    
-    diameter_rod6 = fields.Float(string="Ø Vástago 2")
-    rod_length6 = fields.Float(string='Longitud de Vástago 2')
 
     # Émbolo (Piston)
     piston_diameter = fields.Float(string='Ø Émbolo') 
@@ -110,18 +83,6 @@ class CylinderSurvey(models.Model):
         string="Imágenes del Émbolo", 
         domain=[('component', '=', 'piston')]
     )
-    
-    piston_diameter2 = fields.Float(string='Ø Émbolo 2')
-    piston_length2 = fields.Float(string='Longitud de Émbolo 2')
-    
-    piston_diameter3 = fields.Float(string='Ø Émbolo 3')
-    piston_length3 = fields.Float(string='Longitud de Émbolo 3')
-    
-    piston_diameter4 = fields.Float(string='Ø Émbolo 4')
-    piston_length4 = fields.Float(string='Longitud de Émbolo 4')
-    
-    piston_diameter5 = fields.Float(string='Ø Émbolo 5')
-    piston_length5 = fields.Float(string='Longitud de Émbolo 5')
 
     # Cabeza (Head)
     head_diameter = fields.Float(string='Ø Cabeza')
@@ -131,18 +92,6 @@ class CylinderSurvey(models.Model):
         string="Imágenes de la Cabeza", 
         domain=[('component', '=', 'head')]
     )
-    
-    head_diameter2 = fields.Float(string='Ø Cabeza 2')
-    head_length2 = fields.Float(string='Longitud de Cabeza 2')
-    
-    head_diameter3 = fields.Float(string='Ø Cabeza 3')
-    head_length3 = fields.Float(string='Longitud de Cabeza 3')
-    
-    head_diameter4 = fields.Float(string='Ø Cabeza 4')
-    head_length4 = fields.Float(string='Longitud de Cabeza 4')
-    
-    head_diameter5 = fields.Float(string='Ø Cabeza 5')
-    head_length5 = fields.Float(string='Longitud de Cabeza 5')
 
     # Carrera (Stroke)
     stroke_length = fields.Float(string='Longitud de Carrera')
@@ -152,23 +101,14 @@ class CylinderSurvey(models.Model):
         domain=[('component', '=', 'stroke')]
     )
     
-    # Accesorios
-    accessories  = fields.Text(string='Accesorios')
     accessory_image_ids  = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes de accesorios", 
         domain=[('component', '=', 'accessory')]
     )
 
-    date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True)
+    date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True, required=True)
     description = fields.Text(string="Descripción")
-
-    rotula_id = fields.Many2one(
-        "product.product",
-        string="Rotula",
-        domain="[('categ_id.name', '=', 'FERRETERIA')]",
-        ondelete='restrict'
-    )
     
     date_delivery = fields.Date(string="Fecha de Entrega")
 
@@ -203,30 +143,42 @@ class CylinderSurvey(models.Model):
         help="Suma total de líneas en el registro operativo.",
         readonly=True
     )
-    total_hours = fields.Float(
-        string='Total de Horas',
-        compute='_compute_operational_totals',
+
+    total_groups = fields.Integer(
+        string='Total Grupos',
+        compute='_compute_dashboard_totals',
         store=True,
-        help="Suma total de horas de todas las tareas.",
-        readonly=True
+        help="Cantidad de grupos de cilindros definidos."
     )
+
+    total_packings = fields.Integer(
+        string='Total Empaques',
+        compute='_compute_dashboard_totals',
+        store=True,
+        help="Cantidad de líneas de empaques solicitados."
+    )
+
     state = fields.Selection([
         ('draft', 'Levantamiento'),
-        ('quoted', 'APU'),
+        ('apu', 'APU'),
+        ('quoted', 'Cotización'),
         ('confirmed', 'Orden de Trabajo'),
         ('cancel', 'Cancelado'),
-    ], string='Estado', default='draft', tracking=True, copy=False, index=True)
+    ], string='Estado', default='draft', tracking=True, copy=False, index=True, group_expand='_expand_states')
 
     cylinder_type = fields.Selection([
         ('hydraulic', 'Hidráulico'),
         ('pneumatic', 'Neumático')
-    ],string='Tipo de Cilindro')
+    ],string='Tipo de Cilindro', required=True)
 
     is_standardized = fields.Boolean(
         string='Normalizado'
     )
     
-    num_section = fields.Integer(string='Número de Secciones')
+    num_section = fields.Integer(
+        string='Número de Secciones',
+        default=1, 
+    )
     
     purchase_order_create = fields.Boolean(
         string='Orden de Compra Creada',
@@ -236,7 +188,8 @@ class CylinderSurvey(models.Model):
     section_ids = fields.One2many(
         'impsa.cylinder.section',
         'survey_id',
-        string='Secciones del Cilindro'
+        string='Secciones del Cilindro',
+        copy=True
     )
     
     purchase_order_ids = fields.One2many(
@@ -255,11 +208,10 @@ class CylinderSurvey(models.Model):
         ondelete='set null'
     )
     
-    sale_order_id = fields.One2many(
-        'sale.order',
+    apu_ids = fields.One2many(
+        'impsa.apu.survey',
         'survey_id',
-        string="Orden de Venta",
-        ondelete='set null'
+        string="Análisis de Precios (APUs)"
     )
 
     lead_count = fields.Integer(
@@ -267,15 +219,44 @@ class CylinderSurvey(models.Model):
         compute="_compute_lead_count"
     )
     
-    sale_count = fields.Integer(
-        string="Órdenes de Venta",
-        compute="_compute_sale_count"
+    apu_count = fields.Integer(
+        string="Cantidad de APUs",
+        compute="_compute_apu_count"
     )
 
+    accessory_line_ids = fields.One2many(
+        "impsa.cylinder.accessory",
+        "survey_id",
+        string="Lista de Accesorios y Características",
+        copy=True
+    )
+
+    sale_order_ids = fields.One2many(
+        "sale.order",
+        "survey_id",
+        string="Cotizaciones"
+    )
+
+    sale_order_count = fields.Integer(
+        string="Cantidad de Cotizaciones",
+        compute="_compute_sale_order_count"
+    )
 
     ''' ------------------------
         COMPUTE METHODS
     -------------------------'''
+
+    @api.depends('sale_order_ids')
+    def _compute_sale_order_count(self):
+        for rec in self:
+            rec.sale_order_count = len(rec.sale_order_ids)
+    
+    @api.depends('group_ids', 'cylinder_survey_line_ids')
+    def _compute_dashboard_totals(self):
+        """Calcula las métricas rápidas para las tarjetas superiores en la vista form."""
+        for rec in self:
+            rec.total_groups = len(rec.group_ids)
+            rec.total_packings = len(rec.cylinder_survey_line_ids)
 
     @api.depends('purchase_order_ids')
     def _compute_purchase_order_count(self):
@@ -287,38 +268,134 @@ class CylinderSurvey(models.Model):
         for rec in self:
             rec.lead_count = 1 if rec.lead_id else 0
             
-    @api.depends('sale_order_id')
-    def _compute_sale_count(self):
+    @api.depends('apu_ids')
+    def _compute_apu_count(self):
         for rec in self:
-            rec.sale_count = len(rec.group_ids) if rec.sale_order_id else 0
-            # Contamos las órdenes de venta únicas vinculadas a través de los grupos o directamente
-            rec.sale_count = self.env['sale.order'].search_count([('survey_id', '=', rec.id)])
+            rec.apu_count = len(rec.apu_ids)
 
-    @api.depends('group_ids.operational_record_ids.hr', 'group_ids.operational_record_ids', 'group_ids.quantity')
+    @api.depends('group_ids.operational_record_ids', 'group_ids.quantity')
     def _compute_operational_totals(self):
         for record in self:
             total_tasks = 0
-            total_h = 0.0
             for group in record.group_ids:
-                lines = group.operational_record_ids
-                total_tasks += len(lines)
-                group_hours = sum(lines.mapped('hr'))
-                total_h += (group_hours * group.quantity)
-            
+                total_tasks += len(group.operational_record_ids)
             record.total_tasks = total_tasks
-            record.total_hours = total_h
         
     @api.depends('group_ids.quantity')
     def _compute_allocated_qty(self):
         for survey in self:
             survey.allocated_qty = sum(survey.group_ids.mapped('quantity'))
+
+    @api.model
+    def _expand_states(self, states, domain, order=None):
+        """
+        Fuerza a la vista Kanban a cargar las columnas en este orden exacto,
+        garantizando que aparezcan incluso si no tienen registros (Count = 0).
+        """
+
+        return ['draft', 'apu', 'quoted', 'confirmed'] 
+        # return ['draft', 'apu', 'quoted', 'confirmed', 'cancel']
             
-    @api.onchange('num_section')
-    def _onchange_num_section_limit(self):
-        if self.num_section <= 0:
+    @api.onchange('num_section', 'cylinder_to')
+    def _onchange_generate_sections(self):
+        """
+        Genera dinámicamente las líneas del cilindro telescópico 
+        basado en el número de secciones indicadas.
+        """
+        # 1. Si no es Telescópico, limpiamos las secciones y salimos.
+        if self.cylinder_to and self.cylinder_to.code != 'CE-T':
+            self.num_section = 0
+            self.section_ids = [Command.clear()]
+            return
+
+        if self.num_section == 0:
             self.num_section = 1
-        elif self.num_section > 5:
-            self.num_section = 5
+
+        # 2. Limitamos el número de secciones
+        if self.num_section < 1 or self.num_section > 5:
+            # Limpiamos las líneas para no generar basura o colapsar la vista con 1000 líneas
+            self.section_ids = [Command.clear()] 
+            return {
+                'warning': {
+                    'title': "Límite de Secciones Excedido",
+                    'message': "Por cuestiones de diseño, un cilindro telescópico no puede tener menos de 1 ni más de 5 secciones. Por favor, corrige el número."
+                }
+            }
+
+        # 3. Preparar la creación de líneas usando odoo.Command
+        commands = [Command.clear()] # Primero limpiamos lo que haya
+        
+        # Diccionario para automatizar nombres (Soporta hasta 5 extensiones)
+        ordinales = {1: 'Primera', 2: 'Segunda', 3: 'Tercera', 4: 'Cuarta', 5: 'Quinta'}
+        
+        # Total de registros a crear = 1 (Principal) + num_section
+        total_records = self.num_section + 1
+        
+        for i in range(total_records):
+            if i == 0:
+                # Índice 0 siempre es la Camisa Principal
+                name = 'Camisa Principal'
+                sec_type = 'main'
+            elif i == total_records - 1:
+                # El último índice siempre es la Última Extensión
+                name = f'{ordinales.get(i, str(i) + "a")} Extensión (Última)'
+                sec_type = 'last'
+            else:
+                # Cualquier cosa en medio son Extensiones Intermedias
+                name = f'{ordinales.get(i, str(i) + "a")} Extensión'
+                sec_type = 'intermediate'
+                
+            # Agregamos el comando de creación a la lista
+            commands.append(Command.create({
+                'sequence': (i + 1) * 10, # 10, 20, 30... para mantener el orden
+                'name': name,
+                'section_type': sec_type,
+            }))
+            
+        # Asignamos la lista de comandos al campo One2many
+        self.section_ids = commands
+
+    @api.onchange('cylinder_to')
+    def _onchange_clear_hidden_fields(self):
+        """
+        Evita guardar 'datos fantasma'. Cuando el usuario cambia el tipo de cilindro,
+        resetea los valores de las pestañas o campos que quedarán ocultos.
+        """
+        for rec in self:
+            if not rec.cylinder_to or not rec.cylinder_to.code:
+                continue
+
+            code = rec.cylinder_to.code
+
+            # 1. Si NO es Telescópico, limpiamos sus secciones
+            if code != 'CE-T':
+                rec.num_section = 1
+                rec.section_ids = [Command.clear()]
+                
+            # 2. Si NO es Doble Vástago, limpiamos las medidas del Vástago 2
+            if code != 'CE-DV':
+                rec.diameter_rod2 = 0.0
+                rec.rod_length2 = 0.0
+
+            # 3. Si NO es Otros (CE-OT), vaciamos la tabla de accesorios especiales
+            if code != 'CE-OT':
+                rec.accessory_line_ids = [Command.clear()]
+                
+            # 4. Si ES Telescópico o ES Otros, limpiamos las medidas de un cilindro estándar
+            if code in ['CE-T', 'CE-OT']:
+                rec.barrel_inner_diameter = 0.0
+                rec.barrel_outer_diameter = 0.0
+                rec.barrel_length = 0.0
+                rec.diameter_rod = 0.0
+                rec.rod_length = 0.0
+                rec.piston_diameter = 0.0
+                rec.piston_length = 0.0
+                rec.head_diameter = 0.0
+                rec.head_length = 0.0
+                
+                # El Telescópico SÍ usa carrera global, pero OTROS no.
+                if code == 'CE-OT':
+                    rec.stroke_length = 0.0
 
     ''' ------------------------
         CONSTRAINS
@@ -344,7 +421,8 @@ class CylinderSurvey(models.Model):
     @api.constrains(
         'cylinder_to', 'barrel_inner_diameter', 'barrel_outer_diameter', 'barrel_length',
         'diameter_rod', 'rod_length', 'piston_diameter', 'piston_length', 
-        'head_diameter', 'head_length', 'stroke_length'
+        'head_diameter', 'head_length', 'stroke_length', 'section_ids',
+        'accessory_line_ids'
     )
     def _check_required_dimensions_by_type(self):
         for rec in self:
@@ -354,12 +432,22 @@ class CylinderSurvey(models.Model):
             code = rec.cylinder_to.code
             missing_components = []
 
-            # Evaluamos por bloque de pieza en lugar de campo por campo
+            # Evaluamos por bloque de pieza
             if code == 'CE-OT':
-                if rec.barrel_inner_diameter <= 0.0:
-                    missing_components.append('Diámetro Interior de la Camisa')
+                if not rec.accessory_line_ids:
+                    raise ValidationError(
+                        _("Para el tipo '%s', es obligatorio agregar al menos una "
+                          "línea en la tabla de 'Accesorios / Características'.") 
+                        % rec.cylinder_to.name
+                    )
 
-            elif code in ['CE-DE', 'CE-SE']:
+            elif code == 'CE-T':
+                if not rec.section_ids:
+                    raise ValidationError(
+                        _("Para cilindros Telescópicos, debe agregar al menos una sección.")
+                    )
+
+            elif code in ['CE-DE', 'CE-SE', 'CE-DV']:
                 if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0 or rec.barrel_length <= 0.0:
                     missing_components.append('Camisa')
                 if rec.diameter_rod <= 0.0 or rec.rod_length <= 0.0:
@@ -371,24 +459,82 @@ class CylinderSurvey(models.Model):
                 if rec.stroke_length <= 0.0:
                     missing_components.append('Carrera')
                     
-            elif code in ['CE-T']:
-                if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0 or rec.barrel_length <= 0.0:
-                    missing_components.append('Camisa')
+            elif code == 'CE-T':
+                # 1. Validar la carrera global (compartida por todas las secciones)
+                if rec.stroke_length <= 0.0:
+                    missing_components.append('Carrera Total')
+                    
+                # 2. Validar cada sección generada en la tabla dinámicamente
+                for section in rec.section_ids:
+                    sec_name = section.name  # Ej: "Camisa Principal" o "Segunda Extensión"
+                    
+                    if section.section_type == 'main':
+                        if section.inner_diameter <= 0.0 or section.outer_diameter <= 0.0 or section.length <= 0.0:
+                            missing_components.append(f'Medidas de Camisa en "{sec_name}"')
+                            
+                    elif section.section_type == 'intermediate':
+                        if section.inner_diameter <= 0.0 or section.outer_diameter <= 0.0 or section.length <= 0.0:
+                            missing_components.append(f'Medidas de Tubo en "{sec_name}"')
+                        if section.piston_diameter <= 0.0 or section.piston_length <= 0.0:
+                            missing_components.append(f'Medidas de Émbolo en "{sec_name}"')
+                        if section.head_diameter <= 0.0 or section.head_length <= 0.0:
+                            missing_components.append(f'Medidas de Cabeza en "{sec_name}"')
+                            
+                    elif section.section_type == 'last':
+                        if section.outer_diameter <= 0.0 or section.length <= 0.0:
+                            missing_components.append(f'Medidas de Vástago (Ø Ext) en "{sec_name}"')
+                        if section.piston_diameter <= 0.0 or section.piston_length <= 0.0:
+                            missing_components.append(f'Medidas de Émbolo en "{sec_name}"')
 
+            # Si se recolectaron errores, lanzar la excepción
             if missing_components:
-                componentes = ", ".join(missing_components)
+                componentes = "\n- ".join(missing_components)
                 raise ValidationError(
-                    f"Faltan medidas para el cilindro '{rec.cylinder_to.name}'.\n\n"
-                    f"Asegúrate de registrar valores mayores a 0 en: {componentes}."
+                    f"Faltan medidas mayores a 0 para el cilindro '{rec.cylinder_to.name}'.\n"
+                    f"Por favor revisa lo siguiente:\n- {componentes}"
                 )
+    
+    @api.constrains('section_ids')
+    def _check_telescopic_physics(self):
+        """
+        Valida que las secciones de un cilindro telescópico sean físicamente posibles.
+        El diámetro exterior de la etapa N debe caber dentro del diámetro interior de la etapa N-1.
+        """
+        for survey in self:
+            if survey.cylinder_to_code == 'CE-T' and len(survey.section_ids) > 1:
+                # Asegurarnos de que iteramos en el orden correcto (de fuera hacia adentro)
+                sections = survey.section_ids.sorted(lambda s: s.sequence)
                 
-    @api.constrains('num_section')
-    def _check_num_section(self):
+                for i in range(1, len(sections)):
+                    prev_sec = sections[i-1] # Etapa exterior (ej. Camisa Principal)
+                    curr_sec = sections[i]   # Etapa interior (ej. Primera Extensión)
+                    
+                    # 1. Validación básica que mencionaste (OD actual < OD anterior)
+                    if curr_sec.outer_diameter >= prev_sec.outer_diameter:
+                        raise ValidationError(
+                            f"Incoherencia física: El Ø Exterior de la '{curr_sec.name}' ({curr_sec.outer_diameter}) "
+                            f"no puede ser mayor o igual al Ø Exterior de su antecesor '{prev_sec.name}' ({prev_sec.outer_diameter})."
+                        )
+                    
+                    # 2. Validación estricta de ensamble (OD actual < ID anterior)
+                    # prev_sec siempre tendrá inner_diameter porque no puede ser la 'last'
+                    if prev_sec.inner_diameter and curr_sec.outer_diameter >= prev_sec.inner_diameter:
+                        raise ValidationError(
+                            f"Error de Ensamble: La '{curr_sec.name}' tiene un Ø Exterior ({curr_sec.outer_diameter}) "
+                            f"que no cabe en el Ø Interior de su antecesor '{prev_sec.name}' ({prev_sec.inner_diameter}).\n"
+                            f"¡Revisa las medidas!"
+                        )
+                
+    @api.constrains('num_section', 'cylinder_to')
+    def _check_num_section_limits(self):
         for record in self:
-            if record.num_section <= 0 or record.num_section > 5:
-                raise ValidationError(
-                    "El número de secciones debe ser mayor a 0 y máximo 5."
-                )
+            # Solo aplicamos la regla estricta si es Telescópico
+            if record.cylinder_to and record.cylinder_to.code == 'CE-T':
+                if record.num_section < 1 or record.num_section > 5:
+                    raise ValidationError(
+                        "Integridad de datos: El número de secciones para un "
+                        "cilindro telescópico debe estar estrictamente entre 1 y 5."
+                    )
 
     ''' ------------------------
         ACTIONS
@@ -418,17 +564,31 @@ class CylinderSurvey(models.Model):
                 'target': 'current',
             }
             
-    def action_view_sale_order(self):
+    def action_view_apus(self):
         self.ensure_one()
-        
-        if self.sale_order_id:
+        if self.apu_ids:
             return {
                 'type': 'ir.actions.act_window',
-                'name': 'Orden de Venta',
-                'res_model': 'sale.order',
+                'name': 'Análisis de Precios Unitarios',
+                'res_model': 'impsa.apu.survey',
                 'view_mode': 'list,form',
                 'domain': [('survey_id', '=', self.id)],
+                'context': {'default_survey_id': self.id, 'default_partner_id': self.partner_id.id}
             }
+
+    def action_view_sale_orders(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Cotizaciones'),
+            'res_model': 'sale.order',
+            'view_mode': 'list,form',
+            'domain': [('survey_id', '=', self.id)],
+            'context': {
+                'default_survey_id': self.id, 
+                'default_partner_id': self.partner_id.id
+            }
+        }
 
     def action_confirm(self):
         """Valida e inicializa productos para pasar a Orden de Trabajo."""
@@ -501,53 +661,117 @@ class CylinderSurvey(models.Model):
                 
             for line in lines:
                 if line.code_label:
-                    line.product_id = product_map[line.code_label]
+                    line.product_id = product_map.get(line.code_label, False)
                 else:
                     line.product_id = next(products_no_code_iter, False)
             
             if record.group_ids:
-                count_quotation=0
+                count_apu_confirmed = 0
                 for group in record.group_ids:
-                    if group.sale_order_id and group.sale_order_id.state == 'sale':
-                        count_quotation+=1
-                if count_quotation == 0:
-                    raise ValidationError("Debe existir al menos 1 cotización (orden de venta) aceptada por el cliente.")
+                    if group.apu_id and group.apu_id.state == 'confirmed':
+                        count_apu_confirmed += 1
+                if count_apu_confirmed == 0:
+                    raise ValidationError(_("Debe existir al menos 1 APU en estado 'Para Cotizar' (aprobado) para poder confirmar la Orden de Trabajo."))
 
             # 3. Cambio de Estado                
             record.write({'state': 'confirmed'})
     
-    def action_quoted(self):
-        """Pasa de Cotización a Orden de Trabajo"""
+    def action_to_apu(self):
+        """Pasa de Levantamiento a APU y genera los registros de costeo."""
         for record in self:
             if not record.group_ids:
-                raise ValidationError(_("Debes agregar al menos un 'Identificador del Grupo'"))
+                raise ValidationError(_("No puedes enviar a APU un levantamiento sin grupos."))
+            
+            if record.allocated_qty != record.cylinder_qty:
+                raise ValidationError(_(
+                    "La cantidad de cilindros asignados en los grupos (%s) "
+                    "no coincide con el total declarado (%s)."
+                ) % (record.allocated_qty, record.cylinder_qty))
+
+            # Lógica de creación de APU por cada grupo
             for group in record.group_ids:
+                # Evitar duplicar APUs si el usuario regresó a borrador y volvió a avanzar
+                if not group.apu_id:
+                    apu_vals = {
+                        'survey_id': record.id,
+                        'group_id': group.id,
+                        'partner_id': record.partner_id.id,
+                        # Puedes inyectar más campos iniciales aquí si lo deseas
+                    }
+                    new_apu = self.env['impsa.apu.survey'].create(apu_vals)
+                    group.apu_id = new_apu.id
 
-                # Evitar duplicados
-                if group.sale_order_id:
-                    continue
+            record.write({'state': 'apu'})
 
-                sale_order = self.env['sale.order'].create({
-                    'survey_id': self.id,
-                    'partner_id': record.partner_id.id,
-                    'requeriments_work_order': record.name,
-                    'group_requeriments_work_order': group.name,
-                })
+    def action_quoted(self):
+        """Pasa de APU a Cotización y genera el Sale Order automáticamente."""
+        for record in self:
+            if not record.group_ids:
+                raise ValidationError(_("Operación inválida: No hay grupos definidos."))
+            
+            # Extraer APUs que estén en estado 'confirmed'
+            confirmed_apus = record.apu_ids.filtered(lambda a: a.state == 'confirmed')
+            
+            if not confirmed_apus:
+                raise ValidationError(_("Para generar una cotización, debe existir al menos una APU en estado 'Para Cotizar' (Confirmada)."))
 
-                    # Guardar referencia en el grupo
-                group.sale_order_id = sale_order.id
-        record.write({
-               'state': 'quoted'
-           })         
+            # Validación de Productos en APU
+            apus_without_product = confirmed_apus.filtered(lambda a: not a.apu_product_id)
+            if apus_without_product:
+                apu_names = ", ".join(apus_without_product.mapped('name'))
+                raise ValidationError(
+                    _("Las siguientes APUs no tienen un 'Cilindro a trabajar' asignado: %s. "
+                      "Debe asignar un producto para poder cotizar.") % apu_names
+                )
+
+            # Preparar Líneas de Venta
+            order_lines = []
+            for apu in confirmed_apus:
+                # sale.order.line requiere product.product, no product.template
+                product_variant = apu.apu_product_id.product_variant_id
+                if not product_variant:
+                    raise ValidationError(_("El producto de la APU '%s' no tiene variantes activas válidas.") % apu.name)
+
+                # gran_subtotal_lm es el costo total del grupo.
+                # Si el grupo tiene N cilindros, dividimos el precio para que el total de la línea sea exacto.
+                qty = apu.group_id.quantity or 1.0
+                unit_price = apu.gran_subtotal_lm / qty if qty > 0 else apu.gran_subtotal_lm
+
+                order_lines.append(Command.create({
+                    'product_id': product_variant.id,
+                    'name': f"Reparación / Fabricación: {product_variant.name} (Ref: {apu.name})",
+                    'product_uom_qty': qty,
+                    'price_unit': unit_price,
+                }))
+
+            # Crear el Sale Order (Cotización)
+            so_vals = {
+                'partner_id': record.partner_id.id,
+                'survey_id': record.id, # Enlace trazable
+                'origin': record.name,  # Documento origen estándar
+                'order_line': order_lines,
+            }
+            
+            self.env['sale.order'].sudo().create(so_vals)
+
+            for group in record.group_ids:
+                if not group.operational_record_ids:
+                    raise ValidationError(_(
+                        "El grupo '%s' no tiene tareas operativas asignadas. "
+                        "APU requiere el listado de trabajos para costear."
+                    ) % group.name)
+            
+            record.write({'state': 'quoted'})
 
     def action_set_draft(self):
-        """Permite regresar a borrador"""
+        """Permite regresar a borrador desde cualquier estado cancelado o APU"""
         for record in self: 
             record.write({'state': 'draft'})
 
     def action_cancel(self):
         """Cancela el registro"""
         for record in self:
+            # Bloqueamos la cancelación solo si ya es Orden de Trabajo
             if record.state == 'confirmed':
                 raise ValidationError(_("No puedes cancelar un registro que ya es una Orden de Trabajo confirmada. Reviértelo primero."))
             record.write({'state': 'cancel'})

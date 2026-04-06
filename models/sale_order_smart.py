@@ -5,8 +5,11 @@ class SaleOrderSmart(models.Model):
     _inherit = 'sale.order'
 
     survey_id = fields.Many2one(
-        'impsa.cylinder.survey',
-        string='Levantamiento'
+        "impsa.cylinder.survey",
+        string="Levantamiento de Origen",
+        ondelete="set null",
+        copy=False,
+        help="Levantamiento técnico del cual se generó esta cotización."
     )
     
     cylinder_survey_count = fields.Integer(
@@ -21,14 +24,30 @@ class SaleOrderSmart(models.Model):
         string="Días de entrega",
         compute="_compute_delivery_days"
     )
+    apu_id = fields.Many2one(
+        'impsa.apu.survey',
+        string="APU Relacionado",
+        ondelete="set null",
+        copy=False
+    )
+    
+    apu_survey_count = fields.Integer(
+        string="APU",
+        compute="_compute_apu_survey_count"
+    )
 
+    @api.depends('survey_id')
     def _compute_cylinder_survey_count(self):
         for record in self:
-            record.cylinder_survey_count = len(record.survey_id)
+            record.cylinder_survey_count = 1 if record.survey_id else 0
+
+    @api.depends('apu_id')
+    def _compute_apu_survey_count(self):
+        for record in self:
+            record.apu_survey_count = 1 if record.apu_id else 0
 
     def action_view_survey(self):
         self.ensure_one()
-
         return {
             'type': 'ir.actions.act_window',
             'name': 'Levantamiento',
@@ -53,3 +72,13 @@ class SaleOrderSmart(models.Model):
                     record.delivery_days = 0
             else:
                 record.delivery_days = 0
+
+    def action_view_apu_survey(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'APU',
+            'res_model': 'impsa.apu.survey',
+            'view_mode': 'form',
+            'res_id': self.apu_id.id,
+        }

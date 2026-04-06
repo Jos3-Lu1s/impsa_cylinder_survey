@@ -31,13 +31,6 @@ class CylinderGroup(models.Model):
         string="Registro Operativo",
     )
 
-    group_total_hours = fields.Float(
-        string="Subtotal de Horas",
-        compute="_compute_group_total_hours",
-        store=True,
-        help="Tiempo total estimado para este grupo (Suma de horas de sus operaciones multiplicada por la cantidad de cilindros)."
-    )
-
     image_ids = fields.One2many(
         'impsa.cylinder.image', 
         'group_id', 
@@ -47,22 +40,18 @@ class CylinderGroup(models.Model):
     ''' ------------------------
         SALE FIELDS RELATED
     -------------------------'''
-    sale_order_id = fields.Many2one(
-        'sale.order',
-        string="Cotización"
+    apu_id = fields.Many2one(
+        'impsa.apu.survey',
+        string="Análisis de Precio (APU)",
+        readonly=True,
+        help="APU generado para este grupo de cilindros."
     )
 
-    sale_state = fields.Selection(
-        related='sale_order_id.state',
-        string="Estado",
+    apu_state = fields.Selection(
+        related='apu_id.state',
+        string="Estado APU",
         store=True
     )
-
-    @api.depends('operational_record_ids.hr', 'quantity')
-    def _compute_group_total_hours(self):
-        for group in self:
-            base_hours = sum(group.operational_record_ids.mapped('hr'))
-            group.group_total_hours = base_hours * group.quantity
 
     @api.constrains('quantity')
     def _check_group_quantity(self):
@@ -70,15 +59,15 @@ class CylinderGroup(models.Model):
             if group.quantity < 1:
                 raise ValidationError(_("Un grupo debe contener al menos 1 cilindro."))
                 
-    def action_open_sale_order(self):
+    def action_open_apu(self):
+        """Abre el APU relacionado a este grupo desde la vista del levantamiento"""
         self.ensure_one()
-        
-        if self.sale_order_id:
+        if self.apu_id:
             return {
                 'type': 'ir.actions.act_window',
-                'name': 'Orden de Venta',
-                'res_model': 'sale.order',
+                'name': 'Análisis de Precio Unitario',
+                'res_model': 'impsa.apu.survey',
                 'view_mode': 'form',
-                'res_id': self.sale_order_id.id,
+                'res_id': self.apu_id.id,
                 'target': 'current',
             }

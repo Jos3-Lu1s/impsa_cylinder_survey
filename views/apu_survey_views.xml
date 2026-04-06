@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_impsa_apu_survey_tree"
+            model="ir.ui.view">
+        <field name="name">impsa.apu.survey.tree</field>
+        <field name="model">impsa.apu.survey</field>
+        <field name="arch"
+               type="xml">
+            <list string="Levantamientos"
+                  decoration-muted="state == 'cancel'">
+                <field name="name"
+                       decoration-bf="1" />
+                <field name="survey_id"
+                       decoration-bf="1" />
+                <field name="group_id"
+                       decoration-bf="1" />
+                <field name="gran_subtotal_lm"
+                       decoration-bf="1" />
+                <field name="gran_total_lm"
+                       decoration-bf="1" />
+                <field name="state"
+                       decoration-bf="1" />
+                <field name="date" />
+                <field name="partner_id"
+                       widget="many2one_avatar" />
+                <field name="activity_ids"
+                       string="Actividades"
+                       widget="list_activity" />
+            </list>
+        </field>
+    </record>
+    <record id="view_impsa_apu_survey_form"
+            model="ir.ui.view">
+        <field name="name">impsa.apu.survey.form</field>
+        <field name="model">impsa.apu.survey</field>
+        <field name="arch"
+               type="xml">
+            <form string="APU">
+                <header> 
+                    <button name="action_to_confirmed" string="Confirmar APU" type="object" class="oe_highlight" invisible="state != 'draft'" />
+                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['confirmed']" confirm="¿Está seguro de que desea cancelar este registro?" />
+                    <button name="action_set_draft" string="Establece a Borrador" type="object" invisible="state != 'cancel'" />
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="draft,confirmed,cancel" />
+                </header>
+                <sheet>
+                     <div class="oe_title">
+                        <label for="name"
+                               class="oe_edit_only" />
+                        <h1>
+                            <field name="name"
+                                   placeholder="APU" />
+                        </h1>
+                    </div>
+                     <div class="oe_button_box" name="button_box">
+                        <button name="action_view_survey" type="object" class="oe_stat_button" icon="fa-gears" invisible="not survey_id">
+                            <field name="cylinder_survey_count" widget="statinfo" string="Levantamiento"/>
+                        </button>
+                        <button name="action_view_quote" type="object" class="oe_stat_button" icon="fa-shopping-cart" invisible="not quote_ids">
+                            <field name="quote_count" widget="statinfo" string="Cotización"/>
+                        </button>
+                    </div>
+                    <group>
+                        <div class="row justify-content-md-center">
+                            <div class="col rounded-3 border border-2 border-info bg-info bg-opacity-25 col-lg-2 p-3 me-4">
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="gran_subtotal_lm"
+                                               class="fs-3 fw-bold"
+                                               string="Subtotal" />
+                                    </div>
+                                    <div class="col text-center">
+                                        <i class="fa fa-usd fs-2 p-1"
+                                           aria-hidden="true" />
+                                    </div>
+                                </div>
+                                <field name="gran_subtotal_lm"
+                                       class="fw-bolder h2 justify-content-center" />
+                            </div>
+                            <div class="col rounded-3 border border-2 border-primary col-lg-2 p-3 text-center bg-primary bg-opacity-25">
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="gran_total_lm"
+                                               class="fs-3 fw-bold"
+                                               string="Total" />
+                                    </div>
+                                    <div class="col text-center">
+                                        <i class="fa fa-money fs-2 p-1"
+                                           aria-hidden="true" />
+                                    </div>
+                                </div>
+                                <field name="gran_total_lm"
+                                       class="fw-bolder h2 justify-content-center" />
+                            </div>
+                        </div>
+                    </group>
+                   
+                    <group col="2"
+                           name="Formulario de APU">
+                        <group name="Información General"
+                               string="Información General">
+                            <field name="partner_id" />
+                            <field name="quote_ids" invisible="True"/>
+                            <field name="tipo_costo_mo" />
+                            <field name="costo_fijo_lm"
+                                   invisible="tipo_costo_mo != 'costo_fijo_mo'" />
+                            <field name="apu_product_id" />
+                        </group>
+                        <group name="Datos de Entrada de Cotizador"
+                               class="border-2 border-start">
+                            <separator class="fw-bolder fs-6"
+                                       string="Márgen de costos de material" />
+                            <field name="porcentaje_cindirectos_material"
+                                   widget="percentage" />
+                            <field name="porcentaje_utaimp_material"
+                                   widget="percentage" />
+                            <separator class="fw-bolder fs-6"
+                                       string="Márgen de costos de MO" />
+                            <field name="porcentaje_cindirectos_mo"
+                                   widget="percentage" />
+                            <field name="porcentaje_utaimp_mo"
+                                   widget="percentage" />
+                        </group>
+                    </group>
+                    
+                        <separator class="fw-bolder fs-6"
+                                       string="RESUMEN DE COSTOS" />
+                        <div class="row">
+                            <div class="col-6 rounded-3 border border-2 border-secondary bg-secondary bg-opacity-75 pt-3 pb-3">
+                                <div class="text-center">
+                                    <span class="fs-3 fw-bold  o_field_widget o_readonly_modifier">Costos de Material</span>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fa fa-cubes fs-1" aria-hidden="true"></i>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="text-center">
+                                            <label for="subtotal_material_lm"
+                                                   class="fs-4 fw-bold"
+                                                   string="Subtotal" />
+                                        </div>
+                                        <div class="text-center">
+                                            <field name="subtotal_material_lm"
+                                                   class="fw-bolder h4" />
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="text-center">
+                                            <label for="costos_indirectos_material_lm"
+                                                   class="fs-4 fw-bold"
+                                                   string="Costos Indirectos" />
+                                        </div>
+                                        <div class="text-center">
+                                            <field name="costos_indirectos_material_lm"
+                                                   class="fw-bolder h4" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="text-center">
+                                            <label for="utilidad_impuestos_material_lm"
+                                                   class="fs-4 fw-bold"
+                                                   string="Utilidad Antes de Impuestos" />
+                                        </div>
+                                        <div class="text-center">
+                                            <field name="utilidad_impuestos_material_lm"
+                                                   class="fw-bolder h4" />
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="text-center">
+                                            <label for="total_material_lm"
+                                                   class="fs-4 fw-bold"
+                                                   string="Total" />
+                                        </div>
+                                        <div class="text-center">
+                                            <field name="total_material_lm"
+                                                   class="fw-bolder h4" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 rounded-3 border border-2 border-secondary bg-secondary bg-opacity-75 pt-3 pb-3">
+                                <div class="text-center">
+                                    <span class="fs-3 fw-bold  o_field_widget o_readonly_modifier">Costos de MO</span>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fa fa-male fs-1" aria-hidden="true"></i>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="text-center">
+                                            <label for="subtotal_mo_lm"
+                                                   class="fs-4 fw-bold"
+                                                   string="Subtotal" />
+                                        </div>
+                                        <div class="text-center">
+                                            <field name="subtotal_mo_lm"
+                                                   class="fw-bolder h4" />
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="text-center">
+                                            <label for="costos_indirectos_mo_lm"
+                                                   class="fs-4 fw-bold"
+                                                   string="Costos Indirectos" />
+                                        </div>
+                                        <div class="text-center">
+                                            <field name="costos_indirectos_mo_lm"
+                                                   class="fw-bolder h4" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="text-center">
+                                            <label for="utilidad_impuestos_mo_lm"
+                                                   class="fs-4 fw-bold"
+                                                   string="Utilidad Antes de Impuestos" />
+                                        </div>
+                                        <div class="text-center">
+                                            <field name="utilidad_impuestos_mo_lm"
+                                                   class="fw-bolder h4" />
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="text-center">
+                                            <label for="total_mo_lm"
+                                                   class="fs-4 fw-bold"
+                                                   string="Total" />
+                                        </div>
+                                        <div class="text-center">
+                                            <field name="total_mo_lm"
+                                                   class="fw-bolder h4" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <notebook>
+                        <page string="Cotizador de Materiales"
+                              name="impsa_tab">
+                            <field name="lm_ids">
+                                <list editable="bottom"
+                                      create="1"
+                                      edit="1"
+                                      delete="1">
+                                    <field name="product_id" />
+                                    <field name="reference" />
+                                    <field name="cantidad_lm" />
+                                    <field name="unidad_lm" />
+                                    <field name="precio_unitario_lm" />
+                                    <field name="importe_material_lm" />
+                                    <field name="mo_hrs_lm"
+                                           widget="float_time" />
+                                    <field name="empleado_mo_lm"
+                                           column_invisible="parent.tipo_costo_mo != 'costo_empleado_mo'" />
+                                    <field name="importe_mo_lm" />
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter>
+                    <field name="message_follower_ids" />
+                    <field name="activity_ids" />
+                    <field name="message_ids" />
+                </chatter>
+            </form>
+        </field>
+    </record>
+</odoo>

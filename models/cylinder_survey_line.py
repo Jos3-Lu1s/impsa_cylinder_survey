@@ -51,8 +51,11 @@ class CylinderSurveyLine(models.Model):
     unit_quantity = fields.Integer(string="Cantidad por Cilindro", default=1, required=True)
     
     unit_total = fields.Integer(
-        string="Total",
-        store=True
+        string="Total a Pedir",
+        compute="_compute_unit_total", 
+        store=True,
+        readonly=False,
+        help="Calculado automáticamente (Cant. por Cilindro x Total de Cilindros), pero puedes modificarlo libremente si compras requiere otra cantidad."
     )
 
     @api.constrains('unit_quantity')

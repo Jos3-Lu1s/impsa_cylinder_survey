@@ -4,7 +4,6 @@ from odoo.exceptions import ValidationError
 class OperationalRecordLine(models.Model):
     _name = 'impsa.operational.record.line'
     _description = 'Línea de Registro Operativo'
-
     _order = 'sequence, id desc'
 
     group_id = fields.Many2one(
@@ -25,16 +24,32 @@ class OperationalRecordLine(models.Model):
 
     sequence = fields.Integer(string='Secuencia', default=0)
     
-    hr = fields.Float(string='Tiempo Estimado')
-    work_to_do = fields.Char(
+    work_to_do = fields.Text(
         string='Trabajos a realizar', 
         required=True,
         help="Describe la tarea o trabajo específico a realizar en esta línea."
     )
+    
     obs = fields.Text(string='Dimensiones / Observaciones')
 
-    @api.constrains('hr')
-    def _check_positive_hours(self):
-        for line in self:
-            if line.hr < 0:
-                raise ValidationError(_("El tiempo estimado no puede ser negativo en la tarea: %s") % line.work_to_do)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('group_id'):
+                group = self.env['impsa.cylinder.group'].browse(vals['group_id'])
+                # Si el estado del Survey ya pasó de APU, prohibimos crear
+                if group.survey_id.state not in ('draft', 'apu'):
+                    raise ValidationError(_("No se pueden agregar operaciones después de que el levantamiento ha salido de la etapa de APU."))
+        return super().create(vals_list)
+
+    def write(self, vals):
+        for record in self:
+            if record.survey_id.state not in ('draft', 'apu'):
+                raise ValidationError(_("No se pueden modificar operaciones en este estado (%s).") % record.survey_id.state)
+        return super().write(vals)
+
+    def unlink(self):
+        for record in self:
+            if record.survey_id.state not in ('draft', 'apu'):
+                raise ValidationError(_("No se pueden eliminar operaciones en este estado."))
+        return super().unlink()
