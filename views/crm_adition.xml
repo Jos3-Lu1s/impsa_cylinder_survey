@@ -32,9 +32,7 @@
 
                 <xpath expr="//header//button[@name='action_sale_quotations_new']"
                     position="attributes">
-                    <attribute name="invisible">
-                        not is_won_stage or selection_type == 'repair'
-                    </attribute>
+                    <attribute name="invisible">1</attribute>
                 </xpath>
 
                 <xpath expr="//header" position="inside">
@@ -43,6 +41,14 @@
                         type="object"
                         class="oe_highlight"
                         invisible="stage_sequence &lt; 2 or selection_type == 'manufacturing'" />
+                </xpath>
+
+                <xpath expr="//header" position="inside">
+                    <button name="action_open_apu"
+                        string="APU se va de los cinzons"
+                        type="object"
+                        class="oe_highlight"
+                        invisible="stage_sequence &lt; 2 or selection_type == 'repair'" />
                 </xpath>
 
             </field>
