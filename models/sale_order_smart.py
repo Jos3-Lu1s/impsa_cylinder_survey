@@ -22,14 +22,14 @@ class SaleOrderSmart(models.Model):
     )
     apu_survey_count = fields.Integer(
         string="APU",
-        compute="_compute_cylinder_survey_count"
+        compute="_compute_apu_survey_count"
     )
 
     def _compute_cylinder_survey_count(self):
         for record in self:
             record.cylinder_survey_count = len(record.survey_id)
 
-    def _compute_cylinder_survey_count(self):
+    def _compute_apu_survey_count(self):
         for record in self:
             record.apu_survey_count = len(record.apu_id)
 

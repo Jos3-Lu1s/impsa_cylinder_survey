@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, Command, _
 from odoo.exceptions import ValidationError, UserError
 
 class ApuSurvey(models.Model):
@@ -78,6 +78,7 @@ class ApuSurvey(models.Model):
         string="Levantamientos",
         compute="_compute_cylinder_survey_count"
     )
+
     quote_count = fields.Integer(
         string="Cotizacion",
         compute="_compute_quote_count"
@@ -149,24 +150,24 @@ class ApuSurvey(models.Model):
 
     def action_to_confirmed(self):
         for record in self:
-            if not record.survey_id:
+            if not record.survey_id and not record.quote_id:
                 order_lines = []
-                    # sale.order.line requiere product.product, no product.template
-                    product_variant = apu.apu_product_id.product_variant_id
-                    if not product_variant:
-                        raise ValidationError(_("El producto de la APU '%s' no tiene variantes activas válidas.") % apu.name)
+                # sale.order.line requiere product.product, no product.template
+                product_variant = record.apu_product_id.product_variant_id
+                if not product_variant:
+                    raise ValidationError(_("El producto de la APU '%s' no tiene variantes activas válidas.") % record.name)
 
-                    # gran_subtotal_lm es el costo total del grupo.
-                    # Si el grupo tiene N cilindros, dividimos el precio para que el total de la línea sea exacto.
-                    qty = apu.group_id.quantity or 1.0
-                    unit_price = apu.gran_subtotal_lm / qty if qty > 0 else apu.gran_subtotal_lm
+                # gran_subtotal_lm es el costo total del grupo.
+                # Si el grupo tiene N cilindros, dividimos el precio para que el total de la línea sea exacto.
+                qty = record.group_id.quantity or 1.0
+                unit_price = record.gran_subtotal_lm / qty if qty > 0 else record.gran_subtotal_lm
 
-                    order_lines.append(Command.create({
-                        'product_id': product_variant.id,
-                        'name': f"Reparación / Fabricación: {product_variant.name} (Ref: {apu.name})",
-                        'product_uom_qty': qty,
-                        'price_unit': unit_price,
-                    }))
+                order_lines.append(Command.create({
+                    'product_id': product_variant.id,
+                    'name': f"Reparación / Fabricación: {product_variant.name} (Ref: {record.name})",
+                    'product_uom_qty': qty,
+                    'price_unit': unit_price,
+                }))
 
                 # Crear el Sale Order (Cotización)
                 so_vals = {
@@ -187,6 +188,10 @@ class ApuSurvey(models.Model):
                 state_label = dict(record.survey_id._fields['state'].selection).get(record.survey_id.state)
                 if record.survey_id.state not in ['draft' ,'apu']:
                     raise ValidationError(f"No puedes cancelar el {record.name}, ya que, el '{record.survey_id.name}' esta en estatus {state_label}")
+            else:
+                if record.quote_id.state not in ['draft']:
+                    #state_quote_label = dict(record.quote_id._fields['state'].selection).get(record.quote_id.state)
+                    raise ValidationError(f"No puedes cancelar el {record.name}, ya que, la cotización '{record.quote_id.name}' esta en estatus 'Cotización'")
             record.write({'state': 'cancel'})
 
     def action_set_draft(self):

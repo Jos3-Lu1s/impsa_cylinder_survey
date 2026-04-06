@@ -18,6 +18,8 @@
                        decoration-bf="1" />
                 <field name="gran_total_lm"
                        decoration-bf="1" />
+                <field name="state"
+                       decoration-bf="1" />
                 <field name="date" />
                 <field name="partner_id"
                        widget="many2one_avatar" />

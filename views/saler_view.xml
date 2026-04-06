@@ -10,7 +10,7 @@
                      <field name="survey_id"
                      invisible="survey_id == False"/>
                      <field name="apu_id"
-                     invisible="True"/>
+                     />
                 </xpath>
                 <xpath expr="//div[@name='button_box']" position="inside">
                     <button name="action_view_apu_survey"
