@@ -67,7 +67,7 @@ class ApuSurvey(models.Model):
         help="Grupo de cilindros específico que se está costeando."
     )
 
-    quote_id = fields.One2many(
+    quote_ids = fields.One2many(
         'sale.order',
         'apu_id',
         string="Cotización",
@@ -150,15 +150,13 @@ class ApuSurvey(models.Model):
 
     def action_to_confirmed(self):
         for record in self:
-            if not record.survey_id and not record.quote_id:
+            if not record.quote_ids:
                 order_lines = []
-                # sale.order.line requiere product.product, no product.template
                 product_variant = record.apu_product_id.product_variant_id
+                
                 if not product_variant:
                     raise ValidationError(_("El producto de la APU '%s' no tiene variantes activas válidas.") % record.name)
 
-                # gran_subtotal_lm es el costo total del grupo.
-                # Si el grupo tiene N cilindros, dividimos el precio para que el total de la línea sea exacto.
                 qty = record.group_id.quantity or 1.0
                 unit_price = record.gran_subtotal_lm / qty if qty > 0 else record.gran_subtotal_lm
 
@@ -169,29 +167,29 @@ class ApuSurvey(models.Model):
                     'price_unit': unit_price,
                 }))
 
-                # Crear el Sale Order (Cotización)
                 so_vals = {
                     'partner_id': record.partner_id.id,
-                    'apu_id': record.id, # Enlace trazable
-                    'origin': record.name,  # Documento origen estándar
+                    'apu_id': record.id, 
+                    'survey_id': record.survey_id.id,
+                    'origin': record.name,  
                     'order_line': order_lines,
                 }
                 
                 self.env['sale.order'].sudo().create(so_vals)
-        record.write({'state': 'confirmed'})
+                
+            record.write({'state': 'confirmed'})
          
     def action_cancel(self):
         """Cancela el registro"""
         for record in self:
-            # Bloqueamos la cancelación solo si ya es Orden de Trabajo
             if record.survey_id:
                 state_label = dict(record.survey_id._fields['state'].selection).get(record.survey_id.state)
                 if record.survey_id.state not in ['draft' ,'apu']:
-                    raise ValidationError(f"No puedes cancelar el {record.name}, ya que, el '{record.survey_id.name}' esta en estatus {state_label}")
+                    raise ValidationError(f"No puedes cancelar el {record.name}, ya que el '{record.survey_id.name}' está en estatus {state_label}")
             else:
-                if record.quote_id.state not in ['draft']:
-                    #state_quote_label = dict(record.quote_id._fields['state'].selection).get(record.quote_id.state)
-                    raise ValidationError(f"No puedes cancelar el {record.name}, ya que, la cotización '{record.quote_id.name}' esta en estatus 'Cotización'")
+                if any(quote.state != 'draft' for quote in record.quote_ids):
+                    raise ValidationError(f"No puedes cancelar el {record.name}, ya que tiene cotizaciones fuera de estado 'Borrador'.")
+            
             record.write({'state': 'cancel'})
 
     def action_set_draft(self):
@@ -199,13 +197,15 @@ class ApuSurvey(models.Model):
         for record in self: 
             record.write({'state': 'draft'})
 
+    @api.depends('survey_id')
     def _compute_cylinder_survey_count(self):
         for record in self:
-            record.cylinder_survey_count = len(record.survey_id)
+            record.cylinder_survey_count = 1 if record.survey_id else 0
 
+    @api.depends('quote_ids')
     def _compute_quote_count(self):
         for record in self:
-            record.quote_count = len(record.quote_id)
+            record.quote_count = len(record.quote_ids)
 
     def action_view_survey(self):
         self.ensure_one()
@@ -222,12 +222,13 @@ class ApuSurvey(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': ('Cotizaciones'),
+            'name': 'Cotizaciones',
             'res_model': 'sale.order',
             'view_mode': 'list,form',
             'domain': [('apu_id', '=', self.id)],
             'context': {
                 'default_apu_id': self.id, 
+                'default_survey_id': self.survey_id.id,
                 'default_partner_id': self.partner_id.id
             }
         }
