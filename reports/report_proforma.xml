@@ -113,7 +113,7 @@
 
                         <!-- TABLA DE PARTIDAS - CON BORDES -->
                         <table class="tabla-partidas"
-                               style="width:90%; margin:0 auto; font-size:16px;">
+                               style="width:90%; margin:0 auto; font-size:16px; ">
                             <thead>
                                 <tr>
                                     <th>Cant.</th>
@@ -151,7 +151,7 @@
                         <!-- CONDICIONES Y TOTALES -->
                         <table style="width:90%; margin:20px auto; font-size:16px; border:0 !important; border-width:0 !important; border-color:transparent !important; border-style:none !important;">
                             <tr>
-                                <td style="width:50%;">
+                                <td style="width:65%;">
                                     <strong>Tiempo de entrega:</strong>
                                     <t t-if="doc.delivery_days">
                                         <t t-if="doc.delivery_days &gt;= 7">
@@ -169,8 +169,8 @@
                                     <strong>Vigencia:</strong> <span t-field="doc.validity_date" /><br />
                                     EL FLETE CORRE POR CUENTA Y RIESGO DEL CLIENTE:
                                 </td>
-                                <td style="width:50%;">
-                                    <table style="float:right; margin-right:40px; margin-top:10px; font-size:16px;">
+                                <td style="width:35%; margin-left:50px; vertical-align:top;">
+                                    <table style="float:right; margin-top:10px; font-size:16px; border:0 !important; border-width:0 !important; border-color:transparent !important; border-style:none !important;">
                                         <tr>
                                             <td style="padding:2px 8px;"><strong>Importe</strong></td>
                                             <td style="padding:2px 8px; text-align:right;"><span t-field="line.price_subtotal" /></td>
