@@ -10,6 +10,10 @@
                   decoration-muted="state == 'cancel'">
                 <field name="name"
                        decoration-bf="1" />
+                <field name="survey_id"
+                       decoration-bf="1" />
+                <field name="group_id"
+                       decoration-bf="1" />
                 <field name="date" />
                 <field name="partner_id"
                        widget="many2one_avatar" />
@@ -27,11 +31,12 @@
                type="xml">
             <form string="APU">
                 <header>
+                    <button name="action_to_confirmed" string="Confirmar APU" type="object" class="oe_highlight" invisible="state != 'draft'" />
+                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['confirmed']" confirm="¿Está seguro de que desea cancelar este registro?" />
+                    <button name="action_set_draft" string="Establece a Borrador" type="object" invisible="state != 'cancel'" />
                     <!-- <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed'"/>
 
-                    <button name="action_to_apu" string="Enviar a APU" type="object" class="oe_highlight" invisible="state != 'draft'" />
 
-                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['draft', 'apu', 'quoted']" confirm="¿Está seguro de que desea cancelar este registro?" />
 
                     <button name="action_set_draft" string="Volver a Levantamiento" type="object" invisible="state != 'cancel'" /> -->
                     <field name="state"
@@ -46,6 +51,11 @@
                             <field name="name"
                                    placeholder="APU" />
                         </h1>
+                    </div>
+                     <div class="oe_button_box" name="button_box">
+                        <button name="action_view_survey" type="object" class="oe_stat_button" icon="fa-gear" invisible="not survey_id">
+                            <field name="cylinder_survey_count" widget="statinfo" string="Levantamiento"/>
+                        </button>
                     </div>
                     <group>
                         <div class="row justify-content-md-center">

@@ -1,4 +1,5 @@
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError, UserError
 
 class ApuSurvey(models.Model):
     _name = "impsa.apu.survey"
@@ -14,7 +15,7 @@ class ApuSurvey(models.Model):
         "res.partner", string="Cliente", required=True, tracking=True, ondelete='restrict'
     )
 
-    apu_product_id=fields.Many2one('product.template',string='Cilindro a trabajar')
+    apu_product_id=fields.Many2one('product.template',string='Cilindro a trabajar', domain=lambda self: self._get_domain_product())
 
     date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True)
 
@@ -64,6 +65,11 @@ class ApuSurvey(models.Model):
         ondelete="cascade",
         index=True,
         help="Grupo de cilindros específico que se está costeando."
+    )
+
+    cylinder_survey_count = fields.Integer(
+        string="Levantamientos",
+        compute="_compute_cylinder_survey_count"
     )
     
     
@@ -131,3 +137,45 @@ class ApuSurvey(models.Model):
     #def _compute_tiene_producto_linea(self):
         #for order in self:
             #order.tiene_producto_linea = any(order.order_line.mapped('product_template_id'))
+    def _get_domain_product(self):
+        for record in self:
+            if not record.survey_id:
+                return [('categ_id', '==', 'RCH' )]
+            else:
+                return [('categ_id', '==', 'FCH' )]
+
+    def action_to_confirmed(self):
+        """Pasa de Levantamiento a APU y genera los registros de costeo."""
+        for record in self:
+            pass
+        record.write({'state': 'confirmed'})
+        
+    def action_cancel(self):
+        """Cancela el registro"""
+        for record in self:
+            # Bloqueamos la cancelación solo si ya es Orden de Trabajo
+            if record.survey_id:
+                state_label = dict(record.survey_id._fields['state'].selection).get(record.survey_id.state)
+                if record.survey_id.state not in ['draft' ,'apu']:
+                    raise ValidationError(f"No puedes cancelar el {record.name}, ya que, el '{record.survey_id.name}' esta en estatus {state_label}")
+            record.write({'state': 'cancel'})
+
+    def action_set_draft(self):
+        """Permite regresar a borrador desde cualquier estado cancelado o APU"""
+        for record in self: 
+            record.write({'state': 'draft'})
+
+    def _compute_cylinder_survey_count(self):
+        for record in self:
+            record.cylinder_survey_count = len(record.survey_id)
+
+    def action_view_survey(self):
+        self.ensure_one()
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Levantamiento',
+            'res_model': 'impsa.cylinder.survey',
+            'view_mode': 'form',
+            'res_id': self.survey_id.id,
+        }

@@ -1,18 +1,18 @@
 <odoo>
     <data>
-        <record id="view_sale_order_form_inherit_survey" model="ir.ui.view">
-            <field name="name">sale.order.form.inherit.survey</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_form" />
+        <record id="view_apu_form_inherit_survey" model="ir.ui.view">
+            <field name="name">apu.form.inherit.survey</field>
+            <field name="model">impsa.apu.survey</field>
+            <field name="inherit_id" ref="impsa_cylinder_survey.view_impsa_apu_survey_form" />
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='partner_id']"
                    position="after">       
-                     <field name="requeriments_work_order"
-                     invisible="requeriments_work_order == False"/>
-                     <field name="group_requeriments_work_order"
-                     invisible="group_requeriments_work_order == False"/>
+                     <field name="survey_id"
+                     invisible="survey_id == False"/>
+                     <field name="group_id"
+                     invisible="group_id == False"/>
                 </xpath>
-                <xpath expr="//div[@name='button_box']" position="inside">
+                <xpath expr="//header" position="inside">
                     <button name="action_view_survey"
                         type="object"
                         class="oe_stat_button"
