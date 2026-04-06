@@ -63,3 +63,16 @@ class CrmDecision(models.Model):
                 'default_lead_id': self.id
             }
         }
+        
+    def action_open_apu(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Nueva APU',
+            'res_model': 'impsa.apu.survey',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_lead_id': self.id,
+                'default_partner_id': self.partner_id.id,
+            }
+        }
