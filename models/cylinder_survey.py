@@ -291,6 +291,8 @@ class CylinderSurvey(models.Model):
     def _compute_sale_count(self):
         for rec in self:
             rec.sale_count = len(rec.group_ids) if rec.sale_order_id else 0
+            # Contamos las órdenes de venta únicas vinculadas a través de los grupos o directamente
+            rec.sale_count = self.env['sale.order'].search_count([('survey_id', '=', rec.id)])
 
     @api.depends('group_ids.operational_record_ids.hr', 'group_ids.operational_record_ids', 'group_ids.quantity')
     def _compute_operational_totals(self):

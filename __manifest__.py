@@ -21,7 +21,7 @@
     "data": [
         "security/ir.model.access.csv",
         # 'data/paper_format.xml',
-        # 'reports/report_actions.xml',
+        'reports/report_actions.xml',
         # 'reports/cylinder_survey_report.xml',
         "data/ir_sequence_data.xml",
         "views/cylinder_survey_views.xml",
@@ -31,6 +31,7 @@
         "views/crm_adition.xml",
         "views/saler_view.xml",
         "views/purchase_views.xml",
+        "reports/report_proforma.xml",
     ],
 
     'demo': [

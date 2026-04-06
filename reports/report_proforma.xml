@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_proforma_custom">
+        <t t-call="web.html_container">
+            <meta charset="utf-8" />
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.basic_layout">
+
+                    <!-- ESTILOS INLINE DIRECTO EN EL LAYOUT -->
+                    <style>
+                        /* Reset global para Odoo 19 + Chromium */
+                        * {
+                            box-sizing: border-box;
+                        }
+
+                        table {
+                            border-collapse: collapse !important;
+                            border-spacing: 0 !important;
+                            border: 0 !important;
+                        }
+
+                        table td,
+                        table th {
+                            border: 0 !important;
+                            padding: 0 !important;
+                        }
+
+                        /* SOLO tabla de partidas CON bordes */
+                        table.tabla-partidas {
+                            border: 1px solid black !important;
+                            border-collapse: collapse !important;
+                            border-spacing: 0 !important;
+                        }
+
+                        table.tabla-partidas td,
+                        table.tabla-partidas th {
+                            border: 1px solid black !important;
+                            padding: 4px 6px !important;
+                        }
+
+                        table.tabla-partidas th {
+                            text-align: center !important;
+                            font-weight: bold !important;
+                        }
+
+                        @media print {
+                            table:not(.tabla-partidas),
+                            table:not(.tabla-partidas) td,
+                            table:not(.tabla-partidas) th {
+                                border: 0 !important;
+                                border-width: 0 !important;
+                                border-color: transparent !important;
+                                border-style: none !important;
+                            }
+
+                            table.tabla-partidas,
+                            table.tabla-partidas td,
+                            table.tabla-partidas th {
+                                border: 1px solid black !important;
+                            }
+                        }
+                    </style>
+
+                    <!-- HEADER -->
+                    <div class="header" style="width:100%; font-size:12px;">
+                        <table style="width:100%; border:0 !important; border-width:0 !important; border-color:transparent !important; border-style:none !important;">
+                            <tr>
+                                <td style="width:40%; vertical-align:top;">
+                                    <img src="/impsa_cylinder_survey/static/src/img/imagen-impsa.png"
+                                         style="max-height:80px;"/>
+                                </td>
+                                <td style="width:25%; vertical-align:top;">
+                                    <img src="/impsa_cylinder_survey/static/src/img/ventas_impsa.png"
+                                         style="max-height:80px;"/>
+                                </td>
+                                <td style="width:25%; text-align:center; vertical-align:top;">
+                                    <img src="/impsa_cylinder_survey/static/src/img/logo_impsa2.png"
+                                         style="max-height:90px;"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <div style="border-top:1px solid orange; margin-top:5px; margin-bottom:10px;"></div>
+                    </div>
+
+                    <!-- PAGE -->
+                    <div class="page">
+
+                        <!-- DATOS EMPRESA Y COTIZACIÓN -->
+                        <table style="width:90%; margin:0 auto 10px auto; font-size:16px; border:0 !important; border-width:0 !important; border-color:transparent !important; border-style:none !important;">
+                            <tr>
+                                <td style="width:50%; vertical-align:top;">
+                                    <span t-esc="doc.partner_id.name"/><br />
+                                    <span t-esc="doc.partner_id.phone" /><br />
+                                    <span t-esc="doc.partner_id.street"/> <span t-esc="doc.partner_id.street2"/><span t-esc="doc.partner_id.city"/><br />
+                                </td>
+                                <td style="width:50%; vertical-align:top; text-align:right;">
+                                    <h2 style="margin:0;">Cotización</h2>
+                                    Folio : <br />
+                                    <span t-field="doc.name" /><br />
+                                    Fecha : <br />
+                                    <span t-field="doc.date_order" /><br />
+                                    AT'N : <span t-field="doc.partner_id.name" /><br />
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- MENSAJE -->
+                        <p style="text-align:justify; width:90%; margin:10px auto; font-size:16px;">
+                            Por este conducto nos es muy grato enviarle un cordial saludo y a la vez,
+                            permitirnos someter a su amable consideración nuestro mejor presupuesto
+                            en base a las siguientes partidas:
+                        </p>
+
+                        <!-- TABLA DE PARTIDAS - CON BORDES -->
+                        <table class="tabla-partidas"
+                               style="width:90%; margin:0 auto; font-size:16px;">
+                            <thead>
+                                <tr>
+                                    <th>Cant.</th>
+                                    <th>Unid.</th>
+                                    <th>Descripción</th>
+                                    <th>P. Unitario</th>
+                                    <th>Importe</th>
+                                    <th>Moneda</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.order_line" t-as="line">
+                                    <td style="text-align:center;">
+                                        <span t-field="line.product_uom_qty" />
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <span t-field="line.product_uom_id" />
+                                    </td>
+                                    <td>
+                                        <span t-field="line.name" />
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <span t-field="line.price_unit" />
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <span t-field="line.price_subtotal" />
+                                    </td>
+                                    <td style="text-align:center;">
+                                        <span t-field="line.currency_id" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- CONDICIONES Y TOTALES -->
+                        <table style="width:90%; margin:20px auto; font-size:16px; border:0 !important; border-width:0 !important; border-color:transparent !important; border-style:none !important;">
+                            <tr>
+                                <td style="width:50%;">
+                                    <strong>Tiempo de entrega:</strong>
+                                    <t t-if="doc.delivery_days">
+                                        <t t-if="doc.delivery_days &gt;= 7">
+                                            <span t-esc="round(doc.delivery_days / 7)" /> semanas
+                                            (<span t-esc="doc.delivery_days" /> días)
+                                        </t>
+                                        <t t-else="">
+                                            <span t-esc="doc.delivery_days" /> días
+                                        </t>
+                                    </t>
+                                    <t t-else="">No definido</t>
+                                    <br />
+                                    <strong>Condiciones de pago:</strong> <span t-field="doc.payment_term_id" /><br />
+                                    <strong>Entrega:</strong> <span t-field="doc.warehouse_id" /><br />
+                                    <strong>Vigencia:</strong> <span t-field="doc.validity_date" /><br />
+                                    EL FLETE CORRE POR CUENTA Y RIESGO DEL CLIENTE:
+                                </td>
+                                <td style="width:50%;">
+                                    <table style="float:right; margin-right:40px; margin-top:10px; font-size:16px;">
+                                        <tr>
+                                            <td style="padding:2px 8px;"><strong>Importe</strong></td>
+                                            <td style="padding:2px 8px; text-align:right;"><span t-field="line.price_subtotal" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding:2px 8px;"><strong>Subtotal</strong></td>
+                                            <td style="padding:2px 8px; text-align:right;"><span t-field="doc.amount_untaxed" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding:2px 8px;"><strong>I.V.A.</strong></td>
+                                            <td style="padding:2px 8px; text-align:right;"><span t-field="doc.amount_tax" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding:2px 8px;"><strong>TOTAL</strong></td>
+                                            <td style="padding:2px 8px; text-align:right;"><span t-field="doc.amount_total" /></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- BANCOS -->
+                        <div style="width:90%; margin:20px auto; font-size:16px;">
+                            <p>
+                                En caso de vernos favorecidos con su pedido favor de depositar en la
+                                cuenta de su preferencia:
+                            </p>
+                            <t t-set="banks" t-value="doc.company_id.partner_id.bank_ids" />
+                            <table style="width:100%;  border:0 !important; border-width:0 !important; border-color:transparent !important; border-style:none !important;">
+                                <tr>
+                                    <t t-foreach="banks" t-as="bank">
+                                        <td style="width:50%; vertical-align:top; padding-right:10px;">
+                                            <p style="margin:0;"><strong><span t-esc="bank.bank_id.name" /></strong></p>
+                                            <p style="margin:0;">No. de Cuenta: <span t-esc="bank.acc_number" /></p>
+                                            <p style="margin:0;" t-if="bank.l10n_mx_edi_clabe">
+                                                Clabe: <span t-esc="bank.l10n_mx_edi_clabe" />
+                                            </p>
+                                        </td>
+                                    </t>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- FIRMA -->
+                        <p style="width:90%; margin:20px auto; font-size:16px;">
+                            Sin otro particular por el momento, quedo de usted.<br /><br />
+                            Atentamente,<br /><br />
+                            <span t-field="doc.user_id.name" /><br />
+                            <t t-if="doc.user_id.partner_id.function">
+                                <span t-esc="doc.user_id.partner_id.function" /><br />
+                            </t>
+                            <t t-if="doc.user_id.email">
+                                Email: <span t-field="doc.user_id.email" />
+                            </t>
+                        </p>
+
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="footer" style="width:100%; font-size:10px;">
+                        <div style="border-top:1px solid orange; margin:10px 0;"></div>
+                        <table style="width:100%; text-align:center; border:0 !important; border-width:0 !important; border-color:transparent !important; border-style:none !important;">
+                            <tr>
+                                <td style="width:40%; text-align:right;"><span t-esc="doc.company_id.partner_id.phone" style="color-text:orange;"/></td>
+                                <td style="width:60%; text-align:left; margin-left:10px;"><span t-esc="doc.company_id.partner_id.contact_address"/></td>
+                            </tr>
+                        </table>
+                        <div style="margin-top:5px; text-align:center; font-size:10px;">
+                            Página: <span class="page"/> / <span class="topage"/>
+                        </div>
+                    </div>
+
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="action_report_cylinder_survey" model="ir.actions.report">
+    <!-- <record id="action_report_cylinder_survey" model="ir.actions.report">
         <field name="name">Levantamiento de Cilindros (F-05-01)</field>
         <field name="model">impsa.cylinder.survey</field>
         <field name="report_type">qweb-pdf</field>
@@ -10,5 +10,17 @@
         <field name="binding_model_id" ref="model_impsa_cylinder_survey"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="impsa_cylinder_survey.paperformat_cylinder_survey_landscape"/>
+    </record> -->
+
+    <record id="action_report_proforma_custom" model="ir.actions.report">
+        <field name="name">Proforma Personalizada</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">impsa_cylinder_survey.report_proforma_custom</field>
+        <field name="report_file">impsa_cylinder_survey.report_proforma_custom</field>
+
+        <!-- Para que aparezca en imprimir -->
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
     </record>
 </odoo>
