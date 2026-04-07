@@ -1,5 +1,6 @@
 # [MODIFICADO] Se agregó la importación de 'api'
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 class CrmDecision(models.Model):
     _inherit = "crm.lead"
@@ -100,6 +101,23 @@ class CrmDecision(models.Model):
             'res_model': 'impsa.apu.survey',
             'view_mode': 'list,form',
             'domain': [('lead_id', '=', self.id)],
+            'context': {
+                'default_lead_id': self.id
+            }
+        }
+        
+    def action_view_apu(self):
+        self.ensure_one()
+    
+        # 🚫 Validación
+        if self.apu_survey_ids:
+            raise UserError("Ya existe un APU para esta oportunidad.")
+    
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'APU',
+            'res_model': 'impsa.apu.survey',
+            'view_mode': 'form',
             'context': {
                 'default_lead_id': self.id
             }

@@ -38,24 +38,6 @@ class ApuSurvey(models.Model):
         compute="_compute_lead_count"
     )
 
-    def _compute_lead_count(self):
-        for record in self:
-            record.lead_count = 1 if record.lead_id else 0
-            
-    def action_view_lead(self):
-        self.ensure_one()
-    
-        if not self.lead_id:
-            return
-    
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Oportunidad',
-            'res_model': 'crm.lead',
-            'view_mode': 'form',
-            'res_id': self.lead_id.id,
-        }
-
     state = fields.Selection([
         ('draft', 'Borrador'),
         ('confirmed', 'Para Cotizar'),
@@ -274,5 +256,23 @@ class ApuSurvey(models.Model):
                 'default_survey_id': self.survey_id.id,
                 'default_partner_id': self.partner_id.id
             }
+        }
+        
+    def _compute_lead_count(self):
+        for record in self:
+            record.lead_count = 1 if record.lead_id else 0
+            
+    def action_view_lead(self):
+        self.ensure_one()
+    
+        if not self.lead_id:
+            return
+    
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Oportunidad',
+            'res_model': 'crm.lead',
+            'view_mode': 'form',
+            'res_id': self.lead_id.id,
         }
     
