@@ -105,7 +105,7 @@
                         </button>
                         <button name="action_view_lead"
                                 type="object"
-                                class="oe_stat_button"
+                                class="oe_stat_button d-flex align-items-center gap-2"
                                 icon="fa-handshake-o">
                             <field name="lead_count" widget="statinfo" string="Oportunidad"/>
                         </button>
