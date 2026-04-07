@@ -36,6 +36,7 @@
         "views/integration_menu.xml",
         "views/saler_view.xml",
         "views/hr_department_inherit_view.xml",
+        "views/res_partner_inherit_view.xml",
     ],
 
     'demo': [
