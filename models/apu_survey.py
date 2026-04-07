@@ -15,6 +15,11 @@ class ApuSurvey(models.Model):
         "res.partner", string="Cliente", required=True, tracking=True, ondelete='restrict'
     )
 
+    cylinder_qty_by_group= fields.Integer(
+        related='group_id.quantity',
+        store=True,
+        string="Cant. de cilindros",
+    )
     apu_product_id = fields.Many2one(
         'product.template', string='Cilindro a trabajar'
     )
@@ -96,7 +101,6 @@ class ApuSurvey(models.Model):
         compute="_compute_quote_count"
     )
     
-    
     #CAMPOS PARA LOS COSTOS TOTALES DE LOS MATERIALES#
     subtotal_material_lm = fields.Monetary(string="Subtotal", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
     costos_indirectos_material_lm = fields.Monetary(string="Costos Indirectos", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
@@ -173,9 +177,13 @@ class ApuSurvey(models.Model):
                 product_variant = record.apu_product_id.product_variant_id
                 
                 if not product_variant:
-                    raise ValidationError(_("El producto de la APU '%s' no tiene variantes activas válidas.") % record.name)
+                    raise ValidationError(_("El producto de la APU: '%s' no tiene variantes activas válidas.") % record.name)
+                elif record.cylinder_qty_by_group <= 0:
+                    raise ValidationError(_("Debes colocar un número mayor a 0 en el campo 'Cant. de cilindros'"))
+                elif record.gran_total_lm <= 0:
+                    raise ValidationError(_("El APU: '%s' no puede cotizardo con total 0, verfica tu lista de materiales")% record.name)
 
-                qty = record.group_id.quantity or 1.0
+                qty = record.group_id.quantity or 1.0 
                 unit_price = record.gran_subtotal_lm / qty if qty > 0 else record.gran_subtotal_lm
 
                 order_lines.append(Command.create({
@@ -269,4 +277,9 @@ class ApuSurvey(models.Model):
             'view_mode': 'form',
             'res_id': self.lead_id.id,
         }
-    
+
+    """ @api.onchange('cylinder_qty_by_group')
+    def _onchange_cantidad_lm(self):
+        for record in self:
+            for line in record.lm_ids:
+                line.cantidad_lm=line.cantidad_lm*record.cylinder_qty_by_group """

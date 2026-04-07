@@ -1,0 +1,17 @@
+<odoo>
+    <data>
+        <record id="view_partner_form_inherit_survey" model="ir.ui.view">
+            <field name="name">partner.form.inherit.survey</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='parent_id']"
+                   position="before">       
+                     <field name="code_partner"/>
+                </xpath>
+
+
+            </field>
+        </record>
+    </data>
+</odoo>
