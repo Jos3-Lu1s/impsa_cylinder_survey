@@ -18,6 +18,41 @@ class ApuSurvey(models.Model):
     apu_product_id=fields.Many2one('product.template',string='Cilindro a trabajar', domain=lambda self: self._get_domain_product())
 
     date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True)
+    
+    lead_id = fields.Many2one(
+        'crm.lead',
+        string="Oportunidad",
+        ondelete='cascade'
+    )
+    
+    lead_id = fields.Many2one(
+        'crm.lead',
+        string="Oportunidad",
+        ondelete='cascade'
+    )
+    
+    lead_count = fields.Integer(
+        string="Oportunidad",
+        compute="_compute_lead_count"
+    )
+
+    def _compute_lead_count(self):
+        for record in self:
+            record.lead_count = 1 if record.lead_id else 0
+            
+    def action_view_lead(self):
+        self.ensure_one()
+    
+        if not self.lead_id:
+            return
+    
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Oportunidad',
+            'res_model': 'crm.lead',
+            'view_mode': 'form',
+            'res_id': self.lead_id.id,
+        }
 
     state = fields.Selection([
         ('draft', 'Borrador'),
