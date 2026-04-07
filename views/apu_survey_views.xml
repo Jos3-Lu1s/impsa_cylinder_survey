@@ -19,6 +19,10 @@
                 <field name="gran_total_lm"
                        decoration-bf="1" />
                 <field name="state"
+                       widget="badge"
+                       decoration-warning="state == 'draft'"
+                       decoration-success="state == 'confirmed'"
+                       decoration-danger="state == 'cancel'"
                        decoration-bf="1" />
                 <field name="date" />
                 <field name="partner_id"
@@ -36,78 +40,77 @@
         <field name="arch"
                type="xml">
             <form string="APU">
-                <header> 
-                    <button name="action_to_confirmed" string="Confirmar APU" type="object" class="oe_highlight" invisible="state != 'draft'" />
-                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['confirmed']" confirm="¿Está seguro de que desea cancelar este registro?" />
-                    <button name="action_set_draft" string="Establece a Borrador" type="object" invisible="state != 'cancel'" />
+                <header>
+                    <button name="action_to_confirmed"
+                            string="Confirmar APU"
+                            type="object"
+                            class="oe_highlight"
+                            invisible="state != 'draft'" />
+                    <button name="action_cancel"
+                            string="Cancelar"
+                            type="object"
+                            invisible="state not in ['confirmed']"
+                            confirm="¿Está seguro de que desea cancelar este registro?" />
+                    <button name="action_set_draft"
+                            string="Establece a Borrador"
+                            type="object"
+                            invisible="state != 'cancel'" />
                     <field name="state"
                            widget="statusbar"
                            statusbar_visible="draft,confirmed,cancel" />
                 </header>
                 <sheet>
-                     <div class="oe_title">
-                        <label for="name"
-                               class="oe_edit_only" />
-                        <h1>
-                            <field name="name"
-                                   placeholder="APU" />
-                        </h1>
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+    
+                        <div class="oe_title mb-0 w-100">
+                            <label for="name" class="oe_edit_only" string="Referencia"/>
+                            <h1>
+                                <field name="name" class="oe_inline text-truncate w-100"/>
+                            </h1>
+                        </div>
+
+                        <div class="d-flex flex-column flex-sm-row gap-3 text-end w-100" style="max-width: 600px; margin-left: auto;">
+                            
+                            <div class="flex-fill rounded-3 border border-2 border-info bg-info bg-opacity-25 p-3 d-flex flex-column justify-content-center">
+                                <div class="d-flex justify-content-between align-items-center w-100 mb-1">
+                                    <label for="gran_subtotal_lm" class="fs-5 fw-bold text-muted mb-0" string="Subtotal" />
+                                    <i class="fa fa-usd fs-4 text-info" aria-hidden="true" />
+                                </div>
+                                <field name="gran_subtotal_lm" class="fw-bolder h3 mb-0 w-100" />
+                            </div>
+
+                            <div class="flex-fill rounded-3 border border-2 border-primary bg-primary bg-opacity-25 p-3 d-flex flex-column justify-content-center">
+                                <div class="d-flex justify-content-between align-items-center w-100 mb-1">
+                                    <label for="gran_total_lm" class="fs-5 fw-bold text-muted mb-0" string="Total" />
+                                    <i class="fa fa-money fs-4 text-primary" aria-hidden="true" />
+                                </div>
+                                <field name="gran_total_lm" class="fw-bolder h2 text-primary mb-0 w-100" />
+                            </div>
+
+                        </div>
+                        
                     </div>
-                     <div class="oe_button_box" name="button_box">
+                    <div class="oe_button_box" name="button_box">
                         <button name="action_view_survey" type="object" class="oe_stat_button" icon="fa-gears" invisible="not survey_id">
                             <field name="cylinder_survey_count" widget="statinfo" string="Levantamiento"/>
                         </button>
-                        <button name="action_view_quote" type="object" class="oe_stat_button" icon="fa-shopping-cart" invisible="not quote_ids">
-                            <field name="quote_count" widget="statinfo" string="Cotización"/>
-                        </button>
-                        <button name="action_view_lead"
+                        <button name="action_view_quote"
                                 type="object"
                                 class="oe_stat_button"
-                                icon="fa-handshake-o">
-                            <field name="lead_count" widget="statinfo" string="Oportunidad"/>
+                                icon="fa-shopping-cart"
+                                invisible="not quote_id">
+                            <field name="quote_count"
+                                   widget="statinfo"
+                                   string="Cotización" />
                         </button>
-                    </div>
-                    <group>
-                        <div class="row justify-content-md-center">
-                            <div class="col rounded-3 border border-2 border-info bg-info bg-opacity-25 col-lg-2 p-3 me-4">
-                                <div class="row">
-                                    <div class="col">
-                                        <label for="gran_subtotal_lm"
-                                               class="fs-3 fw-bold"
-                                               string="Subtotal" />
-                                    </div>
-                                    <div class="col text-center">
-                                        <i class="fa fa-usd fs-2 p-1"
-                                           aria-hidden="true" />
-                                    </div>
-                                </div>
-                                <field name="gran_subtotal_lm"
-                                       class="fw-bolder h2 justify-content-center" />
-                            </div>
-                            <div class="col rounded-3 border border-2 border-primary col-lg-2 p-3 text-center bg-primary bg-opacity-25">
-                                <div class="row">
-                                    <div class="col">
-                                        <label for="gran_total_lm"
-                                               class="fs-3 fw-bold"
-                                               string="Total" />
-                                    </div>
-                                    <div class="col text-center">
-                                        <i class="fa fa-money fs-2 p-1"
-                                           aria-hidden="true" />
-                                    </div>
-                                </div>
-                                <field name="gran_total_lm"
-                                       class="fw-bolder h2 justify-content-center" />
-                            </div>
-                        </div>
-                    </group>
-                   
+                    </div> 
                     <group col="2"
                            name="Formulario de APU">
                         <group name="Información General"
                                string="Información General">
                             <field name="partner_id" />
-                            <field name="quote_ids" invisible="True"/>
+                            <field name="quote_ids"
+                                   invisible="True" />
                             <field name="tipo_costo_mo" />
                             <field name="costo_fijo_lm"
                                    invisible="tipo_costo_mo != 'costo_fijo_mo'" />
@@ -129,120 +132,43 @@
                                    widget="percentage" />
                         </group>
                     </group>
-                    
-                        <separator class="fw-bolder fs-6"
-                                       string="RESUMEN DE COSTOS" />
-                        <div class="row">
-                            <div class="col-6 rounded-3 border border-2 border-secondary bg-secondary bg-opacity-75 pt-3 pb-3">
-                                <div class="text-center">
-                                    <span class="fs-3 fw-bold  o_field_widget o_readonly_modifier">Costos de Material</span>
-                                </div>
-                                <div class="text-center">
-                                    <i class="fa fa-cubes fs-1" aria-hidden="true"></i>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="text-center">
-                                            <label for="subtotal_material_lm"
-                                                   class="fs-4 fw-bold"
-                                                   string="Subtotal" />
+                    <separator class="fw-bolder fs-5 mt-4 mb-3" string="Resumen de Costos" />
+
+                        <div class="row g-4 mb-4">
+                            
+                            <div class="col-12 col-md-6">
+                                <div class="border rounded-3 p-3 h-100 shadow-sm">
+                                    <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
+                                        <div class="border rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                            <i class="fa fa-cubes fs-4" aria-hidden="true"></i>
                                         </div>
-                                        <div class="text-center">
-                                            <field name="subtotal_material_lm"
-                                                   class="fw-bolder h4" />
-                                        </div>
+                                        <h4 class="mb-0 fw-bold text-dark m-0">Costos de Material</h4>
                                     </div>
-                                    <div class="col">
-                                        <div class="text-center">
-                                            <label for="costos_indirectos_material_lm"
-                                                   class="fs-4 fw-bold"
-                                                   string="Costos Indirectos" />
-                                        </div>
-                                        <div class="text-center">
-                                            <field name="costos_indirectos_material_lm"
-                                                   class="fw-bolder h4" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="text-center">
-                                            <label for="utilidad_impuestos_material_lm"
-                                                   class="fs-4 fw-bold"
-                                                   string="Utilidad Antes de Impuestos" />
-                                        </div>
-                                        <div class="text-center">
-                                            <field name="utilidad_impuestos_material_lm"
-                                                   class="fw-bolder h4" />
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="text-center">
-                                            <label for="total_material_lm"
-                                                   class="fs-4 fw-bold"
-                                                   string="Total" />
-                                        </div>
-                                        <div class="text-center">
-                                            <field name="total_material_lm"
-                                                   class="fw-bolder h4" />
-                                        </div>
-                                    </div>
+                                    
+                                    <group class="mt-0">
+                                        <field name="subtotal_material_lm" string="Subtotal" />
+                                        <field name="costos_indirectos_material_lm" string="Costos Indirectos" />
+                                        <field name="utilidad_impuestos_material_lm" string="Utilidad (A.I.)" />
+                                        <field name="total_material_lm" string="Total" class="oe_subtotal_footer_separator fw-bolder fs-5 text-dark" />
+                                    </group>
                                 </div>
                             </div>
-                            <div class="col-6 rounded-3 border border-2 border-secondary bg-secondary bg-opacity-75 pt-3 pb-3">
-                                <div class="text-center">
-                                    <span class="fs-3 fw-bold  o_field_widget o_readonly_modifier">Costos de MO</span>
-                                </div>
-                                <div class="text-center">
-                                    <i class="fa fa-male fs-1" aria-hidden="true"></i>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="text-center">
-                                            <label for="subtotal_mo_lm"
-                                                   class="fs-4 fw-bold"
-                                                   string="Subtotal" />
+
+                            <div class="col-12 col-md-6">
+                                <div class="border rounded-3 p-3 h-100 shadow-sm">
+                                    <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
+                                        <div class="border rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                            <i class="fa fa-male fs-3" aria-hidden="true" style="padding-bottom: 2px;"></i>
                                         </div>
-                                        <div class="text-center">
-                                            <field name="subtotal_mo_lm"
-                                                   class="fw-bolder h4" />
-                                        </div>
+                                        <h4 class="mb-0 fw-bold text-dark m-0">Costos de M.O.</h4>
                                     </div>
-                                    <div class="col">
-                                        <div class="text-center">
-                                            <label for="costos_indirectos_mo_lm"
-                                                   class="fs-4 fw-bold"
-                                                   string="Costos Indirectos" />
-                                        </div>
-                                        <div class="text-center">
-                                            <field name="costos_indirectos_mo_lm"
-                                                   class="fw-bolder h4" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="text-center">
-                                            <label for="utilidad_impuestos_mo_lm"
-                                                   class="fs-4 fw-bold"
-                                                   string="Utilidad Antes de Impuestos" />
-                                        </div>
-                                        <div class="text-center">
-                                            <field name="utilidad_impuestos_mo_lm"
-                                                   class="fw-bolder h4" />
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <div class="text-center">
-                                            <label for="total_mo_lm"
-                                                   class="fs-4 fw-bold"
-                                                   string="Total" />
-                                        </div>
-                                        <div class="text-center">
-                                            <field name="total_mo_lm"
-                                                   class="fw-bolder h4" />
-                                        </div>
-                                    </div>
+                                    
+                                    <group class="mt-0">
+                                        <field name="subtotal_mo_lm" string="Subtotal" />
+                                        <field name="costos_indirectos_mo_lm" string="Costos Indirectos" />
+                                        <field name="utilidad_impuestos_mo_lm" string="Utilidad (A.I.)" />
+                                        <field name="total_mo_lm" string="Total" class="oe_subtotal_footer_separator fw-bolder fs-5 text-dark" />
+                                    </group>
                                 </div>
                             </div>
                         </div>
