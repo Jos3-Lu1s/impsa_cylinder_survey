@@ -24,9 +24,20 @@ class CrmDecision(models.Model):
         string="Levantamientos de Cilindro"
     )
     
+    apu_survey_ids = fields.One2many(
+        'impsa.apu.survey',
+        'lead_id',
+        string="Levantamientos de APU"
+    )
+    
     cylinder_survey_count = fields.Integer(
         string="Levantamientos",
         compute="_compute_cylinder_survey_count"
+    )
+    
+    apu_survey_count = fields.Integer(
+        string="APU",
+        compute="_compute_apu_survey_count"
     )
     
     stage_sequence = fields.Integer(
@@ -52,6 +63,11 @@ class CrmDecision(models.Model):
         for rec in self:
             rec.cylinder_survey_count = len(rec.cylinder_survey_ids)
             
+    @api.depends('apu_survey_ids')
+    def _compute_apu_survey_count(self):
+        for rec in self:
+            rec.apu_survey_count = len(rec.apu_survey_ids)
+            
     def action_view_cylinder_surveys(self):
         return {
             'type': 'ir.actions.act_window',
@@ -74,5 +90,17 @@ class CrmDecision(models.Model):
             'context': {
                 'default_lead_id': self.id,
                 'default_partner_id': self.partner_id.id,
+            }
+        }
+        
+    def action_view_apus(self):
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Análisis de Precios',
+            'res_model': 'impsa.apu.survey',
+            'view_mode': 'list,form',
+            'domain': [('lead_id', '=', self.id)],
+            'context': {
+                'default_lead_id': self.id
             }
         }
