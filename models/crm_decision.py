@@ -74,7 +74,7 @@ class CrmDecision(models.Model):
             'type': 'ir.actions.act_window',
             'name': 'Levantamientos',
             'res_model': 'impsa.cylinder.survey',
-            'view_mode': 'list,form',
+            'view_mode': 'form',
             'domain': [('lead_id', '=', self.id)],
             'context': {
                 'default_lead_id': self.id
@@ -99,7 +99,7 @@ class CrmDecision(models.Model):
             'type': 'ir.actions.act_window',
             'name': 'Análisis de Precios',
             'res_model': 'impsa.apu.survey',
-            'view_mode': 'list,form',
+            'view_mode': 'form',
             'domain': [('lead_id', '=', self.id)],
             'context': {
                 'default_lead_id': self.id
@@ -108,11 +108,11 @@ class CrmDecision(models.Model):
         
     def action_view_apu(self):
         self.ensure_one()
-    
+
         # 🚫 Validación
         if self.apu_survey_ids:
             raise UserError("Ya existe un APU para esta oportunidad.")
-    
+
         return {
             'type': 'ir.actions.act_window',
             'name': 'APU',
