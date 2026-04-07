@@ -98,7 +98,7 @@
                                 type="object"
                                 class="oe_stat_button"
                                 icon="fa-shopping-cart"
-                                invisible="not quote_id">
+                                invisible="not quote_ids">
                             <field name="quote_count"
                                    widget="statinfo"
                                    string="Cotización" />
@@ -108,28 +108,28 @@
                            name="Formulario de APU">
                         <group name="Información General"
                                string="Información General">
-                            <field name="partner_id" />
-                            <field name="quote_id"
+                            <field name="partner_id" readonly="state != 'draft'"/>
+                            <field name="quote_ids"
                                    invisible="True" />
-                            <field name="tipo_costo_mo" />
+                            <field name="tipo_costo_mo" readonly="state != 'draft'"/>
                             <field name="costo_fijo_lm"
-                                   invisible="tipo_costo_mo != 'costo_fijo_mo'" />
-                            <field name="apu_product_id" />
+                                   invisible="tipo_costo_mo != 'costo_fijo_mo'" readonly="state != 'draft'"/>
+                            <field name="apu_product_id" readonly="state != 'draft'"/>
                         </group>
                         <group name="Datos de Entrada de Cotizador"
                                class="border-2 border-start">
                             <separator class="fw-bolder fs-6"
                                        string="Márgen de costos de material" />
                             <field name="porcentaje_cindirectos_material"
-                                   widget="percentage" />
+                                   widget="percentage" readonly="state != 'draft'"/>
                             <field name="porcentaje_utaimp_material"
-                                   widget="percentage" />
+                                   widget="percentage" readonly="state != 'draft'"/>
                             <separator class="fw-bolder fs-6"
                                        string="Márgen de costos de MO" />
                             <field name="porcentaje_cindirectos_mo"
-                                   widget="percentage" />
+                                   widget="percentage" readonly="state != 'draft'"/>
                             <field name="porcentaje_utaimp_mo"
-                                   widget="percentage" />
+                                   widget="percentage" readonly="state != 'draft'"/>
                         </group>
                     </group>
                     <separator class="fw-bolder fs-5 mt-4 mb-3" string="Resumen de Costos" />
@@ -175,7 +175,7 @@
                     <notebook>
                         <page string="Cotizador de Materiales"
                               name="impsa_tab">
-                            <field name="lm_ids">
+                            <field name="lm_ids" readonly="state != 'draft'">
                                 <list editable="bottom"
                                       create="1"
                                       edit="1"
