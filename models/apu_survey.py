@@ -26,13 +26,7 @@ class ApuSurvey(models.Model):
         string="Oportunidad",
         ondelete='cascade'
     )
-    
-    lead_id = fields.Many2one(
-        'crm.lead',
-        string="Oportunidad",
-        ondelete='cascade'
-    )
-    
+      
     lead_count = fields.Integer(
         string="Oportunidad",
         compute="_compute_lead_count"
