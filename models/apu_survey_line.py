@@ -17,7 +17,7 @@ class SaleOrderLM(models.Model):
     cantidad_lm = fields.Float(string="Cantidad", default=1.0)
     importe_material_lm = fields.Monetary(string="Imp. Material", compute='_compute_importe_material', store=True,currency_field="currency_id")
     importe_mo_lm = fields.Monetary(string="Imp. MO", compute='_compute_importe_mo', currency_field="currency_id")
-    empleado_mo_lm = fields.Many2one('hr.employee',string="Empleado")
+    empleado_mo_lm = fields.Many2one('hr.department',string="Área")
     reference = fields.Text(
         string="Referencia",
         store=True
@@ -51,5 +51,12 @@ class SaleOrderLM(models.Model):
                  line.importe_mo_lm=0
                  if line.unidad_lm.id == 4:
                     line.cantidad_lm=line.mo_hrs_lm
+            
+    """ @api.onchange('cantidad_lm')
+    def _onchange_cantidad_lm(self):
+        for record in self:
+            if record.apu_id.cylinder_qty_by_group > 0:            
+                record.cantidad_lm=(record.cantidad_lm*1)*record.apu_id.cylinder_qty_by_group """
+
 
 

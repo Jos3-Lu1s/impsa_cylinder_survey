@@ -30,12 +30,12 @@
         "views/cylinder_materials_views.xml",
         "views/accessory_type_views.xml",
         "views/crm_adition.xml",
-        "views/saler_view.xml",
         "views/purchase_views.xml",
         "reports/report_proforma.xml",
         "views/apu_survey_views.xml",
         "views/integration_menu.xml",
         "views/saler_view.xml",
+        "views/hr_department_inherit_view.xml",
     ],
 
     'demo': [
