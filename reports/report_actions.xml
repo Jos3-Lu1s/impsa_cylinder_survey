@@ -13,7 +13,7 @@
     </record> -->
 
     <record id="action_report_proforma_custom" model="ir.actions.report">
-        <field name="name">Proforma Personalizada</field>
+        <field name="name">Cotización</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">impsa_cylinder_survey.report_proforma_custom</field>
