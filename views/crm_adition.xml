@@ -66,5 +66,69 @@
 
             </field>
         </record>
+
+        <record id="quick_create_opportunity_form_inherit_selection" model="ir.ui.view">
+            <field name="name">crm.lead.quick.create.inherit.selection</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.quick_create_opportunity_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[div/field[@name='expected_revenue']]" position="after">
+                    <div class="d-flex align-items-center" colspan="2">
+                        <i class="fa fa-check-circle-o" title="selection_type"/>
+                        <div class="d-flex">
+                            <field name="selection_type" class="m-0" widget="radio" options="{'horizontal': True}"/><span class="fw-bolder text-danger">*</span>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="crm_case_kanban_view_leads_inherit_selection" model="ir.ui.view">
+            <field name="name">crm.lead.kanban.inherit.selection</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//field[@name='activity_ids']" position="after">
+                    
+                    <div t-if="record.selection_type.raw_value" class="text-muted small">
+                        <i class="fa fa-circle-o fa-fw me-1" title="Tipo de Selección"/>
+                        <field name="selection_type"/>
+                    </div>
+                    
+                </xpath>
+                
+            </field>
+        </record>
+
+        <record id="view_crm_case_opportunities_filter_inherit_cylinder" model="ir.ui.view">
+            <field name="name">crm.lead.search.inherit.cylinder.type</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//field[@name='user_id']" position="after">
+                    <field name="selection_type"/>
+                </xpath>
+
+                <xpath expr="//filter[@name='assigned_to_me']" position="after">
+                    <separator/>
+                    <filter string="Fabricación" 
+                            name="filter_type_manufacturing" 
+                            domain="[('selection_type', '=', 'manufacturing')]"/>
+                    <filter string="Reparación" 
+                            name="filter_type_repair" 
+                            domain="[('selection_type', '=', 'repair')]"/>
+                    <separator/>
+                </xpath>
+
+                <xpath expr="//filter[@name='stage']" position="after">
+                    <filter string="Tipo de Cilindro" 
+                            name="groupby_selection_type" 
+                            context="{'group_by':'selection_type'}"/>
+                </xpath>
+                
+            </field>
+        </record>
     </data>
 </odoo>

@@ -1,5 +1,5 @@
 from odoo import models, fields, api, Command, _
-from odoo.exceptions import ValidationError, UserError
+from odoo.exceptions import ValidationError
 
 class ApuSurvey(models.Model):
     _name = "impsa.apu.survey"
@@ -21,7 +21,7 @@ class ApuSurvey(models.Model):
         string="Cant. de cilindros",
     )
     apu_product_id = fields.Many2one(
-        'product.template', string='Cilindro a trabajar'
+        'product.template', string='Cilindro a trabajar', ondelete='restrict'
     )
 
     date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True)
@@ -56,17 +56,13 @@ class ApuSurvey(models.Model):
     currency_id = fields.Many2one(
         "res.currency",
         string="Moneda",
-        default=lambda self: self.env.company.currency_id
+        default=lambda self: self.env.company.currency_id,
+        ondelete='restrict'
     )
 
     costo_fijo_lm = fields.Monetary(
         string="Costo",
         currency_field="currency_id"
-    )
-
-    tiene_producto_linea = fields.Boolean(
-        #compute="_compute_tiene_producto_linea",
-        store=False
     )
 
     survey_id = fields.Many2one(
@@ -131,7 +127,16 @@ class ApuSurvey(models.Model):
         else:
             return {'domain': {'apu_product_id': [('categ_id', '=', 'FCH')]}}
 
-    @api.depends('lm_ids','costo_fijo_lm','tipo_costo_mo','porcentaje_cindirectos_material','porcentaje_utaimp_material','porcentaje_cindirectos_mo','porcentaje_utaimp_mo')
+    @api.depends(
+        'lm_ids.importe_material_lm', 
+        'lm_ids.importe_mo_lm', 
+        'costo_fijo_lm',
+        'tipo_costo_mo',
+        'porcentaje_cindirectos_material',
+        'porcentaje_utaimp_material',
+        'porcentaje_cindirectos_mo',
+        'porcentaje_utaimp_mo'
+    )
     def _compute_totales_lm(self):
         for order in self:
             subtotal_material = sum(order.lm_ids.mapped('importe_material_lm'))
