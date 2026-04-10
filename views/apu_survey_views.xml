@@ -74,7 +74,7 @@
                             <div class="flex-fill rounded-3 border border-2 border-info bg-info bg-opacity-25 p-3 d-flex flex-column justify-content-center">
                                 <div class="d-flex justify-content-between align-items-center w-100 mb-1">
                                     <label for="gran_subtotal_lm" class="fs-5 fw-bold text-muted mb-0" string="Subtotal" />
-                                    <i class="fa fa-usd fs-4 text-info" aria-hidden="true" />
+                                    <i class="fa fa-usd fs-4 text-info" aria-hidden="true" title="Subtotal" />
                                 </div>
                                 <field name="gran_subtotal_lm" class="fw-bolder h3 mb-0 w-100" />
                             </div>
@@ -82,7 +82,7 @@
                             <div class="flex-fill rounded-3 border border-2 border-primary bg-primary bg-opacity-25 p-3 d-flex flex-column justify-content-center">
                                 <div class="d-flex justify-content-between align-items-center w-100 mb-1">
                                     <label for="gran_total_lm" class="fs-5 fw-bold text-muted mb-0" string="Total" />
-                                    <i class="fa fa-money fs-4 text-primary" aria-hidden="true" />
+                                    <i class="fa fa-money fs-4 text-primary" aria-hidden="true" title="Total" />
                                 </div>
                                 <field name="gran_total_lm" class="fw-bolder h2 text-primary mb-0 w-100" />
                             </div>
@@ -148,7 +148,7 @@
                                 <div class="border rounded-3 p-3 h-100 shadow-sm">
                                     <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
                                         <div class="border rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                                            <i class="fa fa-cubes fs-4" aria-hidden="true"></i>
+                                            <i class="fa fa-cubes fs-4" aria-hidden="true" title="Materiales"></i>
                                         </div>
                                         <h4 class="mb-0 fw-bold text-dark m-0">Costos de Material</h4>
                                     </div>
@@ -166,7 +166,7 @@
                                 <div class="border rounded-3 p-3 h-100 shadow-sm">
                                     <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
                                         <div class="border rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                                            <i class="fa fa-male fs-3" aria-hidden="true" style="padding-bottom: 2px;"></i>
+                                            <i class="fa fa-male fs-3" aria-hidden="true" style="padding-bottom: 2px;" title="Mano de Obra"></i>
                                         </div>
                                         <h4 class="mb-0 fw-bold text-dark m-0">Costos de M.O.</h4>
                                     </div>

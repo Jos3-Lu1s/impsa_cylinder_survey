@@ -33,7 +33,7 @@ class ApuSurvey(models.Model):
     )
       
     lead_count = fields.Integer(
-        string="Oportunidad",
+        string="Oportunidades",
         compute="_compute_lead_count"
     )
 
@@ -98,27 +98,27 @@ class ApuSurvey(models.Model):
     )
     
     #CAMPOS PARA LOS COSTOS TOTALES DE LOS MATERIALES#
-    subtotal_material_lm = fields.Monetary(string="Subtotal", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
-    costos_indirectos_material_lm = fields.Monetary(string="Costos Indirectos", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
-    utilidad_impuestos_material_lm = fields.Monetary(string="Utilidad antes de Impuestos", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
-    total_material_lm = fields.Monetary(string="Total", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    subtotal_material_lm = fields.Monetary(string="Subtotal Material", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    costos_indirectos_material_lm = fields.Monetary(string="Costos Indirectos Material", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    utilidad_impuestos_material_lm = fields.Monetary(string="Utilidad (A.I.) Material", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    total_material_lm = fields.Monetary(string="Total Material", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
 
     #CAMPOS PARA LOS COSTOS TOTALES DE LA MANO DE OBRA#
-    subtotal_mo_lm = fields.Monetary(string="Subtotal", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
-    costos_indirectos_mo_lm = fields.Monetary(string="Costos Indirectos", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
-    utilidad_impuestos_mo_lm = fields.Monetary(string="Utilidad antes de Impuestos", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
-    total_mo_lm = fields.Monetary(string="Total", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    subtotal_mo_lm = fields.Monetary(string="Subtotal M.O.", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    costos_indirectos_mo_lm = fields.Monetary(string="Costos Indirectos M.O.", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    utilidad_impuestos_mo_lm = fields.Monetary(string="Utilidad (A.I.) M.O.", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    total_mo_lm = fields.Monetary(string="Total M.O.", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
 
     #CAMPOS PARA LOS COSTOS TOTALES#
     gran_subtotal_lm = fields.Monetary(string="Gran Subtotal", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
     gran_total_lm = fields.Monetary(string="Gran Total", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
 
     #CAMPOS DE PORCENTAJES PARA MARGENES DE COSTOS
-    porcentaje_cindirectos_material=fields.Float(string="Margen C. Indirectos",digits=(16, 2))
-    porcentaje_utaimp_material=fields.Float(string="Margen Utilidad",digits=(16, 2))
+    porcentaje_cindirectos_material=fields.Float(string="Margen C. Indirectos Mat.",digits=(16, 2))
+    porcentaje_utaimp_material=fields.Float(string="Margen Utilidad Mat.",digits=(16, 2))
     
-    porcentaje_cindirectos_mo=fields.Float(string="Margen C. Indirectos",digits=(16, 2))
-    porcentaje_utaimp_mo=fields.Float(string="Margen Utilidad",digits=(16, 2))
+    porcentaje_cindirectos_mo=fields.Float(string="Margen C. Indirectos M.O.",digits=(16, 2))
+    porcentaje_utaimp_mo=fields.Float(string="Margen Utilidad M.O.",digits=(16, 2))
 
     @api.onchange('survey_id')
     def _onchange_survey_id_domain(self):
