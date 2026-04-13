@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_impsa_apu_survey_actions_tree"
+            model="ir.ui.view">
+        <field name="name">impsa.apu.survey.actions.tree</field>
+        <field name="model">impsa.apu.survey.actions</field>
+        <field name="arch"
+               type="xml">
+            <list string="Acciones de los Cilindros" editable="bottom">
+                <field name="name"
+                       decoration-bf="1" />
+                <field name="action_code"
+                       decoration-bf="1" />
+            </list>
+        </field>
+    </record>
+</odoo>

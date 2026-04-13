@@ -94,7 +94,7 @@
                                     <span t-esc="doc.partner_id.street"/> <span t-esc="doc.partner_id.street2"/><span t-esc="doc.partner_id.city"/><br />
                                 </td>
                                 <td style="width:50%; vertical-align:top; text-align:right;">
-                                    <h2 style="margin:0;">Cotización</h2>
+                                    <h2 style="margin:0;">Cotización - <span t-field="doc.name" /></h2>
                                     Folio : <br />
                                     <span t-field="doc.name" /><br />
                                     Fecha : <br />
