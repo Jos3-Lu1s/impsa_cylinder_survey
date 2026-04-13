@@ -24,7 +24,9 @@
                        decoration-success="state == 'confirmed'"
                        decoration-danger="state == 'cancel'"
                        decoration-bf="1" />
-                <field name="date"  options="{'numeric': true}" readonly="1"/>
+                <field name="date"
+                       options="{'numeric': true}"
+                       readonly="1" />
                 <field name="partner_id"
                        widget="many2one_avatar" />
                 <field name="activity_ids"
@@ -61,38 +63,51 @@
                 </header>
                 <sheet>
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
-    
                         <div class="oe_title mb-0 w-100">
-                            <label for="name" class="oe_edit_only" string="Referencia"/>
+                            <label for="name"
+                                   class="oe_edit_only"
+                                   string="Referencia" />
                             <h1>
-                                <field name="name" class="oe_inline text-truncate w-100"/>
+                                <field name="name"
+                                       class="oe_inline text-truncate w-100" />
                             </h1>
                         </div>
-
-                        <div class="d-flex flex-column flex-sm-row gap-3 text-end w-100" style="max-width: 600px; margin-left: auto;">
-                            
+                        <div class="d-flex flex-column flex-sm-row gap-3 text-end w-100"
+                             style="max-width: 600px; margin-left: auto;">
                             <div class="flex-fill rounded-3 border border-2 border-info bg-info bg-opacity-25 p-3 d-flex flex-column justify-content-center">
                                 <div class="d-flex justify-content-between align-items-center w-100 mb-1">
-                                    <label for="gran_subtotal_lm" class="fs-5 fw-bold text-muted mb-0" string="Subtotal" />
-                                    <i class="fa fa-usd fs-4 text-info" aria-hidden="true" />
+                                    <label for="gran_subtotal_lm"
+                                           class="fs-5 fw-bold text-muted mb-0"
+                                           string="Subtotal" />
+                                    <i class="fa fa-usd fs-4 text-info"
+                                       aria-hidden="true" />
                                 </div>
-                                <field name="gran_subtotal_lm" class="fw-bolder h3 mb-0 w-100" />
+                                <field name="gran_subtotal_lm"
+                                       class="fw-bolder h3 mb-0 w-100" />
                             </div>
-
                             <div class="flex-fill rounded-3 border border-2 border-primary bg-primary bg-opacity-25 p-3 d-flex flex-column justify-content-center">
                                 <div class="d-flex justify-content-between align-items-center w-100 mb-1">
-                                    <label for="gran_total_lm" class="fs-5 fw-bold text-muted mb-0" string="Total" />
-                                    <i class="fa fa-money fs-4 text-primary" aria-hidden="true" />
+                                    <label for="gran_total_lm"
+                                           class="fs-5 fw-bold text-muted mb-0"
+                                           string="Total" />
+                                    <i class="fa fa-money fs-4 text-primary"
+                                       aria-hidden="true" />
                                 </div>
-                                <field name="gran_total_lm" class="fw-bolder h2 text-primary mb-0 w-100" />
+                                <field name="gran_total_lm"
+                                       class="fw-bolder h2 text-primary mb-0 w-100" />
                             </div>
-
                         </div>
-                        
                     </div>
-                    <div class="oe_button_box" name="button_box">
-                        <button name="action_view_survey" type="object" class="oe_stat_button" icon="fa-gears" invisible="not survey_id">
-                            <field name="cylinder_survey_count" widget="statinfo" string="Levantamiento"/>
+                    <div class="oe_button_box"
+                         name="button_box">
+                        <button name="action_view_survey"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-gears"
+                                invisible="not survey_id">
+                            <field name="cylinder_survey_count"
+                                   widget="statinfo"
+                                   string="Levantamiento" />
                         </button>
                         <button name="action_view_quote"
                                 type="object"
@@ -108,82 +123,105 @@
                                 class="oe_stat_button d-flex align-items-center gap-2"
                                 icon="fa-handshake-o"
                                 invisible="lead_count == 0">
-                            <field name="lead_count" widget="statinfo" string="Oportunidad"/>
+                            <field name="lead_count"
+                                   widget="statinfo"
+                                   string="Oportunidad" />
                         </button>
-                    </div> 
+                    </div>
                     <group col="2"
                            name="Formulario de APU">
                         <group name="Información General"
                                string="Información General">
-                            <field name="partner_id" readonly="state != 'draft'"/>
-                            <field name="cylinder_qty_by_group" readonly="survey_id == True or state != 'draft'"/>
+                            <field name="partner_id"
+                                   readonly="state != 'draft'" />
+                            <field name="cylinder_qty_by_group"
+                                   readonly="survey_id == True or state != 'draft'" />
                             <field name="quote_ids"
                                    invisible="True" />
-                            <field name="tipo_costo_mo" readonly="state != 'draft'"/>
+                            <field name="tipo_costo_mo"
+                                   readonly="state != 'draft'" />
                             <field name="costo_fijo_lm"
-                                   invisible="tipo_costo_mo != 'costo_fijo_mo'" readonly="state != 'draft'"/>
-                            <field name="apu_product_id" readonly="state != 'draft'"/>
+                                   invisible="tipo_costo_mo != 'costo_fijo_mo'"
+                                   readonly="state != 'draft'" />
+                            <field name="apu_product_id"
+                                   readonly="state != 'draft'" />
                         </group>
                         <group name="Datos de Entrada de Cotizador"
                                class="border-2 border-start">
                             <separator class="fw-bolder fs-6"
                                        string="Márgen de costos de material" />
                             <field name="porcentaje_cindirectos_material"
-                                   widget="percentage" readonly="state != 'draft'"/>
+                                   widget="percentage"
+                                   readonly="state != 'draft'" />
                             <field name="porcentaje_utaimp_material"
-                                   widget="percentage" readonly="state != 'draft'"/>
+                                   widget="percentage"
+                                   readonly="state != 'draft'" />
                             <separator class="fw-bolder fs-6"
                                        string="Márgen de costos de MO" />
                             <field name="porcentaje_cindirectos_mo"
-                                   widget="percentage" readonly="state != 'draft'"/>
+                                   widget="percentage"
+                                   readonly="state != 'draft'" />
                             <field name="porcentaje_utaimp_mo"
-                                   widget="percentage" readonly="state != 'draft'"/>
+                                   widget="percentage"
+                                   readonly="state != 'draft'" />
                         </group>
                     </group>
-                    <separator class="fw-bolder fs-5 mt-4 mb-3" string="Resumen de Costos" />
-
-                        <div class="row g-4 mb-4">
-                            
-                            <div class="col-12 col-md-6">
-                                <div class="border rounded-3 p-3 h-100 shadow-sm">
-                                    <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
-                                        <div class="border rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                                            <i class="fa fa-cubes fs-4" aria-hidden="true"></i>
-                                        </div>
-                                        <h4 class="mb-0 fw-bold text-dark m-0">Costos de Material</h4>
+                    <separator class="fw-bolder fs-5 mt-4 mb-3"
+                               string="Resumen de Costos" />
+                    <div class="row g-4 mb-4">
+                        <div class="col-12 col-md-6">
+                            <div class="border rounded-3 p-3 h-100 shadow-sm">
+                                <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
+                                    <div class="border rounded-circle d-flex align-items-center justify-content-center me-3"
+                                         style="width: 50px; height: 50px;">
+                                        <i class="fa fa-cubes fs-4"
+                                           aria-hidden="true" />
                                     </div>
-                                    
-                                    <group class="mt-0">
-                                        <field name="subtotal_material_lm" string="Subtotal" />
-                                        <field name="costos_indirectos_material_lm" string="Costos Indirectos" />
-                                        <field name="utilidad_impuestos_material_lm" string="Utilidad (A.I.)" />
-                                        <field name="total_material_lm" string="Total" class="oe_subtotal_footer_separator fw-bolder fs-5 text-dark" />
-                                    </group>
+                                    <h4 class="mb-0 fw-bold text-dark m-0">Costos de Material</h4>
                                 </div>
-                            </div>
-
-                            <div class="col-12 col-md-6">
-                                <div class="border rounded-3 p-3 h-100 shadow-sm">
-                                    <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
-                                        <div class="border rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                                            <i class="fa fa-male fs-3" aria-hidden="true" style="padding-bottom: 2px;"></i>
-                                        </div>
-                                        <h4 class="mb-0 fw-bold text-dark m-0">Costos de M.O.</h4>
-                                    </div>
-                                    
-                                    <group class="mt-0">
-                                        <field name="subtotal_mo_lm" string="Subtotal" />
-                                        <field name="costos_indirectos_mo_lm" string="Costos Indirectos" />
-                                        <field name="utilidad_impuestos_mo_lm" string="Utilidad (A.I.)" />
-                                        <field name="total_mo_lm" string="Total" class="oe_subtotal_footer_separator fw-bolder fs-5 text-dark" />
-                                    </group>
-                                </div>
+                                <group class="mt-0">
+                                    <field name="subtotal_material_lm"
+                                           string="Subtotal" />
+                                    <field name="costos_indirectos_material_lm"
+                                           string="Costos Indirectos" />
+                                    <field name="utilidad_impuestos_material_lm"
+                                           string="Utilidad (A.I.)" />
+                                    <field name="total_material_lm"
+                                           string="Total"
+                                           class="oe_subtotal_footer_separator fw-bolder fs-5 text-dark" />
+                                </group>
                             </div>
                         </div>
+                        <div class="col-12 col-md-6">
+                            <div class="border rounded-3 p-3 h-100 shadow-sm">
+                                <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
+                                    <div class="border rounded-circle d-flex align-items-center justify-content-center me-3"
+                                         style="width: 50px; height: 50px;">
+                                        <i class="fa fa-male fs-3"
+                                           aria-hidden="true"
+                                           style="padding-bottom: 2px;" />
+                                    </div>
+                                    <h4 class="mb-0 fw-bold text-dark m-0">Costos de M.O.</h4>
+                                </div>
+                                <group class="mt-0">
+                                    <field name="subtotal_mo_lm"
+                                           string="Subtotal" />
+                                    <field name="costos_indirectos_mo_lm"
+                                           string="Costos Indirectos" />
+                                    <field name="utilidad_impuestos_mo_lm"
+                                           string="Utilidad (A.I.)" />
+                                    <field name="total_mo_lm"
+                                           string="Total"
+                                           class="oe_subtotal_footer_separator fw-bolder fs-5 text-dark" />
+                                </group>
+                            </div>
+                        </div>
+                    </div>
                     <notebook>
                         <page string="Cotizador de Materiales"
                               name="impsa_tab">
-                            <field name="lm_ids" readonly="state != 'draft'">
+                            <field name="lm_ids"
+                                   readonly="state != 'draft'">
                                 <list editable="bottom"
                                       create="1"
                                       edit="1"
@@ -211,5 +249,19 @@
                 </chatter>
             </form>
         </field>
+    </record>
+    
+    <record id="action_apu_survey_all"
+            model="ir.actions.act_window">
+        <field name="name">Análisis de Precios Unitarios</field>
+        <field name="res_model">impsa.apu.survey</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_apu_survey_actions_all"
+            model="ir.actions.act_window">
+        <field name="name">Acciones de los Cilindros</field>
+        <field name="res_model">impsa.apu.survey.actions</field>
+        <field name="view_mode">list</field>
     </record>
 </odoo>

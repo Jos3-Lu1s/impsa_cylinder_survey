@@ -17,6 +17,7 @@
             <field name="company_id" eval="False"/>
         </record>
 
+        
         <record id="seq_code_partner" model="ir.sequence">
             <field name="name">Código Contacto</field>
             <field name="code">res.partner.code</field>
@@ -24,5 +25,13 @@
             <field name="number_next">1</field>
             <field name="company_id" eval="False"/>
         </record>
+        
+        <record id="seq_impsa_apu_survey_actions" model="ir.sequence">
+           <field name="name">Secuencia Acciones</field>
+           <field name="code">impsa.apu.survey.actions</field>
+           <field name="prefix">ACT-</field>
+           <field name="padding">5</field>
+           <field name="company_id" eval="False"/>
+       </record>
     </data>
 </odoo>

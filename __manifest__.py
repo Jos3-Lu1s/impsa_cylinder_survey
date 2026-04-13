@@ -37,6 +37,7 @@
         "views/saler_view.xml",
         "views/hr_department_inherit_view.xml",
         "views/res_partner_inherit_view.xml",
+        "views/apu_survey_actions_views.xml",
     ],
 
     'demo': [
