@@ -40,7 +40,8 @@
                     </div>
                     <group>
                         <group>
-                            <field name="cylinder_number" />
+                            <field name="group_quantity" invisible="1"/>
+                            <field name="cylinder_number" widget="dynamic_quantity_select" />
                             <field name="component" />
                             <field name="name" readonly="1" force_save="1"/>
                         </group>
@@ -477,7 +478,7 @@
                                     <field name="dimensions" optional="show" />
                                     <field name="type_piece" widget="radio" options="{'horizontal': True}" optional="show" width="220" />
                                     <field name="unit_quantity" optional="show" />
-                                    <field name="unit_total" widget="float" optional="show" />
+                                    <field name="unit_total" optional="show" />
                                 </list>
                             </field>
                             <group string="Proveedores">
