@@ -44,6 +44,12 @@ class CylinderImage(models.Model):
 
     image = fields.Image(string="Imagen", max_width=1920, max_height=1920, required=True)
 
+    group_quantity = fields.Integer(
+        related='group_id.quantity', 
+        readonly=True,
+        string="Cantidad del Grupo"
+    )
+
     @api.constrains('cylinder_number', 'group_id')
     def _check_cylinder_number(self):
         """Valida que el usuario no asigne una foto al 'Cilindro 4' si el grupo solo tiene 3."""
