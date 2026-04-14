@@ -21,7 +21,7 @@ class ApuSurvey(models.Model):
         string="Cant. de cilindros",
     )
     apu_product_id = fields.Many2one(
-        'product.template', string='Cilindro a trabajar', ondelete='restrict'
+        'product.template', string='Cilindro a trabajar', ondelete='restrict', domain=[('categ_id.name', '=', 'FABRICACION Y REPARACION')]
     )
 
     date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True)
@@ -44,8 +44,8 @@ class ApuSurvey(models.Model):
     ], string='Estado', default='draft', tracking=True, copy=False, index=True)
 
     lm_ids = fields.One2many(
-        'impsa.apu.survey.line',   # modelo hijo
-        'apu_id',    # campo Many2one del hijo
+        'impsa.apu.survey.line',
+        'apu_id',
         string="Registros Relacionados"
     )
     tipo_costo_mo = fields.Selection([
