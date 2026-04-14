@@ -15,7 +15,7 @@
                             <div class="mt-2 p-2">
                                 <field name="name" class="fw-bolder"/>
                                 <div class="mt-1">
-                                    <!-- <span class="badge rounded-pill text-bg-secondary"><field name="group_id"/></span> -->
+                                    <span class="badge rounded-pill text-bg-info" invisible="not badge_ident_name"><field name="badge_ident_name"/></span>
                                     <span class="badge rounded-pill text-bg-secondary">Cilindro <field name="cylinder_number"/></span>
                                     <span class="badge rounded-pill text-bg-primary me-1"><field name="component"/></span>
                                 </div>
@@ -33,6 +33,11 @@
         <field name="arch" type="xml">
             <form string="Detalle de Imagen">
                 <sheet>
+                    <div invisible="not badge_ident_name">
+                        <h3>
+                            Identificador: <field name="badge_ident_name" readonly="1" options="{'no_open': True}"/>
+                        </h3>
+                    </div>
                     <group>
                         <group>
                             <field name="cylinder_number" />
@@ -431,7 +436,8 @@
                                                 <field name="image_ids" mode="kanban" context="{
                                                     'default_group_id': id,
                                                     'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
-                                                    'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
+                                                    'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared',
+                                                    'default_badge_ident_name':name
                                                 }"/>
                                             </page>
                                         </notebook>
