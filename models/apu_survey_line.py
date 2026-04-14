@@ -22,6 +22,13 @@ class SaleOrderLM(models.Model):
         string="Referencia",
         store=True
     )
+    
+    action_id = fields.Many2one(
+        'impsa.apu.survey.actions',   # modelo al que apunta
+        string='Acciones a cotizar',        # etiqueta en la vista
+        required=False          # opcional
+    )
+    
     #MÉTODOS PARA EL COMPORTAMIENTO DINÁMICO DEL COTIZADOR#
     @api.onchange('product_id')
     def _onchange_product_id(self):

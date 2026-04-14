@@ -139,7 +139,7 @@
                             <field name="quote_ids"
                                    invisible="True" />
                             <field name="tipo_costo_mo"
-                                   readonly="state != 'draft'" />
+                                   readonly="state != 'draft'" invisible="True"/>
                             <field name="costo_fijo_lm"
                                    invisible="tipo_costo_mo != 'costo_fijo_mo'"
                                    readonly="state != 'draft'" />
@@ -226,6 +226,7 @@
                                       create="1"
                                       edit="1"
                                       delete="1">
+                                    <field name="action_id" />
                                     <field name="product_id" />
                                     <field name="reference" />
                                     <field name="cantidad_lm" />
@@ -234,8 +235,7 @@
                                     <field name="importe_material_lm" />
                                     <field name="mo_hrs_lm"
                                            widget="float_time" />
-                                    <field name="empleado_mo_lm"
-                                           column_invisible="parent.tipo_costo_mo != 'costo_empleado_mo'" />
+                                    <field name="empleado_mo_lm" />
                                     <field name="importe_mo_lm" />
                                 </list>
                             </field>
