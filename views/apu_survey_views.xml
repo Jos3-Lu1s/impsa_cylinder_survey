@@ -139,7 +139,7 @@
                             <field name="quote_ids"
                                    invisible="True" />
                             <field name="tipo_costo_mo"
-                                   readonly="state != 'draft'" />
+                                   readonly="state != 'draft'" invisible="True"/>
                             <field name="costo_fijo_lm"
                                    invisible="tipo_costo_mo != 'costo_fijo_mo'"
                                    readonly="state != 'draft'" />
@@ -228,7 +228,6 @@
                                       delete="1">
                                     <field name="action_id" />
                                     <field name="product_id" />
-                                    <field name="reference" />
                                     <field name="cantidad_lm" />
                                     <field name="unidad_lm" />
                                     <field name="precio_unitario_lm" />

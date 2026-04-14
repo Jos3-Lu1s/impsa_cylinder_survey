@@ -18,10 +18,6 @@ class SaleOrderLM(models.Model):
     importe_material_lm = fields.Monetary(string="Imp. Material", compute='_compute_importe_material', store=True,currency_field="currency_id")
     importe_mo_lm = fields.Monetary(string="Imp. MO", compute='_compute_importe_mo', currency_field="currency_id")
     empleado_mo_lm = fields.Many2one('hr.department',string="Área")
-    reference = fields.Text(
-        string="Referencia",
-        store=True
-    )
     
     action_id = fields.Many2one(
         'impsa.apu.survey.actions',   # modelo al que apunta
