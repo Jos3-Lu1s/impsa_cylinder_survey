@@ -139,7 +139,7 @@
                             <field name="quote_ids"
                                    invisible="True" />
                             <field name="tipo_costo_mo"
-                                   readonly="state != 'draft'" invisible="True"/>
+                                   readonly="state != 'draft'" />
                             <field name="costo_fijo_lm"
                                    invisible="tipo_costo_mo != 'costo_fijo_mo'"
                                    readonly="state != 'draft'" />

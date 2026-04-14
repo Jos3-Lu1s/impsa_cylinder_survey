@@ -51,7 +51,7 @@ class ApuSurvey(models.Model):
     tipo_costo_mo = fields.Selection([
         ('costo_fijo_mo', 'Fijo'),
         ('costo_empleado_mo', 'Por Área')
-    ], string='Costo de MO')
+    ], string='Costo de MO', default='costo_empleado_mo')
 
     currency_id = fields.Many2one(
         "res.currency",

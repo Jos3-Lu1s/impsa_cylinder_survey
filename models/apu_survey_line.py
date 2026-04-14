@@ -46,11 +46,11 @@ class SaleOrderLM(models.Model):
     @api.depends('mo_hrs_lm','apu_id.costo_fijo_lm','apu_id.tipo_costo_mo','empleado_mo_lm.hourly_cost')
     def _compute_importe_mo(self):
         for line in self:
-            if line.apu_id.tipo_costo_mo == 'costo_fijo_mo':
+            """ if line.apu_id.tipo_costo_mo == 'costo_fijo_mo':
                 line.importe_mo_lm=line.mo_hrs_lm*line.apu_id.costo_fijo_lm
                 if line.unidad_lm.id == 4:
-                    line.cantidad_lm=line.mo_hrs_lm
-            elif line.apu_id.tipo_costo_mo == 'costo_empleado_mo':
+                    line.cantidad_lm=line.mo_hrs_lm """
+            if line.apu_id.tipo_costo_mo == 'costo_empleado_mo':
                 line.importe_mo_lm=line.mo_hrs_lm*line.empleado_mo_lm.hourly_cost
                 if line.unidad_lm.id == 4:
                     line.cantidad_lm=line.mo_hrs_lm
