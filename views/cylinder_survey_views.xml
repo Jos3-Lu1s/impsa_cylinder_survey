@@ -103,7 +103,7 @@
                                     <field name="activity_ids" widget="kanban_activity" class="me-2"/>
                                     <span class="text-muted small">
                                         <span class="text-muted small d-inline-flex align-items-center">
-                                            <i class="fa fa-calendar-o me-1"></i>
+                                            <i class="fa fa-calendar-o me-1" title="Fecha"></i>
                                             <field name="date" widget="date" options="{'numeric': true}"/>
                                         </span>
                                     </span>
