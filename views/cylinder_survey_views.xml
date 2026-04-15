@@ -40,7 +40,7 @@
                     </div>
                     <group>
                         <group>
-                            <field name="group_quantity" invisible="1"/>
+                            <field name="group_quantity" />
                             <field name="cylinder_number" widget="dynamic_quantity_select" />
                             <field name="component" />
                             <field name="name" readonly="1" force_save="1"/>
@@ -438,7 +438,8 @@
                                                     'default_group_id': id,
                                                     'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
                                                     'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared',
-                                                    'default_badge_ident_name':name
+                                                    'default_badge_ident_name':name,
+                                                    
                                                 }"/>
                                             </page>
                                         </notebook>
