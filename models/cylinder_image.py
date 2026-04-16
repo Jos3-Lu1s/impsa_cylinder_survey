@@ -22,6 +22,10 @@ class CylinderImage(models.Model):
         store=True,
         index=True,
     )
+
+    badge_ident_name=fields.Char(
+        string="Nombre identificador imagen"
+    )
     
     cylinder_number = fields.Integer(
         string="Número de Cilindro", 
@@ -43,6 +47,12 @@ class CylinderImage(models.Model):
     ], string="Componente", required=True)
 
     image = fields.Image(string="Imagen", max_width=1920, max_height=1920, required=True)
+
+    group_quantity = fields.Integer(
+        related='group_id.quantity', 
+        readonly=True,
+        string="Cantidad del Grupo"
+    )
 
     @api.constrains('cylinder_number', 'group_id')
     def _check_cylinder_number(self):
