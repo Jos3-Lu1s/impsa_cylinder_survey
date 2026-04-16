@@ -40,8 +40,7 @@
                     </div>
                     <group>
                         <group>
-                            <field name="group_quantity" />
-                            <field name="cylinder_number" widget="dynamic_quantity_select" />
+                            <field name="cylinder_number" />
                             <field name="component" />
                             <field name="name" readonly="1" force_save="1"/>
                         </group>
