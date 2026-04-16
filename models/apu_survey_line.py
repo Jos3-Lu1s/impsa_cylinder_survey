@@ -8,7 +8,7 @@ class SaleOrderLM(models.Model):
     #CAMPOS RELACIONALES#
     currency_id = fields.Many2one("res.currency",string="Moneda",default=lambda self: self.env.company.currency_id)
     apu_id = fields.Many2one('impsa.apu.survey',string='Cotización',ondelete='cascade')
-    product_id=fields.Many2one('product.template',string='Material')
+    product_id=fields.Many2one('product.template',string='Material', domain=[('categ_id.name', '!=', 'FABRICACION Y REPARACION')])
 
     #CAMPOS DEL COTIZADOR DE MATERIALES#
     mo_hrs_lm = fields.Float(string="Tiempo MO",digits=(16, 2))
