@@ -38,18 +38,12 @@
         "views/hr_department_inherit_view.xml",
         "views/res_partner_inherit_view.xml",
         "views/apu_survey_actions_views.xml",
+        "views/cylinder_views.xml",
     ],
 
     'demo': [
         'demo/demo.xml',
     ],
-
-    'assets': {
-        'web.assets_backend': [
-            'impsa_cylinder_survey/static/src/components/dynamic_quantity_select/dynamic_quantity_select.js',
-            'impsa_cylinder_survey/static/src/components/dynamic_quantity_select/dynamic_quantity_select.xml',
-        ],
-    },
 
     'installable': True,
     'application': False,

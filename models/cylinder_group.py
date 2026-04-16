@@ -18,12 +18,23 @@ class CylinderGroup(models.Model):
         required=True,
     )
     
+    cylinder_ids = fields.One2many(
+        "impsa.cylinder",
+        "group_id",
+        string="Cilindros Físicos"
+    )
+
     quantity = fields.Integer(
         string="Cantidad", 
-        required=True, 
-        default=1,
-        help="¿Cuántos cilindros de este levantamiento comparten estas mismas operaciones?"
+        compute="_compute_quantity",
+        store=True,
+        help="Calculado en base a los cilindros creados en este grupo."
     )
+
+    @api.depends('cylinder_ids')
+    def _compute_quantity(self):
+        for group in self:
+            group.quantity = len(group.cylinder_ids)
 
     operational_record_ids = fields.One2many(
         "impsa.operational.record.line", 
@@ -52,12 +63,6 @@ class CylinderGroup(models.Model):
         string="Estado APU",
         store=True
     )
-
-    @api.constrains('quantity')
-    def _check_group_quantity(self):
-        for group in self:
-            if group.quantity < 1:
-                raise ValidationError(_("Un grupo debe contener al menos 1 cilindro."))
                 
     def action_open_apu(self):
         """Abre el APU relacionado a este grupo desde la vista del levantamiento"""

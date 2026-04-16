@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_impsa_cylinder_group_form" model="ir.ui.view">
+        <field name="name">impsa.cylinder.group.form</field>
+        <field name="model">impsa.cylinder.group</field>
+        <field name="arch" type="xml">
+            <form string="Detalle del Grupo">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" placeholder="Ej. Cilindros frontales..."/></h1>
+                    </div>
+                    <group>
+                        <field name="survey_id" readonly="1"/>
+                        <field name="quantity" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Cilindros Físicos">
+                            <field name="cylinder_ids">
+                                <list string="Cilindros" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name" placeholder="Ej. Cilindro 1"/>
+                                    <field name="notes" optional="show"/>
+                                </list>
+                                </field>
+                        </page>
+                        <page string="Operaciones Específicas">
+                            <field name="operational_record_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="work_to_do"/>
+                                    <field name="obs" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_impsa_cylinder_form" model="ir.ui.view">
+        <field name="name">impsa.cylinder.form</field>
+        <field name="model">impsa.cylinder</field>
+        <field name="arch" type="xml">
+            <form string="Cilindro">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <field name="group_id" readonly="1"/>
+                        <field name="notes"/>
+                    </group>
+                    <notebook>
+                        <page string="Imágenes del Cilindro">
+                            <field name="image_ids" mode="kanban" context="{
+                                'default_cylinder_id': id,
+                                'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared',
+                                'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
+                            }"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+</odoo>

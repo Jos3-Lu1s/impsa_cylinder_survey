@@ -16,7 +16,7 @@
                                 <field name="name" class="fw-bolder"/>
                                 <div class="mt-1">
                                     <span class="badge rounded-pill text-bg-info" invisible="not badge_ident_name"><field name="badge_ident_name"/></span>
-                                    <span class="badge rounded-pill text-bg-secondary">Cilindro <field name="cylinder_number"/></span>
+                                    <!-- <span class="badge rounded-pill text-bg-secondary">Cilindro <field name="cylinder_number"/></span> -->
                                     <span class="badge rounded-pill text-bg-primary me-1"><field name="component"/></span>
                                 </div>
                             </div>
@@ -40,8 +40,7 @@
                     </div>
                     <group>
                         <group>
-                            <field name="group_quantity" />
-                            <field name="cylinder_number" widget="dynamic_quantity_select" />
+                            <field name="cylinder_id" options="{'no_create': True}" />
                             <field name="component" />
                             <field name="name" readonly="1" force_save="1"/>
                         </group>
@@ -415,36 +414,6 @@
                                             string="Ver APU">
                                     </button>
                                 </list>
-
-                                <form string="Detalle del Grupo">
-                                    <sheet>
-                                        <group col="4">
-                                            <field name="name" placeholder="Ej. 3 Cilindros Idénticos del frente..."/>
-                                            <field name="quantity"/>
-                                        </group>
-                                        <notebook>
-                                            <page string="Operaciones del Grupo">
-                                                <field name="operational_record_ids">
-                                                    <list editable="bottom">
-                                                        <field name="sequence" widget="handle"/>
-                                                        <field name="work_to_do"/>
-                                                        <field name="obs" optional="show"/>
-                                                    </list>
-                                                </field>
-                                            </page>
-                                            
-                                            <page string="Fotografías por Cilindro" name="group_images">
-                                                <field name="image_ids" mode="kanban" context="{
-                                                    'default_group_id': id,
-                                                    'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
-                                                    'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared',
-                                                    'default_badge_ident_name':name,
-                                                    
-                                                }"/>
-                                            </page>
-                                        </notebook>
-                                    </sheet>
-                                </form>
                             </field>
                         </page>
 

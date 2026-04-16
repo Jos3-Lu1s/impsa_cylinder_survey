@@ -12,3 +12,4 @@ access_apu_survey_line,access_apu_survey_line,model_impsa_apu_survey_line,base.g
 access_impsa_cylinder_accessory,access_impsa_cylinder_accessory,model_impsa_cylinder_accessory,base.group_user,1,1,1,1
 access_impsa_accessory_type,access_impsa_accessory_type,model_impsa_accessory_type,base.group_user,1,1,1,1
 access_impsa_apu_survey_actions,impsa.apu.survey.actions,model_impsa_apu_survey_actions,base.group_user,1,1,1,1
+access_impsa_cylinder,impsa.cylinder,model_impsa_cylinder,base.group_user,1,1,1,1
