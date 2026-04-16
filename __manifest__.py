@@ -38,6 +38,7 @@
         "views/hr_department_inherit_view.xml",
         "views/res_partner_inherit_view.xml",
         "views/apu_survey_actions_views.xml",
+        "views/pricelist_access.xml",
     ],
 
     'demo': [
