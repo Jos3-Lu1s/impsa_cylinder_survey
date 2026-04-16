@@ -1,0 +1,16 @@
+<odoo>
+    <data>
+        <record id="view_pricelist_form_inherit_contact" model="ir.ui.view">
+            <field name="name">product.pricelist.form.contact</field>
+            <field name="model">product.pricelist</field>
+            <field name="inherit_id" ref="product.product_pricelist_view"/>
+            <field name="arch" type="xml">
+            
+                <xpath expr="//sheet/group" position="inside">
+                    <field name="contacto_id"/>
+                </xpath>
+            
+            </field>
+        </record>
+    </data>
+</odoo>

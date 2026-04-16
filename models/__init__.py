@@ -15,3 +15,4 @@ from . import apu_survey
 from . import apu_survey_line
 from . import cylinder_accessory
 from . import apu_survey_actions
+from . import pricelist_conect
