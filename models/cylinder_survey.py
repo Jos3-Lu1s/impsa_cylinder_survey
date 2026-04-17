@@ -208,6 +208,10 @@ class CylinderSurvey(models.Model):
         ondelete='set null'
     )
     
+    has_confirmed_order = fields.Boolean(
+        compute="_compute_has_confirmed_order"
+    )
+    
     apu_ids = fields.One2many(
         'impsa.apu.survey',
         'survey_id',
@@ -285,6 +289,14 @@ class CylinderSurvey(models.Model):
     def _compute_allocated_qty(self):
         for survey in self:
             survey.allocated_qty = sum(survey.group_ids.mapped('quantity'))
+            
+    def _compute_has_confirmed_order(self):
+        for record in self:
+            existing = self.search([
+                ('state', '=', 'confirmed'),
+                ('id', '!=', record.id)
+            ], limit=1)
+            record.has_confirmed_order = bool(existing)
 
     @api.model
     def _expand_states(self, states, domain, order=None):
@@ -593,6 +605,14 @@ class CylinderSurvey(models.Model):
     def action_confirm(self):
         """Valida e inicializa productos para pasar a Orden de Trabajo."""
         for record in self:
+            existing_order = self.search([
+                ('state', '=', 'confirmed'),
+                ('id', '!=', record.id)
+            ], limit=1)
+            if existing_order:
+                raise ValidationError(
+                    "Ya existe una Orden de Trabajo confirmada. No puedes crear otra."
+                )
             # 1. Validaciones
             if not record.group_ids:
                 raise ValidationError("Define al menos un Grupo de Cilindros.")
@@ -779,6 +799,9 @@ class CylinderSurvey(models.Model):
     def action_create_purchase_order(self):
         """Crea Órdenes de Compra agrupadas por proveedor del empaque."""
         self.ensure_one()
+        
+        if self.purchase_order_create:
+            raise UserError(_("Ya se generó una Orden de Compra para este registro."))
 
         if not self.cylinder_survey_line_ids:
              raise UserError(_("No hay empaques para generar órdenes de compra."))

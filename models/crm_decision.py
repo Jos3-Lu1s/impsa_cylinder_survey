@@ -12,7 +12,7 @@ class CrmDecision(models.Model):
     selection_type = fields.Selection([
         ('manufacturing', 'Fabricación'),
         ('repair', 'Reparación')
-    ],string='Tipo de Cilindro', required=True)
+    ],string='Tipo de Cilindro')
     
     is_won_stage = fields.Boolean(
         related='stage_id.is_won',
