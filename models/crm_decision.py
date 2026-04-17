@@ -70,11 +70,24 @@ class CrmDecision(models.Model):
             rec.apu_survey_count = len(rec.apu_survey_ids)
             
     def action_view_cylinder_surveys(self):
+        surveys = self.env['impsa.cylinder.survey'].search([
+            ('lead_id', '=', self.id)
+        ])
+
+        if len(surveys) == 1:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Levantamiento',
+                'res_model': 'impsa.cylinder.survey',
+                'view_mode': 'form',
+                'res_id': surveys.id,
+            }
+
         return {
             'type': 'ir.actions.act_window',
             'name': 'Levantamientos',
             'res_model': 'impsa.cylinder.survey',
-            'view_mode': 'form',
+            'view_mode': 'tree,form',
             'domain': [('lead_id', '=', self.id)],
             'context': {
                 'default_lead_id': self.id
@@ -95,11 +108,28 @@ class CrmDecision(models.Model):
         }
         
     def action_view_apus(self):
+        self.ensure_one()
+
+        apus = self.env['impsa.apu.survey'].search([
+            ('lead_id', '=', self.id)
+        ])
+    
+        # 👉 Si hay uno, abrir directo
+        if len(apus) == 1:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'APU',
+                'res_model': 'impsa.apu.survey',
+                'view_mode': 'form',
+                'res_id': apus.id,
+            }
+    
+        # 👉 Si hay varios (o quieres permitir ver lista)
         return {
             'type': 'ir.actions.act_window',
             'name': 'Análisis de Precios',
             'res_model': 'impsa.apu.survey',
-            'view_mode': 'form',
+            'view_mode': 'tree,form',
             'domain': [('lead_id', '=', self.id)],
             'context': {
                 'default_lead_id': self.id
