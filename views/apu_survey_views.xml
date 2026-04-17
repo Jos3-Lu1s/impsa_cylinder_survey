@@ -135,7 +135,7 @@
                             <field name="partner_id"
                                    readonly="state != 'draft'" />
                             <field name="cylinder_qty_by_group"
-                                   readonly="survey_id == True or state != 'draft'" />
+                                   readonly="survey_id or state != 'draft'" />
                             <field name="quote_ids"
                                    invisible="True" />
                             <field name="tipo_costo_mo"
