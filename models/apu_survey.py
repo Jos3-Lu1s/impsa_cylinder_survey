@@ -177,20 +177,20 @@ class ApuSurvey(models.Model):
 
     def action_to_confirmed(self):
         for record in self:
+            order_lines = []
+            if record.cylinder_qty_by_group <= 0:
+                raise ValidationError(_("Debes colocar un número mayor a 0 en el campo 'Cant. de cilindros'"))
+            elif record.gran_total_lm <= 0:
+                raise ValidationError(_("El APU: '%s' no puede cotizardo con total 0, verfica tu lista de materiales")% record.name)
+
+            #qty = record.group_id.quantity or 1.0 
+            qty = record.cylinder_qty_by_group or 1.0 
+            unit_price = record.gran_subtotal_lm / qty if qty > 0 else record.gran_subtotal_lm
             if not record.quote_ids:
-                order_lines = []
                 product_variant = record.apu_product_id.product_variant_id
-                
                 if not product_variant:
                     raise ValidationError(_("El producto de la APU: '%s' no tiene variantes activas válidas.") % record.name)
-                elif record.cylinder_qty_by_group <= 0:
-                    raise ValidationError(_("Debes colocar un número mayor a 0 en el campo 'Cant. de cilindros'"))
-                elif record.gran_total_lm <= 0:
-                    raise ValidationError(_("El APU: '%s' no puede cotizardo con total 0, verfica tu lista de materiales")% record.name)
-
-                qty = record.group_id.quantity or 1.0 
-                unit_price = record.gran_subtotal_lm / qty if qty > 0 else record.gran_subtotal_lm
-
+                
                 order_lines.append(Command.create({
                     'product_id': product_variant.id,
                     'name': f"Reparación / Fabricación: {product_variant.name} (Ref: {record.name})",
@@ -205,8 +205,26 @@ class ApuSurvey(models.Model):
                     'origin': record.name,  
                     'order_line': order_lines,
                 }
-                
                 self.env['sale.order'].sudo().create(so_vals)
+            else:
+                for quote in record.quote_ids:
+                    for line in quote.order_line:
+                        order_lines.append(Command.update(line.id, {
+                            'product_uom_qty': qty,
+                            'price_unit': unit_price,
+                        }))
+
+                    quote.sudo().write({'order_line': order_lines})
+                """ order_lines.append(Command.update(record.quote_ids.id,{
+                    'product_uom_qty': qty,
+                    'price_unit': unit_price,
+                }))
+
+                so_vals = {
+                    'order_line': order_lines,
+                }
+                record.quote_ids.sudo().write(so_vals)   """  
+                
                 
             record.write({'state': 'confirmed'})
          
