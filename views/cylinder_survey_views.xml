@@ -183,7 +183,7 @@
         <field name="arch" type="xml">
             <form string="Levantamiento de Cilindro">
                 <header>
-                    <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed'"/>
+                    <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed' or purchase_order_create == True"/>
 
                     <button name="action_to_apu" string="Enviar a APU" type="object" class="oe_highlight" invisible="state != 'draft'" />
 

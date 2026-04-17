@@ -67,6 +67,20 @@
             </field>
         </record>
 
+        <record id="crm_lead_partner_required_inherit" model="ir.ui.view">
+            <field name="name">crm.lead.partner.required.inherit</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
+            <field name="arch" type="xml">
+            
+                <xpath expr="//field[@name='partner_id']" position="attributes">
+                    <attribute name="invisible">not is_partner_visible</attribute>
+                    <attribute name="required">is_partner_visible</attribute>
+                </xpath>
+            
+            </field>
+        </record>
+
         <record id="quick_create_opportunity_form_inherit_selection" model="ir.ui.view">
             <field name="name">crm.lead.quick.create.inherit.selection</field>
             <field name="model">crm.lead</field>
