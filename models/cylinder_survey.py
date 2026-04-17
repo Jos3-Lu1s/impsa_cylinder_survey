@@ -430,9 +430,43 @@ class CylinderSurvey(models.Model):
                     f"pero el total declarado es de solo {survey.cylinder_qty}."
                 )
 
+    @api.constrains('cylinder_to', 'barrel_inner_diameter', 'barrel_outer_diameter', 'diameter_rod', 'diameter_rod2', 'piston_diameter')
+    def _check_standard_physics(self):
+        """Valida que las medidas de un cilindro estándar tengan sentido físico."""
+        for rec in self:
+            if rec.cylinder_to_code in ['CE-DE', 'CE-SE', 'CE-DV']:
+                
+                # 1. Grosor de pared de la Camisa
+                if rec.barrel_inner_diameter and rec.barrel_outer_diameter:
+                    if rec.barrel_inner_diameter >= rec.barrel_outer_diameter:
+                        raise ValidationError(_("Error Físico: El Ø Interior de la Camisa (%(int)s) no puede ser mayor o igual a su Ø Exterior (%(ext)s).") % {
+                            'int': rec.barrel_inner_diameter, 'ext': rec.barrel_outer_diameter
+                        })
+                
+                # 2. Vástago vs Camisa
+                if rec.diameter_rod and rec.barrel_inner_diameter:
+                    if rec.diameter_rod >= rec.barrel_inner_diameter:
+                        raise ValidationError(_("Error de Ensamble: El Vástago (Ø %(rod)s) no cabe dentro de la Camisa (Ø Int %(barrel)s).") % {
+                            'rod': rec.diameter_rod, 'barrel': rec.barrel_inner_diameter
+                        })
+                
+                # Vástago 2 vs Camisa (Solo para Doble Vástago)
+                if rec.cylinder_to_code == 'CE-DV' and rec.diameter_rod2 and rec.barrel_inner_diameter:
+                    if rec.diameter_rod2 >= rec.barrel_inner_diameter:
+                        raise ValidationError(_("Error de Ensamble: El Vástago 2 (Ø %(rod)s) no cabe dentro de la Camisa (Ø Int %(barrel)s).") % {
+                            'rod': rec.diameter_rod2, 'barrel': rec.barrel_inner_diameter
+                        })
+
+                # 3. Émbolo vs Camisa
+                if rec.piston_diameter and rec.barrel_inner_diameter:
+                    if rec.piston_diameter > rec.barrel_inner_diameter:
+                        raise ValidationError(_("Error de Ensamble: El Émbolo (Ø %(piston)s) es más grande que el hueco de la Camisa (Ø Int %(barrel)s).") % {
+                            'piston': rec.piston_diameter, 'barrel': rec.barrel_inner_diameter
+                        })
+
     @api.constrains(
         'cylinder_to', 'barrel_inner_diameter', 'barrel_outer_diameter', 'barrel_length',
-        'diameter_rod', 'rod_length', 'piston_diameter', 'piston_length', 
+        'diameter_rod', 'rod_length', 'diameter_rod2', 'rod_length2', 'piston_diameter', 'piston_length', 
         'head_diameter', 'head_length', 'stroke_length', 'section_ids',
         'accessory_line_ids'
     )
@@ -464,6 +498,11 @@ class CylinderSurvey(models.Model):
                     missing_components.append('Camisa')
                 if rec.diameter_rod <= 0.0 or rec.rod_length <= 0.0:
                     missing_components.append('Vástago')
+                    
+                if code == 'CE-DV':
+                    if rec.diameter_rod2 <= 0.0 or rec.rod_length2 <= 0.0:
+                        missing_components.append('Vástago 2')
+                        
                 if rec.piston_diameter <= 0.0 or rec.piston_length <= 0.0:
                     missing_components.append('Émbolo')
                 if rec.head_diameter <= 0.0 or rec.head_length <= 0.0:
@@ -502,8 +541,11 @@ class CylinderSurvey(models.Model):
             if missing_components:
                 componentes = "\n- ".join(missing_components)
                 raise ValidationError(
-                    f"Faltan medidas mayores a 0 para el cilindro '{rec.cylinder_to.name}'.\n"
-                    f"Por favor revisa lo siguiente:\n- {componentes}"
+                    _("Faltan medidas mayores a 0 para el cilindro '%(name)s'.\n"
+                      "Por favor revisa lo siguiente:\n- %(components)s") % {
+                          'name': rec.cylinder_to.name,
+                          'components': componentes
+                      }
                 )
     
     @api.constrains('section_ids')
@@ -516,6 +558,13 @@ class CylinderSurvey(models.Model):
             if survey.cylinder_to_code == 'CE-T' and len(survey.section_ids) > 1:
                 # Asegurarnos de que iteramos en el orden correcto (de fuera hacia adentro)
                 sections = survey.section_ids.sorted(lambda s: s.sequence)
+
+                for section in sections:
+                    if section.inner_diameter and section.outer_diameter:
+                        if section.inner_diameter >= section.outer_diameter:
+                            raise ValidationError(_("Error Físico en '%(name)s': El Ø Interior (%(int)s) no puede ser mayor o igual a su Ø Exterior (%(ext)s).") % {
+                                'name': section.name, 'int': section.inner_diameter, 'ext': section.outer_diameter
+                            })
                 
                 for i in range(1, len(sections)):
                     prev_sec = sections[i-1] # Etapa exterior (ej. Camisa Principal)
