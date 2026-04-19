@@ -492,6 +492,8 @@ class CylinderSurvey(models.Model):
                     raise ValidationError(
                         _("Para cilindros Telescópicos, debe agregar al menos una sección.")
                     )
+                if rec.stroke_length <= 0.0:
+                    missing_components.append('Carrera Total')
 
             elif code in ['CE-DE', 'CE-SE', 'CE-DV']:
                 if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0 or rec.barrel_length <= 0.0:
@@ -509,33 +511,6 @@ class CylinderSurvey(models.Model):
                     missing_components.append('Cabeza')
                 if rec.stroke_length <= 0.0:
                     missing_components.append('Carrera')
-                    
-            elif code == 'CE-T':
-                # 1. Validar la carrera global (compartida por todas las secciones)
-                if rec.stroke_length <= 0.0:
-                    missing_components.append('Carrera Total')
-                    
-                # 2. Validar cada sección generada en la tabla dinámicamente
-                for section in rec.section_ids:
-                    sec_name = section.name  # Ej: "Camisa Principal" o "Segunda Extensión"
-                    
-                    if section.section_type == 'main':
-                        if section.inner_diameter <= 0.0 or section.outer_diameter <= 0.0 or section.length <= 0.0:
-                            missing_components.append(f'Medidas de Camisa en "{sec_name}"')
-                            
-                    elif section.section_type == 'intermediate':
-                        if section.inner_diameter <= 0.0 or section.outer_diameter <= 0.0 or section.length <= 0.0:
-                            missing_components.append(f'Medidas de Tubo en "{sec_name}"')
-                        if section.piston_diameter <= 0.0 or section.piston_length <= 0.0:
-                            missing_components.append(f'Medidas de Émbolo en "{sec_name}"')
-                        if section.head_diameter <= 0.0 or section.head_length <= 0.0:
-                            missing_components.append(f'Medidas de Cabeza en "{sec_name}"')
-                            
-                    elif section.section_type == 'last':
-                        if section.outer_diameter <= 0.0 or section.length <= 0.0:
-                            missing_components.append(f'Medidas de Vástago (Ø Ext) en "{sec_name}"')
-                        if section.piston_diameter <= 0.0 or section.piston_length <= 0.0:
-                            missing_components.append(f'Medidas de Émbolo en "{sec_name}"')
 
             # Si se recolectaron errores, lanzar la excepción
             if missing_components:
@@ -570,7 +545,6 @@ class CylinderSurvey(models.Model):
                     prev_sec = sections[i-1] # Etapa exterior (ej. Camisa Principal)
                     curr_sec = sections[i]   # Etapa interior (ej. Primera Extensión)
                     
-                    # 1. Validación básica que mencionaste (OD actual < OD anterior)
                     if curr_sec.outer_diameter >= prev_sec.outer_diameter:
                         raise ValidationError(
                             f"Incoherencia física: El Ø Exterior de la '{curr_sec.name}' ({curr_sec.outer_diameter}) "
