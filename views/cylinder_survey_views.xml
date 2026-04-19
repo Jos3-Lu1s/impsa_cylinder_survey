@@ -320,36 +320,48 @@
                                 <field name="name" readonly="1" force_save="1" decoration-bf="1" width="200px"/>
                                 
                                 <field name="inner_diameter" 
-                                       force_save="1"
-                                       readonly="section_type == 'last'" 
-                                       decoration-warning="section_type == 'last'"
-                                       string="Ø Interior"/>
-                                       
-                                <field name="outer_diameter" force_save="1" string="Ø Vástago (Ext)" decoration-bf="1"/>
+                                    force_save="1"
+                                    readonly="section_type == 'last'" 
+                                    decoration-danger="inner_diameter &lt;= 0 and section_type in ('main', 'intermediate')"
+                                    decoration-muted="section_type == 'last'"
+                                    string="Ø Interior"/>
+                                    
+                                <field name="outer_diameter" 
+                                    force_save="1" 
+                                    string="Ø Vástago (Ext)" 
+                                    decoration-danger="outer_diameter &lt;= 0"
+                                    decoration-bf="1"/>
                                 
-                                <field name="length" string="Longitud" force_save="1"/>
+                                <field name="length" 
+                                    string="Longitud" 
+                                    force_save="1"
+                                    decoration-danger="length &lt;= 0"/>
                                 
                                 <field name="piston_diameter" 
-                                       force_save="1"
-                                       readonly="section_type == 'main'" 
-                                       decoration-warning="section_type == 'main'"/>
-                                       
+                                    force_save="1"
+                                    readonly="section_type == 'main'" 
+                                    decoration-danger="piston_diameter &lt;= 0 and section_type in ('intermediate', 'last')"
+                                    decoration-muted="section_type == 'main'"/>
+                                    
                                 <field name="piston_length" 
-                                       string="Long. Émbolo"
-                                       readonly="section_type == 'main'" 
-                                       force_save="1"
-                                       decoration-warning="section_type == 'main'"/>
+                                    string="Long. Émbolo"
+                                    readonly="section_type == 'main'" 
+                                    force_save="1"
+                                    decoration-danger="piston_length &lt;= 0 and section_type in ('intermediate', 'last')"
+                                    decoration-muted="section_type == 'main'"/>
                                 
                                 <field name="head_diameter" 
-                                       readonly="section_type in ('last', 'main')" 
-                                       force_save="1"
-                                       decoration-warning="section_type in ('last', 'main')"/>
-                                       
+                                    readonly="section_type in ('last', 'main')" 
+                                    force_save="1"
+                                    decoration-danger="head_diameter &lt;= 0 and section_type == 'intermediate'"
+                                    decoration-muted="section_type in ('last', 'main')"/>
+                                    
                                 <field name="head_length" 
-                                       string="Long. Cabeza"
-                                       force_save="1"
-                                       readonly="section_type in ('last', 'main')" 
-                                       decoration-warning="section_type in ('last', 'main')"/>
+                                    string="Long. Cabeza"
+                                    force_save="1"
+                                    readonly="section_type in ('last', 'main')" 
+                                    decoration-danger="head_length &lt;= 0 and section_type == 'intermediate'"
+                                    decoration-muted="section_type in ('last', 'main')"/>
                             </list>
                         </field>
 
