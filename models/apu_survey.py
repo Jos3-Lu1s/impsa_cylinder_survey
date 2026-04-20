@@ -300,9 +300,3 @@ class ApuSurvey(models.Model):
             'view_mode': 'form',
             'res_id': self.lead_id.id,
         }
-
-    """ @api.onchange('cylinder_qty_by_group')
-    def _onchange_cantidad_lm(self):
-        for record in self:
-            for line in record.lm_ids:
-                line.cantidad_lm=line.cantidad_lm*record.cylinder_qty_by_group """

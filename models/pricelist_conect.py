@@ -5,5 +5,5 @@ class ProductPricelist(models.Model):
 
     contacto_id = fields.Many2one(
         'res.partner',
-        string='Contacto',
+        string='Cliente',
     )
