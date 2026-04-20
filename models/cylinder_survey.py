@@ -780,22 +780,22 @@ class CylinderSurvey(models.Model):
                 qty = apu.group_id.quantity or 1.0
                 unit_price = apu.gran_subtotal_lm / qty if qty > 0 else apu.gran_subtotal_lm
 
-                order_lines.append(Command.create({
-                    'product_id': product_variant.id,
-                    'name': f"Reparación / Fabricación: {product_variant.name} (Ref: {apu.name})",
-                    'product_uom_qty': qty,
-                    'price_unit': unit_price,
-                }))
+            #     order_lines.append(Command.create({
+            #         'product_id': product_variant.id,
+            #         'name': f"Reparación / Fabricación: {product_variant.name} (Ref: {apu.name})",
+            #         'product_uom_qty': qty,
+            #         'price_unit': unit_price,
+            #     }))
 
-            # Crear el Sale Order (Cotización)
-            so_vals = {
-                'partner_id': record.partner_id.id,
-                'survey_id': record.id, # Enlace trazable
-                'origin': record.name,  # Documento origen estándar
-                'order_line': order_lines,
-            }
+            # # Crear el Sale Order (Cotización)
+            # so_vals = {
+            #     'partner_id': record.partner_id.id,
+            #     'survey_id': record.id, # Enlace trazable
+            #     'origin': record.name,  # Documento origen estándar
+            #     'order_line': order_lines,
+            # }
             
-            self.env['sale.order'].sudo().create(so_vals)
+            # self.env['sale.order'].sudo().create(so_vals)
 
             for group in record.group_ids:
                 if not group.operational_record_ids:

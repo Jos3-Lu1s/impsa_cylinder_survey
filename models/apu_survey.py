@@ -202,7 +202,7 @@ class ApuSurvey(models.Model):
             #qty = record.group_id.quantity or 1.0 
             qty = record.cylinder_qty_by_group or 1.0 
             unit_price = record.gran_subtotal_lm / qty if qty > 0 else record.gran_subtotal_lm
-            if not record.quote_ids and not record.survey_id:
+            if not record.quote_ids:
                 product_variant = record.apu_product_id.product_variant_id
                 if not product_variant:
                     raise ValidationError(_("El producto de la APU: '%s' no tiene variantes activas válidas.") % record.name)
