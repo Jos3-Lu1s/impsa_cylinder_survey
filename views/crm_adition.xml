@@ -46,13 +46,23 @@
                         string="Levantamiento"
                         type="object"
                         class="oe_highlight"
-                        invisible="stage_sequence &lt; 2 or selection_type == 'manufacturing' or cylinder_survey_count >= 1 or not selection_type" />
+                        invisible="is_survey == False or selection_type != 'repair' or cylinder_survey_count >= 1 or not selection_type" />
                         
                     <button name="action_open_apu"
                         string="APU"
                         type="object"
                         class="oe_highlight"
-                        invisible="stage_sequence &lt; 2 or selection_type == 'repair' or apu_survey_count >= 1 or not selection_type" />
+                        invisible="is_apu == False or selection_type != 'manufacturing' or apu_survey_count >= 1 or not selection_type" />
+                </xpath>
+
+                <!-- Ocultar botón GANADO -->
+                <xpath expr="//button[@name='action_set_won_rainbowman']" position="attributes">
+                    <attribute name="invisible">is_won_stage == True</attribute>
+                </xpath>
+                
+                <!-- Ocultar botón PERDIDO -->
+                <xpath expr="//button[@name='%(crm.crm_lead_lost_action)d']" position="attributes">
+                    <attribute name="invisible">is_lose == True</attribute>
                 </xpath>
 
             </field>

@@ -88,6 +88,22 @@ class CrmDecision(models.Model):
         store=True
     )
     
+    is_survey = fields.Boolean(
+        related='stage_id.is_survey',
+        string="Requiere Levantamiento",
+        store=False
+    )
+    is_apu = fields.Boolean(
+        related='stage_id.is_apu',
+        string="Requiere APU",
+        store=False
+    )
+    is_lose = fields.Boolean(
+        related='stage_id.is_lose',
+        string="Etapa de Pérdida",
+        store=False
+    )
+    
     @api.depends('cylinder_survey_ids')
     def _compute_cylinder_survey_count(self):
         for rec in self:
@@ -216,3 +232,18 @@ class CrmDecision(models.Model):
                 'default_lead_id': self.id
             }
         }
+        
+class CrmStage(models.Model):
+    _inherit = 'crm.stage'
+
+    is_survey = fields.Boolean(
+        string="Requiere Levantamiento",
+    )
+    
+    is_apu = fields.Boolean(
+        string="Requiere APU",
+    )
+    
+    is_lose = fields.Boolean(
+        string="Etapa de Pérdida",
+    )
