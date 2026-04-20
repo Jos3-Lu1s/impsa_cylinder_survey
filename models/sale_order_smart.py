@@ -38,36 +38,6 @@ class SaleOrderSmart(models.Model):
 
     """ product_domain = fields.Json(compute='_compute_product_domain', store=False) """
 
-    @api.depends('partner_id')
-    def _compute_product_domain(self):
-        for record in self:
-            if record.partner_id:
-                # Buscar lista de precios que tenga asignado este contacto
-                pricelist = self.env['product.pricelist'].search([
-                    ('contacto_id', '=', record.partner_id.id)  # ← nombre de tu campo Many2one
-                ], limit=1)
-                if pricelist:
-                    items = self.env['product.pricelist.item'].search([
-                        ('pricelist_id', '=', pricelist.id),
-                        ('applied_on', 'in', ['0_product_variant', '1_product'])
-                    ])
-
-                    product_ids = []
-                    for item in items:
-                        if item.applied_on == '0_product_variant':
-                            product_ids.append(item.product_id.id)
-                        elif item.applied_on == '1_product':
-                            product_ids += item.product_tmpl_id.product_variant_ids.ids
-
-                    if product_ids:
-                        record.product_domain = json.dumps([('id', 'in', list(set(product_ids)))])
-                    else:
-                        record.product_domain = json.dumps([])
-                else:
-                    record.product_domain = json.dumps([])
-            else:
-                record.product_domain = json.dumps([])
-
     @api.depends('survey_id')
     def _compute_cylinder_survey_count(self):
         for record in self:
@@ -124,18 +94,3 @@ class SaleOrderSmart(models.Model):
                 self.pricelist_id=pricelist.id
                 #raise ValidationError(f"La lista de precios es {pricelist}")
 
-    """ @api.depends('partner_id', 'pricelist_id')
-    def _compute_product_domain(self):
-        for record in self:
-            if record.pricelist_id:
-                items = self.env['product.pricelist.item'].search([
-                    ('pricelist_id', '=', record.pricelist_id.id),
-                ])
-
-                template_ids = items.mapped('product_tmpl_id').ids
-
-                _logger.info(">>> Templates encontrados: %s", template_ids)
-                record.product_domain = [('id', 'in', template_ids)] if template_ids else []
-            else:
-                record.product_domain = [] """
-  

@@ -159,6 +159,13 @@ class ApuSurvey(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
+         # Rescatar valores que serán pisados por el related
+        qty_by_group_values = {
+            i: vals.pop('cylinder_qty_by_group', None)
+            for i, vals in enumerate(vals_list)
+        }
+
+        # Generar secuencia
         for vals in vals_list:
             if vals.get("name", "Nuevo") == "Nuevo":
                 vals["name"] = (
@@ -166,14 +173,23 @@ class ApuSurvey(models.Model):
                     or "Nuevo"
                 )
 
-        return super(ApuSurvey, self).create(vals_list)
+        records = super(ApuSurvey, self).create(vals_list)
 
-    def _get_domain_product(self):
-        for record in self:
-            if not record.survey_id:
-                return [('categ_id', '==', 'RCH' )]
-            else:
-                return [('categ_id', '==', 'FCH' )]
+        # Reescribir el valor después de que el related lo haya recomputado
+        for i, record in enumerate(records):
+            qty = qty_by_group_values.get(i)
+            if qty is not None:
+                record.write({'cylinder_qty_by_group': qty})
+
+        return records
+        """ for vals in vals_list:
+            if vals.get("name", "Nuevo") == "Nuevo":
+                vals["name"] = (
+                    self.env["ir.sequence"].next_by_code("impsa.apu.survey")
+                    or "Nuevo"
+                )
+
+        return super(ApuSurvey, self).create(vals_list) """
 
     def action_to_confirmed(self):
         for record in self:
