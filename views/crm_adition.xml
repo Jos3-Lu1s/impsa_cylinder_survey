@@ -2,12 +2,8 @@
 <odoo>
     <data>
 
-        <record id="crm.stage_lead2" model="crm.stage">
-            <field name="name">Levantamiento</field> 
-        </record>
-
-        <record id="view_crm_adition" model="ir.ui.view">
-            <field name="name">crm.lead.form.inherit.cylinder_survey</field>
+        <record id="crm_lead_view_form_inherit_impsa_cylinder" model="ir.ui.view">
+            <field name="name">crm.lead.view.form.inherit.impsa</field>
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor" />
             <field name="arch" type="xml">
@@ -18,9 +14,7 @@
                         class="oe_stat_button"
                         icon="fa-cogs"
                         invisible="cylinder_survey_count == 0">
-
-                        <field name="cylinder_survey_count" widget="statinfo"
-                            string="Levantamientos" />
+                        <field name="cylinder_survey_count" widget="statinfo" string="Levantamientos" />
                     </button>
 
                     <button name="action_view_apus"
@@ -28,40 +22,37 @@
                         class="oe_stat_button"
                         icon="fa-calculator"
                         invisible="apu_survey_count == 0">
-
                         <field name="apu_survey_count" widget="statinfo" string="APU" />
                     </button>
                 </xpath>
 
                 <xpath expr="//button[@name='action_view_sale_quotation']" position="attributes">
-                    <attribute name="invisible">1</attribute>
+                    <attribute name="invisible">selection_type in ('manufacturing', 'repair')</attribute>
+                </xpath>
+                <xpath expr="//header//button[@name='action_sale_quotations_new']" position="attributes">
+                    <attribute name="invisible">selection_type in ('manufacturing', 'repair')</attribute>
                 </xpath>
 
                 <xpath expr="//field[@name='tag_ids']" position="after">
                     <field name="is_won_stage" invisible="1" />
-                    <!-- <field name="selection_crm"  readonly="stage_sequence > 2" /> -->
-                    <field name="selection_type"  readonly="stage_sequence > 2 or cylinder_survey_count >= 1 or apu_survey_count >= 1" widget="radio" options="{'horizontal': True}"/>
+                    <field name="selection_type"  
+                           readonly="stage_sequence > 2 or cylinder_survey_count >= 1 or apu_survey_count >= 1" 
+                           widget="radio" 
+                           options="{'horizontal': True}"/>
                 </xpath>
 
-                <xpath expr="//header//button[@name='action_sale_quotations_new']"
-                    position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-
-                <xpath expr="//header" position="inside">
+                <xpath expr="//button[@name='action_set_won_rainbowman']" position="before">
                     <button name="action_open_cylinder_survey"
                         string="Levantamiento"
                         type="object"
                         class="oe_highlight"
-                        invisible="stage_sequence &lt; 2 or selection_type == 'manufacturing' or cylinder_survey_count >= 1 or selection_type == False" />
-                </xpath>
-
-                <xpath expr="//header" position="inside">
+                        invisible="stage_sequence &lt; 2 or selection_type == 'manufacturing' or cylinder_survey_count >= 1 or not selection_type" />
+                        
                     <button name="action_open_apu"
                         string="APU"
                         type="object"
                         class="oe_highlight"
-                        invisible="stage_sequence &lt; 2 or selection_type == 'repair' or apu_survey_count >= 1 or selection_type == False" />
+                        invisible="stage_sequence &lt; 2 or selection_type == 'repair' or apu_survey_count >= 1 or not selection_type" />
                 </xpath>
 
             </field>
@@ -128,6 +119,28 @@
                             context="{'group_by':'selection_type'}"/>
                 </xpath>
                 
+            </field>
+        </record>
+
+        <record id="crm_quotation_partner_view_form_inherit_impsa" model="ir.ui.view">
+            <field name="name">crm.quotation.partner.view.form.inherit.impsa</field>
+            <field name="model">crm.quotation.partner</field>
+            <field name="inherit_id" ref="sale_crm.crm_quotation_partner_view_form"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//field[@name='action']" position="replace">
+                    
+                    <field name="action" widget="radio" string="Cliente para Levantamiento" 
+                           invisible="not context.get('open_survey')"/>
+                    
+                    <field name="action" widget="radio" string="Cliente para APU" 
+                           invisible="not context.get('open_apu')"/>
+                    
+                    <field name="action" widget="radio" string="Cotización del cliente" 
+                           invisible="context.get('open_survey') or context.get('open_apu')"/>
+                           
+                </xpath>
+
             </field>
         </record>
     </data>

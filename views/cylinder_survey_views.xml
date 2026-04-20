@@ -5,19 +5,31 @@
         <field name="name">impsa.cylinder.image.kanban.shared</field>
         <field name="model">impsa.cylinder.image</field>
         <field name="arch" type="xml">
-            <kanban string="Imágenes del cilindro" default_group_by="cylinder_number">
+            <kanban string="Imágenes del cilindro" default_group_by="group_id" records_draggable="0">
                 <templates>
                     <t t-name="card">
-                        <div>
+                        <div class="p-0 pb-2 shadow-sm border-0 h-100">
+                            
+                            <div class="bg-light p-2 border-bottom d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-truncate" style="max-width: 70%;">
+                                    <i class="fa fa-folder-open-o me-1 text-primary"/>
+                                    <field name="group_name"/>
+                                </span>
+                                <span class="badge rounded-pill text-bg-dark">
+                                    Cil. <field name="cylinder_number"/> / <field name="group_qty"/>
+                                </span>
+                            </div>
+
                             <div class="d-flex align-items-center justify-content-center overflow-hidden" style="height: 200px; background-color: #f8f9fa;">
                                 <field name="image" widget="image" options="{'size': [256, 256]}" />
                             </div>
-                            <div class="mt-2 p-2">
+
+                            <div class="mt-2 px-2 d-flex justify-content-between">
                                 <field name="name" class="fw-bolder"/>
-                                <div class="mt-1">
-                                    <span class="badge rounded-pill text-bg-info" invisible="not badge_ident_name"><field name="badge_ident_name"/></span>
-                                    <span class="badge rounded-pill text-bg-secondary">Cilindro <field name="cylinder_number"/></span>
-                                    <span class="badge rounded-pill text-bg-primary me-1"><field name="component"/></span>
+                                <div class="mt-1 gap-2">
+                                    <span class="badge rounded-pill text-bg-primary me-1">
+                                        <field name="component"/>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -31,20 +43,42 @@
         <field name="name">impsa.cylinder.image.form.shared</field>
         <field name="model">impsa.cylinder.image</field>
         <field name="arch" type="xml">
-            <form string="Detalle de Imagen">
+            <form string="Inspección Fotográfica">
                 <sheet>
-                    <div invisible="not badge_ident_name">
-                        <h3>
-                            Identificador: <field name="badge_ident_name" readonly="1" options="{'no_open': True}"/>
-                        </h3>
+                    <div class="oe_title mb-3 w-100">
+                        <label for="name" string="Referencia Fotográfica"/>
+                        
+                        <h1 class="d-flex align-items-center flex-wrap gap-2">
+                            
+                            <span invisible="name" class="text-muted">
+                                Nueva Fotografía
+                            </span>
+                            
+                            <field name="name" 
+                                readonly="1" 
+                                force_save="1" 
+                                class="text-primary w-auto flex-grow-0 m-0" 
+                                invisible="not name"/>
+                            
+                            <span invisible="not group_name" class="text-muted fs-4 d-flex align-items-center">
+                                (<field name="group_name" readonly="1" nolabel="1" class="w-auto m-0"/>)
+                            </span>
+                            
+                        </h1>
                     </div>
                     <group>
                         <group>
-                            <field name="group_quantity" />
-                            <field name="cylinder_number" widget="dynamic_quantity_select" />
-                            <field name="component" />
-                            <field name="name" readonly="1" force_save="1"/>
+                            <label for="cylinder_number" string="Cilindro Identificado"/>
+                            <div class="o_row align-items-center">
+                                <field name="cylinder_number" class="fw-bold" style="width: 3rem !important;"/>
+                                <span class="text-muted fs-4">/</span>
+                                <field name="group_qty" readonly="1" class="text-muted" style="width: 1rem !important;"/>
+                                <span class="badge rounded-pill text-bg-info ms-2">Total en grupo</span>
+                            </div>
                         </group>
+                    </group>
+                    <group>
+                        <field name="component" widget="selection_badge"/>
                     </group>
                     <div class="row mt-3">
                         <div class="col-12 text-center">
@@ -183,7 +217,7 @@
         <field name="arch" type="xml">
             <form string="Levantamiento de Cilindro">
                 <header>
-                    <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed'"/>
+                    <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed' or purchase_order_create == True"/>
 
                     <button name="action_to_apu" string="Enviar a APU" type="object" class="oe_highlight" invisible="state != 'draft'" />
 
@@ -321,36 +355,48 @@
                                 <field name="name" readonly="1" force_save="1" decoration-bf="1" width="200px"/>
                                 
                                 <field name="inner_diameter" 
-                                       force_save="1"
-                                       readonly="section_type == 'last'" 
-                                       decoration-warning="section_type == 'last'"
-                                       string="Ø Interior"/>
-                                       
-                                <field name="outer_diameter" force_save="1" string="Ø Vástago (Ext)" decoration-bf="1"/>
+                                    force_save="1"
+                                    readonly="section_type == 'last'" 
+                                    decoration-danger="inner_diameter &lt;= 0 and section_type in ('main', 'intermediate')"
+                                    decoration-muted="section_type == 'last'"
+                                    string="Ø Interior"/>
+                                    
+                                <field name="outer_diameter" 
+                                    force_save="1" 
+                                    string="Ø Vástago (Ext)" 
+                                    decoration-danger="outer_diameter &lt;= 0"
+                                    decoration-bf="1"/>
                                 
-                                <field name="length" string="Longitud" force_save="1"/>
+                                <field name="length" 
+                                    string="Longitud" 
+                                    force_save="1"
+                                    decoration-danger="length &lt;= 0"/>
                                 
                                 <field name="piston_diameter" 
-                                       force_save="1"
-                                       readonly="section_type == 'main'" 
-                                       decoration-warning="section_type == 'main'"/>
-                                       
+                                    force_save="1"
+                                    readonly="section_type == 'main'" 
+                                    decoration-danger="piston_diameter &lt;= 0 and section_type in ('intermediate', 'last')"
+                                    decoration-muted="section_type == 'main'"/>
+                                    
                                 <field name="piston_length" 
-                                       string="Long. Émbolo"
-                                       readonly="section_type == 'main'" 
-                                       force_save="1"
-                                       decoration-warning="section_type == 'main'"/>
+                                    string="Long. Émbolo"
+                                    readonly="section_type == 'main'" 
+                                    force_save="1"
+                                    decoration-danger="piston_length &lt;= 0 and section_type in ('intermediate', 'last')"
+                                    decoration-muted="section_type == 'main'"/>
                                 
                                 <field name="head_diameter" 
-                                       readonly="section_type in ('last', 'main')" 
-                                       force_save="1"
-                                       decoration-warning="section_type in ('last', 'main')"/>
-                                       
+                                    readonly="section_type in ('last', 'main')" 
+                                    force_save="1"
+                                    decoration-danger="head_diameter &lt;= 0 and section_type == 'intermediate'"
+                                    decoration-muted="section_type in ('last', 'main')"/>
+                                    
                                 <field name="head_length" 
-                                       string="Long. Cabeza"
-                                       force_save="1"
-                                       readonly="section_type in ('last', 'main')" 
-                                       decoration-warning="section_type in ('last', 'main')"/>
+                                    string="Long. Cabeza"
+                                    force_save="1"
+                                    readonly="section_type in ('last', 'main')" 
+                                    decoration-danger="head_length &lt;= 0 and section_type == 'intermediate'"
+                                    decoration-muted="section_type in ('last', 'main')"/>
                             </list>
                         </field>
 
@@ -438,7 +484,7 @@
                                                     'default_group_id': id,
                                                     'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
                                                     'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared',
-                                                    'default_badge_ident_name':name,
+                                                    'default_group_name':name,
                                                     
                                                 }"/>
                                             </page>

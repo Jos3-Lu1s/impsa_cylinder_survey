@@ -14,6 +14,9 @@ class CylinderImage(models.Model):
         ondelete='cascade',
         index=True
     )
+
+    group_name = fields.Char(related='group_id.name', string="Nombre del Grupo", readonly=True)
+    group_qty = fields.Integer(related='group_id.quantity', string="Total en Grupo", readonly=True)
     
     survey_id = fields.Many2one(
         'impsa.cylinder.survey', 
@@ -21,10 +24,6 @@ class CylinderImage(models.Model):
         related='group_id.survey_id',
         store=True,
         index=True,
-    )
-
-    badge_ident_name=fields.Char(
-        string="Nombre identificador imagen"
     )
     
     cylinder_number = fields.Integer(
@@ -47,12 +46,6 @@ class CylinderImage(models.Model):
     ], string="Componente", required=True)
 
     image = fields.Image(string="Imagen", max_width=1920, max_height=1920, required=True)
-
-    group_quantity = fields.Integer(
-        related='group_id.quantity', 
-        readonly=True,
-        string="Cantidad del Grupo"
-    )
 
     @api.constrains('cylinder_number', 'group_id')
     def _check_cylinder_number(self):
