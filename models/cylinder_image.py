@@ -14,6 +14,9 @@ class CylinderImage(models.Model):
         ondelete='cascade',
         index=True
     )
+
+    group_name = fields.Char(related='group_id.name', string="Nombre del Grupo", readonly=True)
+    group_qty = fields.Integer(related='group_id.quantity', string="Total en Grupo", readonly=True)
     
     survey_id = fields.Many2one(
         'impsa.cylinder.survey', 
