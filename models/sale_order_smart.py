@@ -36,7 +36,11 @@ class SaleOrderSmart(models.Model):
         compute="_compute_apu_survey_count"
     )
 
-    """ product_domain = fields.Json(compute='_compute_product_domain', store=False) """
+    @api.onchange('pricelist_id')
+    def _onchange_pricelist_product_domain(self):
+        """Dispara el recálculo del dominio en todas las líneas."""
+        for line in self.order_line:
+            line._compute_product_template_domain()
 
     @api.depends('survey_id')
     def _compute_cylinder_survey_count(self):
