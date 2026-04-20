@@ -66,8 +66,18 @@
                             
                         </h1>
                     </div>
-                    <group col="4" class="mb-4">
-                        <field name="cylinder_number" string="Cilindro No." class="fw-bold"/>
+                    <group>
+                        <group>
+                            <label for="cylinder_number" string="Cilindro Identificado"/>
+                            <div class="o_row align-items-center">
+                                <field name="cylinder_number" class="fw-bold" style="width: 3rem !important;"/>
+                                <span class="text-muted fs-4">/</span>
+                                <field name="group_qty" readonly="1" class="text-muted" style="width: 1rem !important;"/>
+                                <span class="badge rounded-pill text-bg-info ms-2">Total en grupo</span>
+                            </div>
+                        </group>
+                    </group>
+                    <group>
                         <field name="component" widget="selection_badge"/>
                     </group>
                     <div class="row mt-3">

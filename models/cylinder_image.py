@@ -25,10 +25,6 @@ class CylinderImage(models.Model):
         store=True,
         index=True,
     )
-
-    badge_ident_name=fields.Char(
-        string="Nombre identificador imagen"
-    )
     
     cylinder_number = fields.Integer(
         string="Número de Cilindro", 
