@@ -35,6 +35,7 @@
 
                 <xpath expr="//field[@name='tag_ids']" position="after">
                     <field name="is_won_stage" invisible="1" />
+                    <field name="final_lap" invisible="1" readonly="1"/>
                     <field name="selection_type"  
                            readonly="stage_sequence > 2 or cylinder_survey_count >= 1 or apu_survey_count >= 1" 
                            widget="radio" 
@@ -57,12 +58,12 @@
 
                 <!-- Ocultar botón GANADO -->
                 <xpath expr="//button[@name='action_set_won_rainbowman']" position="attributes">
-                    <attribute name="invisible">is_won_stage == True</attribute>
+                    <attribute name="invisible">ganado_state == False</attribute>
                 </xpath>
                 
                 <!-- Ocultar botón PERDIDO -->
                 <xpath expr="//button[@name='%(crm.crm_lead_lost_action)d']" position="attributes">
-                    <attribute name="invisible">is_lose == True</attribute>
+                    <attribute name="invisible">is_lose == False</attribute>
                 </xpath>
 
             </field>

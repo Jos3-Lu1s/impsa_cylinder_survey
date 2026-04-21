@@ -12,8 +12,18 @@
                     <field name="is_survey"/>
                     <field name="is_apu"/>
                     <field name="is_lose"/>
+                    <field name="ganado_state"/>
                 </xpath>
 
+                <xpath expr="//field[@name='is_won']" position="after">
+                    <field name="stage_type"
+                           widget="radio"
+                           options="{'horizontal': True}"/>
+                </xpath>
+
+                <xpath expr="//field[@name='is_won']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
             </field>
         </record>
 
