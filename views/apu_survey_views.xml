@@ -7,7 +7,7 @@
         <field name="arch"
                type="xml">
             <list string="Levantamientos"
-                  decoration-muted="state == 'cancel'">
+                  decoration-muted="state == 'cancel'" create="0">
                 <field name="name"
                        decoration-bf="1" />
                 <field name="survey_id"
@@ -41,7 +41,7 @@
         <field name="model">impsa.apu.survey</field>
         <field name="arch"
                type="xml">
-            <form string="APU">
+            <form string="APU" create="0">
                 <header>
                     <button name="action_to_confirmed"
                             string="Confirmar APU"
