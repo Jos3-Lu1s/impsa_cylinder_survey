@@ -18,7 +18,7 @@ class ApuSurvey(models.Model):
     cylinder_qty_by_group= fields.Integer(
         related='group_id.quantity',
         store=True,
-        string="Cant. de cilindros",
+        string="Cantidad",
     )
     apu_product_id = fields.Many2one(
         'product.template', string='Cilindro a trabajar', ondelete='restrict', domain=[('categ_id.name', '=', 'FABRICACION Y REPARACION')]

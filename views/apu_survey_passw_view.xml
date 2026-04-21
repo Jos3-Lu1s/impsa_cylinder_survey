@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_margin_password_wizard_form" model="ir.ui.view">
+        <field name="name">margin.password.wizard.form</field>
+        <field name="model">impsa.apu.survey.passw</field>
+        <field name="arch" type="xml">
+            <form string="Acceso Restringido">
+                <group>
+                    <field name="password" password="True"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" 
+                        string="Confirmar" 
+                        type="object" 
+                        class="btn-primary"/>
+                    <button string="Cancelar" 
+                        class="btn-secondary" 
+                        special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

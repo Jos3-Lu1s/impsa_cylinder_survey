@@ -39,6 +39,7 @@
         "views/res_partner_inherit_view.xml",
         "views/apu_survey_actions_views.xml",
         "views/pricelist_access.xml",
+        "views/apu_survey_passw_view.xml",
         "views/apu_survey_margins_views.xml",
     ],
 

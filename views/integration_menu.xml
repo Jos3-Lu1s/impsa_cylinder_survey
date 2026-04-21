@@ -18,7 +18,7 @@
     
     <menuitem id="menu_sale_apu_survey_actions" name="Catálogo de acciones" parent="menu_sale_apu_survey_actions_root" action="action_apu_survey_actions_all" sequence="70"/>
 
-    <menuitem id="menu_sale_apu_survey_margins" name="Catálogo de margenes" parent="menu_sale_apu_survey_actions_root" action="action_apu_survey_margins_all" sequence="80"/>
+    <menuitem id="menu_sale_apu_survey_margins" name="Catálogo de margenes" parent="menu_sale_apu_survey_actions_root" action="action_apu_survey_margins_passw" sequence="80"/>
 
     <menuitem id="menu_cylinder_options" name="Catálogo de cilindros" parent="menu_cylinder_catalogos" action="action_impsa_cylinder_options" sequence="70"/>
     

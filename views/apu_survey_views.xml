@@ -260,10 +260,16 @@
         <field name="view_mode">list</field>
     </record>
 
-    <record id="action_apu_survey_margins_all"
+    <!-- <record id="action_apu_survey_margins_all"
             model="ir.actions.act_window">
             <field name="name">Margenes de Costos</field>
             <field name="res_model">impsa.apu.survey.margins</field>
             <field name="view_mode">list</field>
-        </record>
+       </record> -->
+       <record id="action_apu_survey_margins_passw" model="ir.actions.act_window">
+              <field name="name">Catálogo de Márgenes</field>
+              <field name="res_model">impsa.apu.survey.passw</field>
+              <field name="view_mode">form</field>
+              <field name="target">new</field> 
+       </record>
 </odoo>
