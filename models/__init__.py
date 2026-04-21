@@ -19,3 +19,4 @@ from . import pricelist_conect
 from . import sale_order_line_inherit
 from . import apu_survey_margins
 from . import apu_survey_passw_wizard
+from . import mail_compose_message
