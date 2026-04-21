@@ -150,19 +150,15 @@
                                class="border-2 border-start">
                             <separator class="fw-bolder fs-6"
                                        string="Márgen de costos de material" />
-                            <field name="porcentaje_cindirectos_material"
-                                   widget="percentage"
+                            <field name="porcentaje_cindirectos_material"                           
                                    readonly="state != 'draft'" />
                             <field name="porcentaje_utaimp_material"
-                                   widget="percentage"
                                    readonly="state != 'draft'" />
                             <separator class="fw-bolder fs-6"
                                        string="Márgen de costos de MO" />
                             <field name="porcentaje_cindirectos_mo"
-                                   widget="percentage"
                                    readonly="state != 'draft'" />
                             <field name="porcentaje_utaimp_mo"
-                                   widget="percentage"
                                    readonly="state != 'draft'" />
                         </group>
                     </group>
@@ -263,4 +259,11 @@
         <field name="res_model">impsa.apu.survey.actions</field>
         <field name="view_mode">list</field>
     </record>
+
+    <record id="action_apu_survey_margins_all"
+            model="ir.actions.act_window">
+            <field name="name">Margenes de Costos</field>
+            <field name="res_model">impsa.apu.survey.margins</field>
+            <field name="view_mode">list</field>
+        </record>
 </odoo>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_impsa_apu_survey_margins_tree"
+            model="ir.ui.view">
+        <field name="name">impsa.apu.survey.margins.tree</field>
+        <field name="model">impsa.apu.survey.margins</field>
+        <field name="arch"
+               type="xml">
+            <list string="Márgenes de Costos" editable="bottom">
+                <field name="margin_code"
+                        />
+                <field name="type_cost_margin"
+                widget="selection_badge"
+                decoration-info="1"
+                        />
+                <field name="type_profit_margin"
+                widget="selection_badge"
+                        />
+                <field name="percentage"
+                       widget="percentage" />
+            </list>
+        </field>
+    </record>
+</odoo>

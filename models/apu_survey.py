@@ -114,11 +114,32 @@ class ApuSurvey(models.Model):
     gran_total_lm = fields.Monetary(string="Gran Total", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
 
     #CAMPOS DE PORCENTAJES PARA MARGENES DE COSTOS
-    porcentaje_cindirectos_material=fields.Float(string="Margen C. Indirectos Mat.",digits=(16, 2))
-    porcentaje_utaimp_material=fields.Float(string="Margen Utilidad Mat.",digits=(16, 2))
+    #porcentaje_cindirectos_material=fields.Float(string="Margen C. Indirectos Mat.",digits=(16, 2))
+    #porcentaje_utaimp_material=fields.Float(string="Margen Utilidad Mat.",digits=(16, 2))
     
-    porcentaje_cindirectos_mo=fields.Float(string="Margen C. Indirectos M.O.",digits=(16, 2))
-    porcentaje_utaimp_mo=fields.Float(string="Margen Utilidad M.O.",digits=(16, 2))
+    #porcentaje_cindirectos_mo=fields.Float(string="Margen C. Indirectos M.O.",digits=(16, 2))
+    #porcentaje_utaimp_mo=fields.Float(string="Margen Utilidad M.O.",digits=(16, 2))
+
+    porcentaje_cindirectos_material=fields.Many2one(
+        'impsa.apu.survey.margins', string='Margen C. Indirectos Mat.', ondelete='restrict',
+         domain=[('type_cost_margin', '=', 'material'),
+         ('type_profit_margin', '=', 'indirect_cost'), ]
+    )
+    porcentaje_utaimp_material=fields.Many2one(
+        'impsa.apu.survey.margins', string='Margen Utilidad Mat.', ondelete='restrict',
+         domain=[('type_cost_margin', '=', 'material'),
+         ('type_profit_margin', '=', 'profit_margin'),]
+    )
+    porcentaje_cindirectos_mo=fields.Many2one(
+        'impsa.apu.survey.margins', string='Margen C. Indirectos M.O.', ondelete='restrict',
+         domain=[('type_cost_margin', '=', 'labour'),
+         ('type_profit_margin', '=', 'indirect_cost'),]
+    )
+    porcentaje_utaimp_mo=fields.Many2one(
+        'impsa.apu.survey.margins', string='Margen Utilidad M.O.', ondelete='restrict',
+         domain=[('type_cost_margin', '=', 'labour'),
+         ('type_profit_margin', '=', 'profit_margin'),]
+    )
 
     @api.onchange('survey_id')
     def _onchange_survey_id_domain(self):
@@ -144,13 +165,13 @@ class ApuSurvey(models.Model):
             
 
             order.subtotal_material_lm = subtotal_material
-            order.costos_indirectos_material_lm=subtotal_material*order.porcentaje_cindirectos_material
-            order.utilidad_impuestos_material_lm=subtotal_material*order.porcentaje_utaimp_material
+            order.costos_indirectos_material_lm=subtotal_material*order.porcentaje_cindirectos_material.percentage
+            order.utilidad_impuestos_material_lm=subtotal_material*order.porcentaje_utaimp_material.percentage
             order.total_material_lm= order.subtotal_material_lm + order.costos_indirectos_material_lm + order.utilidad_impuestos_material_lm
 
             order.subtotal_mo_lm = subtotal_mo
-            order.costos_indirectos_mo_lm=subtotal_mo*order.porcentaje_cindirectos_mo
-            order.utilidad_impuestos_mo_lm=subtotal_mo*order.porcentaje_utaimp_mo
+            order.costos_indirectos_mo_lm=subtotal_mo*order.porcentaje_cindirectos_mo.percentage
+            order.utilidad_impuestos_mo_lm=subtotal_mo*order.porcentaje_utaimp_mo.percentage
             order.total_mo_lm= order.subtotal_mo_lm + order.costos_indirectos_mo_lm + order.utilidad_impuestos_mo_lm
 
             order.gran_subtotal_lm=order.total_material_lm+order.total_mo_lm
@@ -202,7 +223,7 @@ class ApuSurvey(models.Model):
             #qty = record.group_id.quantity or 1.0 
             qty = record.cylinder_qty_by_group or 1.0 
             unit_price = record.gran_subtotal_lm / qty if qty > 0 else record.gran_subtotal_lm
-            if not record.quote_ids and not record.survey_id:
+            if not record.quote_ids:
                 product_variant = record.apu_product_id.product_variant_id
                 if not product_variant:
                     raise ValidationError(_("El producto de la APU: '%s' no tiene variantes activas válidas.") % record.name)
