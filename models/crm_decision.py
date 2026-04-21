@@ -118,9 +118,14 @@ class CrmDecision(models.Model):
         trackyng=True
     )
     
-    def message_subscribe(self, partner_ids=None, subtype_ids=None):
-        # ❌ no agregar followers automáticamente
-        return True
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+
+        if 'name' in fields_list:
+            res['name'] = ' '
+
+        return res
     
     @api.depends('stage_id', 'stage_id.stage_type')
     def _compute_stage_type(self):
