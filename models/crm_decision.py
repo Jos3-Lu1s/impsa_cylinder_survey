@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+from odoo import exceptions, _
 
 # HERENCIA DEL WIZARD ESTÁNDAR
 class CrmQuotationPartner(models.TransientModel):
@@ -58,7 +59,7 @@ class CrmDecision(models.Model):
     
     is_won_stage = fields.Boolean(
         related='stage_id.is_won',
-        store=True
+        store=False
     )
     
     cylinder_survey_ids = fields.One2many(
@@ -85,8 +86,111 @@ class CrmDecision(models.Model):
     
     stage_sequence = fields.Integer(
         related='stage_id.sequence',
-        store=True
+        store=False
     )
+    
+    is_survey = fields.Boolean(
+        related='stage_id.is_survey',
+        string="Requiere Levantamiento",
+        store=False
+    )
+    is_apu = fields.Boolean(
+        related='stage_id.is_apu',
+        string="Requiere APU",
+        store=False
+    )
+    is_lose = fields.Boolean(
+        related='stage_id.is_lose',
+        string="Etapa de Pérdida",
+        store=False
+    )
+    
+    ganado_state = fields.Boolean(
+        related='stage_id.ganado_state',
+        store=False,
+        string="Ganado",
+    )
+    
+    final_lap = fields.Boolean(
+        string="Terminado",
+        default=False,
+        copy=False,
+        trackyng=True
+    )
+    
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        # Ejecuta TODOS los onchange existentes
+        res = super(CrmLead, self)._onchange_partner_id() if hasattr(super(), '_onchange_partner_id') else None
+
+        # 🔥 Solo limpias el nombre
+        self.name = False
+
+        return res
+
+    @api.onchange('partner_id')  
+    def _onchange_clear_name(self):
+        """Segundo onchange — asegura que el nombre quede vacío
+        sin importar el orden de ejecución."""
+        if self.partner_id and self.name and (
+            self.partner_id.name in self.name or
+            'Oportunidad' in self.name or
+            'Opportunity' in self.name
+        ):
+            self.name = ''
+    
+    @api.depends('stage_id', 'stage_id.stage_type')
+    def _compute_stage_type(self):
+        for lead in self:
+            lead.is_survey = lead.stage_id.stage_type == 'survey'
+            lead.is_apu    = lead.stage_id.stage_type == 'apu'
+            lead.is_lost   = lead.stage_id.stage_type == 'lose'
+    
+    def action_set_won_rainbowman(self):
+        """Sobreescribe el botón Ganado para activar final_lap."""
+        res = super().action_set_won_rainbowman()
+        self.sudo().write({'final_lap': True})
+        return res
+
+    def action_set_won(self):
+        """Cubre también el método alternativo de marcar como ganado."""
+        res = super().action_set_won()
+        self.sudo().write({'final_lap': True})
+        return res
+    
+    def write(self, vals):
+        if 'stage_id' in vals:
+            for lead in self:
+                if lead.final_lap:
+                    raise exceptions.ValidationError(_(
+                        'La oportunidad "%s" ya fue marcada como ganada '
+                        'y no puede cambiar de etapa.'
+                    ) % lead.name)
+
+                # Validaciones de tipo vs etapa
+                nueva_etapa = self.env['crm.stage'].browse(vals['stage_id'])
+                tipo = vals.get('selection_type', lead.selection_type)
+
+                if tipo == 'repair' and nueva_etapa.is_apu:
+                    raise exceptions.ValidationError(_(
+                        'La oportunidad "%s" es de tipo Reparación y no '
+                        'puede avanzar a la etapa "%s" que requiere APU.'
+                    ) % (lead.name, nueva_etapa.name))
+
+                if tipo == 'manufacturing' and nueva_etapa.is_survey:
+                    raise exceptions.ValidationError(_(
+                        'La oportunidad "%s" es de tipo Fabricación y no '
+                        'puede avanzar a la etapa "%s" que requiere '
+                        'Levantamiento.'
+                    ) % (lead.name, nueva_etapa.name))
+
+                if not tipo and (nueva_etapa.is_apu or nueva_etapa.is_survey):
+                    raise exceptions.ValidationError(_(
+                        'Debes seleccionar un tipo antes de avanzar '
+                        'a la etapa "%s".'
+                    ) % nueva_etapa.name)
+
+        return super().write(vals)
     
     @api.depends('cylinder_survey_ids')
     def _compute_cylinder_survey_count(self):
@@ -216,3 +320,26 @@ class CrmDecision(models.Model):
                 'default_lead_id': self.id
             }
         }
+        
+class CrmStage(models.Model):
+    _inherit = 'crm.stage'
+
+    stage_type = fields.Selection([
+        ('survey',  'Requiere Levantamiento'),
+        ('apu',     'Requiere APU'),
+        ('negotiation', 'Negociación'),
+        ('none', 'Normal'),
+    ], string='Tipo de etapa', default='none')
+    
+    is_survey = fields.Boolean(compute='_compute_stage_flags', store=True)
+    is_apu    = fields.Boolean(compute='_compute_stage_flags', store=True)
+    is_lose   = fields.Boolean(compute='_compute_stage_flags', store=True)
+    ganado_state = fields.Boolean(compute='_compute_stage_flags', store=True)
+    
+    @api.depends('stage_type')
+    def _compute_stage_flags(self):
+        for stage in self:
+            stage.is_survey      = stage.stage_type == 'survey'
+            stage.is_apu         = stage.stage_type == 'apu'
+            stage.is_lose        = stage.stage_type == 'negotiation'
+            stage.ganado_state   = stage.stage_type == 'negotiation'
