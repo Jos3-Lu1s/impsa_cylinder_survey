@@ -140,6 +140,11 @@ class ApuSurvey(models.Model):
          domain=[('type_cost_margin', '=', 'labour'),
          ('type_profit_margin', '=', 'profit_margin'),]
     )
+    
+    def _message_get_suggested_recipients(self, **kwargs):
+        # En esta versión devuelve lista, no dict
+        # Simplemente retornamos lista vacía
+        return []
 
     @api.onchange('survey_id')
     def _onchange_survey_id_domain(self):

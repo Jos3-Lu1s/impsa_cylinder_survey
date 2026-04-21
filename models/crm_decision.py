@@ -118,6 +118,11 @@ class CrmDecision(models.Model):
         trackyng=True
     )
     
+    def _message_get_suggested_recipients(self, **kwargs):
+        # En esta versión devuelve lista, no dict
+        # Simplemente retornamos lista vacía
+        return []
+    
     @api.model
     def default_get(self, fields_list):
         res = super().default_get(fields_list)
