@@ -118,6 +118,27 @@ class CrmDecision(models.Model):
         trackyng=True
     )
     
+    @api.onchange('partner_id')
+    def _onchange_partner_id(self):
+        # Ejecuta TODOS los onchange existentes
+        res = super(CrmLead, self)._onchange_partner_id() if hasattr(super(), '_onchange_partner_id') else None
+
+        # 🔥 Solo limpias el nombre
+        self.name = False
+
+        return res
+
+    @api.onchange('partner_id')  
+    def _onchange_clear_name(self):
+        """Segundo onchange — asegura que el nombre quede vacío
+        sin importar el orden de ejecución."""
+        if self.partner_id and self.name and (
+            self.partner_id.name in self.name or
+            'Oportunidad' in self.name or
+            'Opportunity' in self.name
+        ):
+            self.name = ''
+    
     @api.depends('stage_id', 'stage_id.stage_type')
     def _compute_stage_type(self):
         for lead in self:
