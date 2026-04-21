@@ -119,6 +119,11 @@ class ApuSurvey(models.Model):
     
     porcentaje_cindirectos_mo=fields.Float(string="Margen C. Indirectos M.O.",digits=(16, 2))
     porcentaje_utaimp_mo=fields.Float(string="Margen Utilidad M.O.",digits=(16, 2))
+    
+    def _message_get_suggested_recipients(self, **kwargs):
+        # En esta versión devuelve lista, no dict
+        # Simplemente retornamos lista vacía
+        return []
 
     @api.onchange('survey_id')
     def _onchange_survey_id_domain(self):

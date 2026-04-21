@@ -35,6 +35,11 @@ class SaleOrderSmart(models.Model):
         string="APU",
         compute="_compute_apu_survey_count"
     )
+    
+    def _message_get_suggested_recipients(self, **kwargs):
+        # En esta versión devuelve lista, no dict
+        # Simplemente retornamos lista vacía
+        return []
 
     @api.onchange('pricelist_id')
     def _onchange_pricelist_product_domain(self):
