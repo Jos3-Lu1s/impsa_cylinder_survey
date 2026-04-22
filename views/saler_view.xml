@@ -47,10 +47,10 @@
                         class="btn-primary"/>
                 </xpath>
 
-                <xpath expr="//field[@name='order_line']"
+                <!-- <xpath expr="//field[@name='order_line']"
                     position="attributes">
                     <attribute name="readonly">apu_id</attribute>
-                </xpath>
+                </xpath> -->
 
                 <xpath expr="//field[@name='pricelist_id']"
                     position="attributes">
