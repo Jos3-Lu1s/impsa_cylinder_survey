@@ -895,3 +895,26 @@ class CylinderSurvey(models.Model):
                 )
 
         return super(CylinderSurvey, self).create(vals_list)
+    
+    def write(self, vals):
+        result = super().write(vals)
+    
+        if 'state' not in vals:
+            return result
+    
+        mapeo_crm = {
+            'apu':       'apu',
+            'quoted':    'negotiation',
+            'confirmed': 'won',
+        }
+    
+        for survey in self:
+            nuevo_state = vals['state']
+    
+            # ── Sincronizar CRM ───────────────────────────────────────
+            if survey.lead_id:
+                sync_type = mapeo_crm.get(nuevo_state)
+                if sync_type:
+                    survey.lead_id._sync_stage_from_type(sync_type)
+    
+        return result

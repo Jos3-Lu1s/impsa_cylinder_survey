@@ -321,3 +321,39 @@ class ApuSurvey(models.Model):
             'view_mode': 'form',
             'res_id': self.lead_id.id,
         }
+        
+    def write(self, vals):
+        result = super().write(vals)
+    
+        if 'state' not in vals:
+            return result
+    
+        mapeo_crm = {
+            'confirmed': 'negotiation',
+        }
+    
+        mapeo_survey = {
+            'confirmed': 'quoted',  # APU confirmado → levantamiento a cotización
+            'cancel':    'draft',   # APU cancelado  → levantamiento regresa a borrador
+        }
+    
+        for apu in self:
+            nuevo_state = vals['state']
+    
+            # ── Sincronizar levantamiento padre ───────────────────────
+            if apu.survey_id:
+                survey_state = mapeo_survey.get(nuevo_state)
+                if survey_state:
+                    apu.survey_id.sudo().write({'state': survey_state})
+    
+            # ── Sincronizar CRM ───────────────────────────────────────
+            # Camino 1 — APU directo desde CRM
+            # Camino 2 — APU desde levantamiento que tiene lead
+            lead = apu.lead_id or (apu.survey_id and apu.survey_id.lead_id)
+    
+            if lead:
+                sync_type = mapeo_crm.get(nuevo_state)
+                if sync_type:
+                    lead._sync_stage_from_type(sync_type)
+    
+        return result

@@ -118,6 +118,25 @@ class CrmDecision(models.Model):
         trackyng=True
     )
     
+    def _sync_stage_from_type(self, stage_type):
+        self.ensure_one()
+    
+        # Ganado — usa el flujo nativo
+        if stage_type == 'won':
+            if not self.final_lap:
+                self.action_set_won_rainbowman()
+            return
+    
+        # Busca la etapa CRM cuyo stage_type coincida
+        etapa = self.env['crm.stage'].search([
+            ('stage_type', '=', stage_type)
+        ], limit=1)
+    
+        if etapa and etapa.id != self.stage_id.id:
+            # Usamos sudo para evitar conflictos con las validaciones
+            # de write() si el usuario no tiene permisos de mover etapa
+            self.sudo().write({'stage_id': etapa.id})
+    
     def _message_get_suggested_recipients(self, **kwargs):
         # En esta versión devuelve lista, no dict
         # Simplemente retornamos lista vacía
@@ -151,8 +170,32 @@ class CrmDecision(models.Model):
         self.sudo().write({'final_lap': True})
         return res
     
+    def _sync_stage_from_type(self, stage_type):
+        self.ensure_one()
+
+        # Ganado — usa el flujo nativo de Odoo
+        if stage_type == 'won':
+            if not self.final_lap:
+                self.action_set_won_rainbowman()
+            return
+
+        etapa = self.env['crm.stage'].search([
+            ('stage_type', '=', stage_type)
+        ], limit=1)
+
+        if etapa and etapa.id != self.stage_id.id:
+            self.sudo().with_context(sync_from_survey=True).write({
+                'stage_id': etapa.id
+            })
+    
     def write(self, vals):
         if 'stage_id' in vals:
+
+            if self.env.context.get('sync_from_survey'):
+                return super().write(vals)
+
+            nueva_etapa = self.env['crm.stage'].browse(vals['stage_id'])
+
             for lead in self:
                 if lead.final_lap:
                     raise exceptions.ValidationError(_(
@@ -160,28 +203,43 @@ class CrmDecision(models.Model):
                         'y no puede cambiar de etapa.'
                     ) % lead.name)
 
-                # Validaciones de tipo vs etapa
-                nueva_etapa = self.env['crm.stage'].browse(vals['stage_id'])
                 tipo = vals.get('selection_type', lead.selection_type)
 
-                if tipo == 'repair' and nueva_etapa.is_apu:
-                    raise exceptions.ValidationError(_(
-                        'La oportunidad "%s" es de tipo Reparación y no '
-                        'puede avanzar a la etapa "%s" que requiere APU.'
-                    ) % (lead.name, nueva_etapa.name))
-
-                if tipo == 'manufacturing' and nueva_etapa.is_survey:
-                    raise exceptions.ValidationError(_(
-                        'La oportunidad "%s" es de tipo Fabricación y no '
-                        'puede avanzar a la etapa "%s" que requiere '
-                        'Levantamiento.'
-                    ) % (lead.name, nueva_etapa.name))
-
-                if not tipo and (nueva_etapa.is_apu or nueva_etapa.is_survey):
+                if not tipo and nueva_etapa.stage_type in ('apu', 'survey'):
                     raise exceptions.ValidationError(_(
                         'Debes seleccionar un tipo antes de avanzar '
                         'a la etapa "%s".'
                     ) % nueva_etapa.name)
+
+                # Fabricación no puede ir a etapa de levantamiento
+                if tipo == 'manufacturing' and nueva_etapa.stage_type == 'survey':
+                    raise exceptions.ValidationError(_(
+                        'La oportunidad "%s" es de tipo Fabricación y no '
+                        'puede avanzar a una etapa de Levantamiento.'
+                    ) % lead.name)
+
+                # Reparación no puede saltar directo a APU sin levantamiento
+                if tipo == 'repair' and nueva_etapa.stage_type == 'apu':
+                    levantamiento = lead.cylinder_survey_ids.filtered(
+                        lambda s: s.state == 'apu'
+                    )
+                    if not levantamiento:
+                        raise exceptions.ValidationError(_(
+                            'La oportunidad "%s" es de tipo Reparación y solo '
+                            'puede avanzar a APU cuando el levantamiento '
+                            'relacionado esté en estado APU.'
+                        ) % lead.name)
+
+                # Negociación requiere cotización o APU confirmado
+                if nueva_etapa.stage_type == 'negotiation':
+                    lev_cotizado   = lead.cylinder_survey_ids.filtered(lambda s: s.state == 'quoted')
+                    apu_confirmado = lead.apu_survey_ids.filtered(lambda a: a.state == 'confirmed')
+                    if not lev_cotizado and not apu_confirmado:
+                        raise exceptions.ValidationError(_(
+                            'La oportunidad "%s" no puede avanzar a '
+                            'Negociación hasta que el levantamiento esté '
+                            'en Cotización o el APU esté confirmado.'
+                        ) % lead.name)
 
         return super().write(vals)
     
