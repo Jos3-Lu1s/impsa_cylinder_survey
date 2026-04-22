@@ -12,7 +12,7 @@ class ApuSurvey(models.Model):
     )
 
     partner_id = fields.Many2one(
-        "res.partner", string="Cliente", required=True, tracking=True, ondelete='restrict'
+        "res.partner", string="Cliente", required=True, tracking=True, ondelete='restrict', context={'search_by_ref': True}
     )
 
     cylinder_qty_by_group= fields.Integer(
