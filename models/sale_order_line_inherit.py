@@ -27,3 +27,10 @@ class SaleOrderLine(models.Model):
                 ])
             else:
                 line.product_template_domain = json.dumps([])
+    
+    @api.onchange('product_template_id','product_uom_qty','product_uom_id','price_unit','tax_ids',)
+    def _onchange_order_line(self):
+        for line in self:
+            apu_related=line.order_id.apu_id
+            if apu_related:
+                raise ValidationError(f"No puede cambiar las lineas de orden de venta si cuenta con un APU relacionado. \n Por favor dirigete al {apu_related.name} correspondiente si desea aplicar algún ajuste.")
