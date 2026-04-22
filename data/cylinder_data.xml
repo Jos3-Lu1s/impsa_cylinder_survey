@@ -302,5 +302,12 @@
             <field name="action_code">ACT-0038</field>
         </record>
 
+
+        <!--Parametros del sistema-->
+        <record id="apu_survey_margins_passw" model="ir.config_parameter">
+            <field name="key">view.impsa.passw</field>
+            <field name="value">password</field>
+        </record>
+
     </data>
 </odoo>

@@ -18,7 +18,7 @@ class ApuSurvey(models.Model):
     cylinder_qty_by_group= fields.Integer(
         related='group_id.quantity',
         store=True,
-        string="Cant. de cilindros",
+        string="Cantidad",
     )
     apu_product_id = fields.Many2one(
         'product.template', string='Cilindro a trabajar', ondelete='restrict', domain=[('categ_id.name', '=', 'FABRICACION Y REPARACION')]
@@ -114,11 +114,37 @@ class ApuSurvey(models.Model):
     gran_total_lm = fields.Monetary(string="Gran Total", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
 
     #CAMPOS DE PORCENTAJES PARA MARGENES DE COSTOS
-    porcentaje_cindirectos_material=fields.Float(string="Margen C. Indirectos Mat.",digits=(16, 2))
-    porcentaje_utaimp_material=fields.Float(string="Margen Utilidad Mat.",digits=(16, 2))
+    #porcentaje_cindirectos_material=fields.Float(string="Margen C. Indirectos Mat.",digits=(16, 2))
+    #porcentaje_utaimp_material=fields.Float(string="Margen Utilidad Mat.",digits=(16, 2))
     
-    porcentaje_cindirectos_mo=fields.Float(string="Margen C. Indirectos M.O.",digits=(16, 2))
-    porcentaje_utaimp_mo=fields.Float(string="Margen Utilidad M.O.",digits=(16, 2))
+    #porcentaje_cindirectos_mo=fields.Float(string="Margen C. Indirectos M.O.",digits=(16, 2))
+    #porcentaje_utaimp_mo=fields.Float(string="Margen Utilidad M.O.",digits=(16, 2))
+
+    porcentaje_cindirectos_material=fields.Many2one(
+        'impsa.apu.survey.margins', string='Margen C. Indirectos Mat.', ondelete='restrict',
+         domain=[('type_cost_margin', '=', 'material'),
+         ('type_profit_margin', '=', 'indirect_cost'), ]
+    )
+    porcentaje_utaimp_material=fields.Many2one(
+        'impsa.apu.survey.margins', string='Margen Utilidad Mat.', ondelete='restrict',
+         domain=[('type_cost_margin', '=', 'material'),
+         ('type_profit_margin', '=', 'profit_margin'),]
+    )
+    porcentaje_cindirectos_mo=fields.Many2one(
+        'impsa.apu.survey.margins', string='Margen C. Indirectos M.O.', ondelete='restrict',
+         domain=[('type_cost_margin', '=', 'labour'),
+         ('type_profit_margin', '=', 'indirect_cost'),]
+    )
+    porcentaje_utaimp_mo=fields.Many2one(
+        'impsa.apu.survey.margins', string='Margen Utilidad M.O.', ondelete='restrict',
+         domain=[('type_cost_margin', '=', 'labour'),
+         ('type_profit_margin', '=', 'profit_margin'),]
+    )
+    
+    def _message_get_suggested_recipients(self, **kwargs):
+        # En esta versión devuelve lista, no dict
+        # Simplemente retornamos lista vacía
+        return []
 
     @api.onchange('survey_id')
     def _onchange_survey_id_domain(self):
@@ -144,13 +170,13 @@ class ApuSurvey(models.Model):
             
 
             order.subtotal_material_lm = subtotal_material
-            order.costos_indirectos_material_lm=subtotal_material*order.porcentaje_cindirectos_material
-            order.utilidad_impuestos_material_lm=subtotal_material*order.porcentaje_utaimp_material
+            order.costos_indirectos_material_lm=subtotal_material*order.porcentaje_cindirectos_material.percentage
+            order.utilidad_impuestos_material_lm=subtotal_material*order.porcentaje_utaimp_material.percentage
             order.total_material_lm= order.subtotal_material_lm + order.costos_indirectos_material_lm + order.utilidad_impuestos_material_lm
 
             order.subtotal_mo_lm = subtotal_mo
-            order.costos_indirectos_mo_lm=subtotal_mo*order.porcentaje_cindirectos_mo
-            order.utilidad_impuestos_mo_lm=subtotal_mo*order.porcentaje_utaimp_mo
+            order.costos_indirectos_mo_lm=subtotal_mo*order.porcentaje_cindirectos_mo.percentage
+            order.utilidad_impuestos_mo_lm=subtotal_mo*order.porcentaje_utaimp_mo.percentage
             order.total_mo_lm= order.subtotal_mo_lm + order.costos_indirectos_mo_lm + order.utilidad_impuestos_mo_lm
 
             order.gran_subtotal_lm=order.total_material_lm+order.total_mo_lm
