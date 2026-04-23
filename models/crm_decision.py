@@ -10,7 +10,6 @@ class CrmQuotationPartner(models.TransientModel):
         """
         Interceptamos el comportamiento estándar del wizard.
         """
-        # Lógica nativa (crear, vincular o ignorar el cliente)
         res = super().action_apply()
         
         # Flujo de LEVANTAMIENTO
@@ -41,7 +40,6 @@ class CrmQuotationPartner(models.TransientModel):
                 }
             }
             
-        # Cotización normal de Odoo, devolvemos el resultado nativo
         return res
 
 # MODELO CRM.LEAD (OPORTUNIDAD)
@@ -115,40 +113,17 @@ class CrmDecision(models.Model):
         string="Terminado",
         default=False,
         copy=False,
-        trackyng=True
+        tracking=True
     )
     
-    def _sync_stage_from_type(self, stage_type):
-        self.ensure_one()
-    
-        # Ganado — usa el flujo nativo
-        if stage_type == 'won':
-            if not self.final_lap:
-                self.action_set_won_rainbowman()
-            return
-    
-        # Busca la etapa CRM cuyo stage_type coincida
-        etapa = self.env['crm.stage'].search([
-            ('stage_type', '=', stage_type)
-        ], limit=1)
-    
-        if etapa and etapa.id != self.stage_id.id:
-            # Usamos sudo para evitar conflictos con las validaciones
-            # de write() si el usuario no tiene permisos de mover etapa
-            self.sudo().write({'stage_id': etapa.id})
-    
     def _message_get_suggested_recipients(self, **kwargs):
-        # En esta versión devuelve lista, no dict
-        # Simplemente retornamos lista vacía
         return []
     
     @api.model
-    def default_get(self, fields_list):
-        res = super().default_get(fields_list)
-
-        if 'name' in fields_list:
+    def default_get(self, fields): 
+        res = super().default_get(fields)
+        if 'name' in fields:
             res['name'] = ' '
-
         return res
     
     @api.depends('stage_id', 'stage_id.stage_type')
@@ -156,16 +131,14 @@ class CrmDecision(models.Model):
         for lead in self:
             lead.is_survey = lead.stage_id.stage_type == 'survey'
             lead.is_apu    = lead.stage_id.stage_type == 'apu'
-            lead.is_lost   = lead.stage_id.stage_type == 'lose'
+            lead.is_lose   = lead.stage_id.stage_type == 'lose' 
     
     def action_set_won_rainbowman(self):
-        """Sobreescribe el botón Ganado para activar final_lap."""
         res = super().action_set_won_rainbowman()
         self.sudo().write({'final_lap': True})
         return res
 
     def action_set_won(self):
-        """Cubre también el método alternativo de marcar como ganado."""
         res = super().action_set_won()
         self.sudo().write({'final_lap': True})
         return res
@@ -173,7 +146,6 @@ class CrmDecision(models.Model):
     def _sync_stage_from_type(self, stage_type):
         self.ensure_one()
 
-        # Ganado — usa el flujo nativo de Odoo
         if stage_type == 'won':
             if not self.final_lap:
                 self.action_set_won_rainbowman()
@@ -190,7 +162,6 @@ class CrmDecision(models.Model):
     
     def write(self, vals):
         if 'stage_id' in vals:
-
             if self.env.context.get('sync_from_survey'):
                 return super().write(vals)
 
@@ -211,14 +182,12 @@ class CrmDecision(models.Model):
                         'a la etapa "%s".'
                     ) % nueva_etapa.name)
 
-                # Fabricación no puede ir a etapa de levantamiento
                 if tipo == 'manufacturing' and nueva_etapa.stage_type == 'survey':
                     raise exceptions.ValidationError(_(
                         'La oportunidad "%s" es de tipo Fabricación y no '
                         'puede avanzar a una etapa de Levantamiento.'
                     ) % lead.name)
 
-                # Reparación no puede saltar directo a APU sin levantamiento
                 if tipo == 'repair' and nueva_etapa.stage_type == 'apu':
                     levantamiento = lead.cylinder_survey_ids.filtered(
                         lambda s: s.state == 'apu'
@@ -230,7 +199,6 @@ class CrmDecision(models.Model):
                             'relacionado esté en estado APU.'
                         ) % lead.name)
 
-                # Negociación requiere cotización o APU confirmado
                 if nueva_etapa.stage_type == 'negotiation':
                     lev_cotizado   = lead.cylinder_survey_ids.filtered(lambda s: s.state == 'quoted')
                     apu_confirmado = lead.apu_survey_ids.filtered(lambda a: a.state == 'confirmed')
@@ -257,15 +225,12 @@ class CrmDecision(models.Model):
     def action_open_cylinder_survey(self):
         self.ensure_one()
 
-        # Si NO hay cliente establecido, llamamos al modal nativo
         if not self.partner_id:
             action = self.env["ir.actions.actions"]._for_xml_id("sale_crm.crm_quotation_partner_action")
             action['name'] = 'Nuevo Levantamiento'
             action['context'] = dict(self.env.context, open_survey=True)
-            
             return action
 
-        # Si SÍ hay cliente, abrimos el formulario normalmente
         return {
             'type': 'ir.actions.act_window',
             'name': 'Nuevo Levantamiento',
@@ -279,9 +244,7 @@ class CrmDecision(models.Model):
         }
 
     def action_view_cylinder_surveys(self):
-        surveys = self.env['impsa.cylinder.survey'].search([
-            ('lead_id', '=', self.id)
-        ])
+        surveys = self.cylinder_survey_ids 
 
         if len(surveys) == 1:
             return {
@@ -303,18 +266,13 @@ class CrmDecision(models.Model):
             }
         }
         
-    # -------------------------------------------------------------------------
-    # ACCIONES DE APU
-    # -------------------------------------------------------------------------
     def action_open_apu(self):
         self.ensure_one()
 
-        # Si NO hay cliente establecido, llamamos al modal nativo
         if not self.partner_id:
             action = self.env["ir.actions.actions"]._for_xml_id("sale_crm.crm_quotation_partner_action")
             action['name'] = 'Nueva APU'
             action['context'] = dict(self.env.context, open_apu=True)
-            
             return action
 
         return {
@@ -331,10 +289,7 @@ class CrmDecision(models.Model):
         
     def action_view_apus(self):
         self.ensure_one()
-
-        apus = self.env['impsa.apu.survey'].search([
-            ('lead_id', '=', self.id)
-        ])
+        apus = self.apu_survey_ids
     
         if len(apus) == 1:
             return {
@@ -360,7 +315,7 @@ class CrmDecision(models.Model):
         self.ensure_one()
 
         if self.apu_survey_ids:
-            raise UserError("Ya existe un APU para esta oportunidad.")
+            raise UserError(_("Ya existe un APU para esta oportunidad."))
 
         return {
             'type': 'ir.actions.act_window',
@@ -379,6 +334,7 @@ class CrmStage(models.Model):
         ('survey',  'Requiere Levantamiento'),
         ('apu',     'Requiere APU'),
         ('negotiation', 'Negociación'),
+        ('lose', 'Perdido'),
         ('none', 'Normal'),
     ], string='Tipo de etapa', default='none')
     
@@ -392,5 +348,5 @@ class CrmStage(models.Model):
         for stage in self:
             stage.is_survey      = stage.stage_type == 'survey'
             stage.is_apu         = stage.stage_type == 'apu'
-            stage.is_lose        = stage.stage_type == 'negotiation'
+            stage.is_lose        = stage.stage_type == 'lose'
             stage.ganado_state   = stage.stage_type == 'negotiation'

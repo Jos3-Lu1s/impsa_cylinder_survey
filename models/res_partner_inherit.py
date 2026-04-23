@@ -1,4 +1,5 @@
 from odoo import models, fields, api, _
+from odoo.osv import expression
 from datetime import date
 from typing import Union
 
@@ -9,7 +10,6 @@ class ResPartnerInherit(models.Model):
     
     @api.model
     def create(self, vals_list: Union[dict, list]):
-        # Si viene un solo dict, convertirlo en lista
         if isinstance(vals_list, dict):
             vals_list = [vals_list]
 
@@ -19,24 +19,16 @@ class ResPartnerInherit(models.Model):
 
         return super().create(vals_list)
     
-    """ @api.model
-    def _name_search(self, name='', domain=None, operator='ilike', limit=100, order=None):
-        domain = domain or []
-        if name:
-            domain = [
-                '|', '|',
-                ('name', operator, name),
-                ('ref', operator, name),
-                ('code_partner', operator, name),  # ← campo personalizado
-            ] + domain
-            return self._search(domain, limit=limit, order=order)
-        return super()._name_search(name, domain, operator, limit, order) """
     @api.model
-    def _search_display_name(self, operator, value):
+    def _search_display_name(self, operator, value): # type: ignore
+        # obtenemos primero el dominio nativo
+        domain = super()._search_display_name(operator, value)
+        
         if value:
-            return [
-                '|',
-                ('name', operator, value),
-                ('code_partner', operator, value),
-            ]
-        return super()._search_display_name(operator, value)
+            # combinamos el dominio original con nuestra nueva regla
+            domain = expression.OR([
+                domain,
+                [('code_partner', operator, value)]
+            ])
+            
+        return domain 
