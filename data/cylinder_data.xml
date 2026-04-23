@@ -309,5 +309,29 @@
             <field name="value">password</field>
         </record>
 
+        <!--Parametros de margenes-->
+        <record id="apu_survey_margins_labour_indirect_cost" model="impsa.apu.survey.margins">
+            <field name="type_cost_margin">labour</field>
+            <field name="type_profit_margin">indirect_cost</field>
+            <field name="percentage">0.20</field>
+        </record>
+        <record id="apu_survey_margins_labour_profit" model="impsa.apu.survey.margins">
+            <field name="type_cost_margin">labour</field>
+            <field name="type_profit_margin">profit_margin</field>
+            <field name="percentage">0.50</field>
+        </record>
+        <record id="apu_survey_margins_material_indirect_cost" model="impsa.apu.survey.margins">
+            <field name="type_cost_margin">material</field>
+            <field name="type_profit_margin">indirect_cost</field>
+            <field name="percentage">0.20</field>
+        </record>
+        <record id="apu_survey_margins_material_profit" model="impsa.apu.survey.margins">
+            <field name="type_cost_margin">material</field>
+            <field name="type_profit_margin">profit_margin</field>
+            <field name="percentage">0.50</field>
+        </record>
+        
+         
+
     </data>
 </odoo>
