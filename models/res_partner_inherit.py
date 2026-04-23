@@ -6,7 +6,7 @@ from typing import Union
 class ResPartnerInherit(models.Model):
     _inherit = 'res.partner'
 
-    code_partner = fields.Char(string="Codigo de contacto", readonly=True, copy=False, index=True)
+    code_partner = fields.Char(string="Codigo", help="Codigo de contacto", readonly=True, copy=False, index=True)
     
     @api.model
     def create(self, vals_list: Union[dict, list]):
@@ -21,13 +21,11 @@ class ResPartnerInherit(models.Model):
     
     @api.depends('is_company', 'name', 'parent_id.display_name', 'type', 'company_name', 'code_partner')
     def _compute_display_name(self):
-        # 1. Ejecutar el comportamiento estándar primero
         super()._compute_display_name()
         
-        # 2. Recorrer los registros para inyectar el código
         for partner in self:
             if partner.code_partner:
-                # Modificamos el display_name para incluir el código entre corchetes
+                # incluir el código entre corchetes
                 partner.display_name = f"[{partner.code_partner}] {partner.display_name}"
 
     @api.model
