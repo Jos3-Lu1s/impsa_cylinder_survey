@@ -151,15 +151,19 @@
                             <separator class="fw-bolder fs-6"
                                        string="Márgen de costos de material" />
                             <field name="porcentaje_cindirectos_material"                           
-                                   readonly="state != 'draft'" />
+                                   readonly="state != 'draft'"
+                                   options="{'no_open': True,'no_create': True, 'no_quick_create': True, 'no_create_edit': True}" />
                             <field name="porcentaje_utaimp_material"
-                                   readonly="state != 'draft'" />
+                                   readonly="state != 'draft'"
+                                   options="{'no_open': True,'no_create': True, 'no_quick_create': True, 'no_create_edit': True}" />
                             <separator class="fw-bolder fs-6"
                                        string="Márgen de costos de MO" />
                             <field name="porcentaje_cindirectos_mo"
-                                   readonly="state != 'draft'" />
+                                   readonly="state != 'draft'"
+                                   options="{'no_open': True,'no_create': True, 'no_quick_create': True, 'no_create_edit': True}" />
                             <field name="porcentaje_utaimp_mo"
-                                   readonly="state != 'draft'" />
+                                   readonly="state != 'draft'"
+                                   options="{'no_open': True,'no_create': True, 'no_quick_create': True, 'no_create_edit': True}" />
                         </group>
                     </group>
                     <separator class="fw-bolder fs-5 mt-4 mb-3"
