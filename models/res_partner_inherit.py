@@ -1,11 +1,11 @@
 from odoo import models, fields, api, _
-from odoo.osv import expression
-from datetime import date
+from odoo.fields import Domain
 from typing import Union
 
 class ResPartnerInherit(models.Model):
     _inherit = 'res.partner'
 
+    display_name = fields.Char(recursive=True)
     code_partner = fields.Char(string="Codigo", help="Codigo de contacto", readonly=True, copy=False, index=True)
     
     @api.model
@@ -29,15 +29,10 @@ class ResPartnerInherit(models.Model):
                 partner.display_name = f"[{partner.code_partner}] {partner.display_name}"
 
     @api.model
-    def _search_display_name(self, operator, value): # type: ignore
-        # obtenemos primero el dominio nativo
+    def _search_display_name(self, operator, value):
         domain = super()._search_display_name(operator, value)
         
         if value:
-            # combinamos el dominio original con nuestra nueva regla
-            domain = expression.OR([
-                domain,
-                [('code_partner', operator, value)]
-            ])
+            domain = Domain(domain) | Domain([('code_partner', operator, value)])
             
-        return domain 
+        return domain

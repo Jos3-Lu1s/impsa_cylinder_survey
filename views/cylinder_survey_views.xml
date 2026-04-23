@@ -12,7 +12,7 @@
                             
                             <div class="bg-light p-2 border-bottom d-flex justify-content-between align-items-center">
                                 <span class="fw-bold text-truncate" style="max-width: 70%;">
-                                    <i class="fa fa-folder-open-o me-1 text-primary"/>
+                                    <i class="fa fa-folder-open-o me-1 text-primary" title="Grupo"/>
                                     <field name="group_name"/>
                                 </span>
                                 <span class="badge rounded-pill text-bg-dark">

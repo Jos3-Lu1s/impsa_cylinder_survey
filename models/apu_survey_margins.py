@@ -27,13 +27,10 @@ class ApuSurveyActions(models.Model):
         ('profit_margin', 'Utilidad'),
     ], string="Tipo", required=True)
 
-    _sql_constraints = [
-        (
-            'unique_margen_tipo_costo',
-            'UNIQUE(percentage, type_cost_margin, type_profit_margin)',
-            'Ya existe un margen con el mismo porcentaje, tipo y margen de costos.'
-        )
-    ]
+    _unique_margen_tipo_costo = models.Constraint(
+        'UNIQUE(percentage, type_cost_margin, type_profit_margin)',
+        'Ya existe un margen con el mismo porcentaje, tipo y margen de costos.'
+    )
 
     @api.constrains('percentage', 'type_cost_margin', 'type_profit_margin')
     def _check_unique_margen(self):

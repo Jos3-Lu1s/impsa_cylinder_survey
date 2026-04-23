@@ -170,8 +170,7 @@
                                 <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
                                     <div class="border rounded-circle d-flex align-items-center justify-content-center me-3"
                                          style="width: 50px; height: 50px;">
-                                        <i class="fa fa-cubes fs-4"
-                                           aria-hidden="true" />
+                                        <i class="fa fa-cubes fs-4" aria-hidden="true" title="Materiales" />
                                     </div>
                                     <h4 class="mb-0 fw-bold text-dark m-0">Costos de Material</h4>
                                 </div>
@@ -193,9 +192,7 @@
                                 <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
                                     <div class="border rounded-circle d-flex align-items-center justify-content-center me-3"
                                          style="width: 50px; height: 50px;">
-                                        <i class="fa fa-male fs-3"
-                                           aria-hidden="true"
-                                           style="padding-bottom: 2px;" />
+                                        <i class="fa fa-male fs-3" aria-hidden="true" style="padding-bottom: 2px;" title="Mano de Obra" />
                                     </div>
                                     <h4 class="mb-0 fw-bold text-dark m-0">Costos de M.O.</h4>
                                 </div>
