@@ -1,6 +1,8 @@
 from odoo import models, fields, api, _
 from datetime import date
 from odoo.exceptions import ValidationError
+import base64
+
 class SaleOrderSmart(models.Model):
     _inherit = 'sale.order'
 
@@ -102,4 +104,35 @@ class SaleOrderSmart(models.Model):
             if self.partner_id:
                 self.pricelist_id=pricelist.id
                 #raise ValidationError(f"La lista de precios es {pricelist}")
+                
+    def _get_report_base_filename(self):
+        self.ensure_one()
+        return self.name
 
+    def action_quotation_send(self):
+        self.ensure_one()
+    
+        # ── Generar PDF pasando el xml_id como string ─────────────────
+        report = self.env['ir.actions.report']
+        pdf_content, _ = report.sudo()._render_qweb_pdf(
+            'impsa_cylinder_survey.action_report_proforma_custom',
+            res_ids=[self.id]
+        )
+    
+        # ── Crear adjunto ─────────────────────────────────────────────
+        attachment = self.env['ir.attachment'].sudo().create({
+            'name': f'{self.name}.pdf',
+            'type': 'binary',
+            'datas': base64.b64encode(pdf_content),
+            'res_model': 'sale.order',
+            'res_id': self.id,
+            'mimetype': 'application/pdf',
+        })
+    
+        # ── Llamar al wizard nativo con el adjunto reemplazado ────────
+        result = super().action_quotation_send()
+    
+        if isinstance(result, dict) and result.get('context'):
+            result['context']['default_attachment_ids'] = [attachment.id]
+    
+        return result
