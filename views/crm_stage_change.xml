@@ -12,10 +12,6 @@
                            widget="radio"
                            options="{'horizontal': True}"/>
                 </xpath>
-
-                <xpath expr="//field[@name='is_won']" position="attributes">
-                    <attribute name="invisible">True</attribute>
-                </xpath>
             </field>
         </record>
 

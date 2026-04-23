@@ -43,6 +43,12 @@
         "views/apu_survey_margins_views.xml",
         "views/crm_stage_change.xml",
     ],
+    
+    'assets': {
+        'web.assets_backend': [
+            'impsa_cylinder_survey/static/src/css/crm_hide_send.css',
+        ],
+    },
 
     'demo': [
         'demo/demo.xml',
