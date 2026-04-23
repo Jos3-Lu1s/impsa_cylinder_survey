@@ -22,10 +22,12 @@ class CylinderSurveyLine(models.Model):
     description_label = fields.Char(
         string="Descripción del Empaque",
         required=True,
+        help="Nombre descriptivo del empaque o sello (ej. Sello de Vástago, O-Ring, Limpiador)."
     )
     
     code_label = fields.Char(
-        string="Código Capturado"
+        string="Código Capturado",
+        help="Código de referencia del fabricante o número de parte capturado del catálogo."
     )
 
     code = fields.Char(
@@ -48,14 +50,19 @@ class CylinderSurveyLine(models.Model):
         ondelete='restrict'
     )
     
-    unit_quantity = fields.Integer(string="Cantidad por Cilindro", default=1, required=True)
+    unit_quantity = fields.Integer(
+        string="Cantidad por Cilindro", 
+        default=1, 
+        required=True,
+        help="Número de piezas de este tipo que utiliza un solo cilindro."
+    )
     
     unit_total = fields.Integer(
         string="Total a Pedir",
         compute="_compute_unit_total", 
         store=True,
         readonly=False,
-        help="Calculado automáticamente (Cant. por Cilindro x Total de Cilindros), pero puedes modificarlo libremente si compras requiere otra cantidad."
+        help="Total acumulado a solicitar. Se calcula automáticamente como (Cant. por Cilindro x Total de Cilindros), pero permite ajuste manual si se requiere un stock extra."
     )
 
     @api.constrains('unit_quantity')
