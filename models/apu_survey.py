@@ -122,29 +122,25 @@ class ApuSurvey(models.Model):
     #porcentaje_utaimp_mo=fields.Float(string="Margen Utilidad M.O.",digits=(16, 2))
 
     porcentaje_cindirectos_material=fields.Many2one(
-        'impsa.apu.survey.margins', string='Margen C. Indirectos Mat.', ondelete='restrict',
-        required=True,
+        'impsa.apu.survey.margins', string='Margen C. Indirectos Mat.',
         tracking=True,
          domain=[('type_cost_margin', '=', 'material'),
          ('type_profit_margin', '=', 'indirect_cost'), ]
     )
     porcentaje_utaimp_material=fields.Many2one(
-        'impsa.apu.survey.margins', string='Margen Utilidad Mat.', ondelete='restrict',
-        required=True,
+        'impsa.apu.survey.margins', string='Margen Utilidad Mat.',
         tracking=True,
          domain=[('type_cost_margin', '=', 'material'),
          ('type_profit_margin', '=', 'profit_margin'),]
     )
     porcentaje_cindirectos_mo=fields.Many2one(
-        'impsa.apu.survey.margins', string='Margen C. Indirectos M.O.', ondelete='restrict',
-        required=True,
+        'impsa.apu.survey.margins', string='Margen C. Indirectos M.O.',
         tracking=True,
          domain=[('type_cost_margin', '=', 'labour'),
          ('type_profit_margin', '=', 'indirect_cost'),]
     )
     porcentaje_utaimp_mo=fields.Many2one(
-        'impsa.apu.survey.margins', string='Margen Utilidad M.O.', ondelete='restrict',
-        required=True,
+        'impsa.apu.survey.margins', string='Margen Utilidad M.O.',
         tracking=True,
          domain=[('type_cost_margin', '=', 'labour'),
          ('type_profit_margin', '=', 'profit_margin'),]
@@ -237,8 +233,8 @@ class ApuSurvey(models.Model):
             #qty = record.group_id.quantity or 1.0 
             qty = record.cylinder_qty_by_group or 1.0 
             unit_price = record.gran_subtotal_lm / qty if qty > 0 else record.gran_subtotal_lm
+            product_variant = record.apu_product_id.product_variant_id
             if not record.quote_ids:
-                product_variant = record.apu_product_id.product_variant_id
                 if not product_variant:
                     raise ValidationError(_("Debes colocar un cilindro a trabajar") % record.name)
                 
@@ -261,6 +257,7 @@ class ApuSurvey(models.Model):
                 for quote in record.quote_ids:
                     for line in quote.order_line:
                         order_lines.append(Command.update(line.id, {
+                            'product_id': product_variant.id,
                             'product_uom_qty': qty,
                             'price_unit': unit_price,
                         }))

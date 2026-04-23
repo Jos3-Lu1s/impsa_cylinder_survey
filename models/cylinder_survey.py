@@ -750,6 +750,10 @@ class CylinderSurvey(models.Model):
                         'survey_id': record.id,
                         'group_id': group.id,
                         'partner_id': record.partner_id.id,
+                        'porcentaje_cindirectos_material':self.env.ref('impsa_cylinder_survey.apu_survey_margins_material_indirect_cost').id,
+                        'porcentaje_utaimp_material':self.env.ref('impsa_cylinder_survey.apu_survey_margins_material_profit').id,
+                        'porcentaje_cindirectos_mo':self.env.ref('impsa_cylinder_survey.apu_survey_margins_labour_indirect_cost').id,
+                        'porcentaje_utaimp_mo':self.env.ref('impsa_cylinder_survey.apu_survey_margins_labour_profit').id,
                         # Puedes inyectar más campos iniciales aquí si lo deseas
                     }
                     new_apu = self.env['impsa.apu.survey'].create(apu_vals)
