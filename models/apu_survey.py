@@ -12,16 +12,17 @@ class ApuSurvey(models.Model):
     )
 
     partner_id = fields.Many2one(
-        "res.partner", string="Cliente", required=True, tracking=True, ondelete='restrict', context={'search_by_ref': True}
+        "res.partner", string="Cliente", required=True, tracking=True, ondelete='restrict', context={'search_by_ref': True}, index=True
     )
 
     cylinder_qty_by_group= fields.Integer(
         related='group_id.quantity',
         store=True,
         string="Cantidad",
+        tracking=True
     )
     apu_product_id = fields.Many2one(
-        'product.template', string='Cilindro a trabajar', ondelete='restrict', domain=[('categ_id.name', '=', 'FABRICACION Y REPARACION')]
+        'product.template', string='Cilindro a trabajar',tracking=True, ondelete='restrict', domain=[('categ_id.name', '=', 'FABRICACION Y REPARACION')]
     )
 
     date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True)
@@ -110,8 +111,8 @@ class ApuSurvey(models.Model):
     total_mo_lm = fields.Monetary(string="Total M.O.", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
 
     #CAMPOS PARA LOS COSTOS TOTALES#
-    gran_subtotal_lm = fields.Monetary(string="Gran Subtotal", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
-    gran_total_lm = fields.Monetary(string="Gran Total", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
+    gran_subtotal_lm = fields.Monetary(string="Gran Subtotal", store=True, currency_field="currency_id", readonly=True, tracking=True, compute='_compute_totales_lm')
+    gran_total_lm = fields.Monetary(string="Gran Total", store=True, currency_field="currency_id", readonly=True, tracking=True, compute='_compute_totales_lm')
 
     #CAMPOS DE PORCENTAJES PARA MARGENES DE COSTOS
     #porcentaje_cindirectos_material=fields.Float(string="Margen C. Indirectos Mat.",digits=(16, 2))
@@ -122,21 +123,29 @@ class ApuSurvey(models.Model):
 
     porcentaje_cindirectos_material=fields.Many2one(
         'impsa.apu.survey.margins', string='Margen C. Indirectos Mat.', ondelete='restrict',
+        required=True,
+        tracking=True,
          domain=[('type_cost_margin', '=', 'material'),
          ('type_profit_margin', '=', 'indirect_cost'), ]
     )
     porcentaje_utaimp_material=fields.Many2one(
         'impsa.apu.survey.margins', string='Margen Utilidad Mat.', ondelete='restrict',
+        required=True,
+        tracking=True,
          domain=[('type_cost_margin', '=', 'material'),
          ('type_profit_margin', '=', 'profit_margin'),]
     )
     porcentaje_cindirectos_mo=fields.Many2one(
         'impsa.apu.survey.margins', string='Margen C. Indirectos M.O.', ondelete='restrict',
+        required=True,
+        tracking=True,
          domain=[('type_cost_margin', '=', 'labour'),
          ('type_profit_margin', '=', 'indirect_cost'),]
     )
     porcentaje_utaimp_mo=fields.Many2one(
         'impsa.apu.survey.margins', string='Margen Utilidad M.O.', ondelete='restrict',
+        required=True,
+        tracking=True,
          domain=[('type_cost_margin', '=', 'labour'),
          ('type_profit_margin', '=', 'profit_margin'),]
     )
@@ -231,7 +240,7 @@ class ApuSurvey(models.Model):
             if not record.quote_ids:
                 product_variant = record.apu_product_id.product_variant_id
                 if not product_variant:
-                    raise ValidationError(_("El producto de la APU: '%s' no tiene variantes activas válidas.") % record.name)
+                    raise ValidationError(_("Debes colocar un cilindro a trabajar") % record.name)
                 
                 order_lines.append(Command.create({
                     'product_id': product_variant.id,
@@ -276,8 +285,8 @@ class ApuSurvey(models.Model):
             if record.survey_id:
                 selection_options = dict(self.env['impsa.cylinder.survey'].fields_get(allfields=['state'])['state']['selection'])
                 state_label = selection_options.get(record.survey_id.state, record.survey_id.state)
-                if record.survey_id.state not in ['draft' ,'apu']:
-                    raise ValidationError(f"No puedes cancelar el {record.name}, ya que el '{record.survey_id.name}' está en estatus {state_label}")
+                """ if record.survey_id.state not in ['draft' ,'apu']:
+                    raise ValidationError(f"No puedes cancelar el {record.name}, ya que el '{record.survey_id.name}' está en estatus {state_label}") """
             else:
                 if any(quote.state != 'draft' for quote in record.quote_ids):
                     raise ValidationError(f"No puedes cancelar el {record.name}, ya que tiene cotizaciones fuera de estado 'Borrador'.")

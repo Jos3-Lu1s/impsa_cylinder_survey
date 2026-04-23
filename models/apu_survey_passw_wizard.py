@@ -6,7 +6,7 @@ class MarginPasswordWizard(models.TransientModel):
     _name = 'impsa.apu.survey.passw'
     _description = 'Verificación de contraseña'
 
-    password = fields.Char(string='Contraseña', password=True)
+    password = fields.Char(string='Contraseña')
 
     def action_confirm(self):
         # Obtener contraseña desde parámetros del sistema

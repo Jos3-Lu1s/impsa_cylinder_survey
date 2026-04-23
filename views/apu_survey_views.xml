@@ -151,15 +151,19 @@
                             <separator class="fw-bolder fs-6"
                                        string="Márgen de costos de material" />
                             <field name="porcentaje_cindirectos_material"                           
-                                   readonly="state != 'draft'" />
+                                   readonly="state != 'draft'"
+                                   options="{'no_open': True,'no_create': True, 'no_quick_create': True, 'no_create_edit': True}" />
                             <field name="porcentaje_utaimp_material"
-                                   readonly="state != 'draft'" />
+                                   readonly="state != 'draft'"
+                                   options="{'no_open': True,'no_create': True, 'no_quick_create': True, 'no_create_edit': True}" />
                             <separator class="fw-bolder fs-6"
                                        string="Márgen de costos de MO" />
                             <field name="porcentaje_cindirectos_mo"
-                                   readonly="state != 'draft'" />
+                                   readonly="state != 'draft'"
+                                   options="{'no_open': True,'no_create': True, 'no_quick_create': True, 'no_create_edit': True}" />
                             <field name="porcentaje_utaimp_mo"
-                                   readonly="state != 'draft'" />
+                                   readonly="state != 'draft'"
+                                   options="{'no_open': True,'no_create': True, 'no_quick_create': True, 'no_create_edit': True}" />
                         </group>
                     </group>
                     <separator class="fw-bolder fs-5 mt-4 mb-3"
@@ -170,8 +174,7 @@
                                 <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
                                     <div class="border rounded-circle d-flex align-items-center justify-content-center me-3"
                                          style="width: 50px; height: 50px;">
-                                        <i class="fa fa-cubes fs-4"
-                                           aria-hidden="true" />
+                                        <i class="fa fa-cubes fs-4" aria-hidden="true" title="Materiales" />
                                     </div>
                                     <h4 class="mb-0 fw-bold text-dark m-0">Costos de Material</h4>
                                 </div>
@@ -193,9 +196,7 @@
                                 <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
                                     <div class="border rounded-circle d-flex align-items-center justify-content-center me-3"
                                          style="width: 50px; height: 50px;">
-                                        <i class="fa fa-male fs-3"
-                                           aria-hidden="true"
-                                           style="padding-bottom: 2px;" />
+                                        <i class="fa fa-male fs-3" aria-hidden="true" style="padding-bottom: 2px;" title="Mano de Obra" />
                                     </div>
                                     <h4 class="mb-0 fw-bold text-dark m-0">Costos de M.O.</h4>
                                 </div>

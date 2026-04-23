@@ -1,17 +1,49 @@
 <odoo>
     <data>
+        <record id="view_partner_tree_inherit_code" model="ir.ui.view">
+            <field name="name">res.partner.tree.inherit.code</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='complete_name']" position="after">
+                    <field name="code_partner" decoration-bf="1" optional="show"/>
+                </xpath>
+            </field>
+        </record>
+
         <record id="view_partner_form_inherit_survey" model="ir.ui.view">
             <field name="name">partner.form.inherit.survey</field>
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form" />
             <field name="arch" type="xml">
-                
-                <xpath expr="//field[@name='parent_id']"
-                   position="before">       
-                     <field name="code_partner"/>
+                <xpath expr="//field[@name='parent_id']" position="before">       
+                     <field name="code_partner" invisible="not code_partner"/>
                 </xpath>
+            </field>
+        </record>
 
+        <record id="view_res_partner_filter_inherit_code" model="ir.ui.view">
+            <field name="name">res.partner.select.inherit.code</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="code_partner" string="Código" filter_domain="[('code_partner', 'ilike', self)]"/>
+                </xpath>
+            </field>
+        </record>
 
+        <record id="res_partner_kanban_view_inherit_code" model="ir.ui.view">
+            <field name="name">res.partner.kanban.inherit.code</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.res_partner_kanban_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//main[hasclass('ps-2')]//field[@name='complete_name']/.." position="after">
+                    <div t-if="record.code_partner.raw_value" class="text-truncate">
+                        <i class="fa fa-fw me-1 fa-hashtag text-primary" title="Código"/>
+                        <field name="code_partner"/>
+                    </div>
+                </xpath>
             </field>
         </record>
     </data>

@@ -12,7 +12,7 @@
                             
                             <div class="bg-light p-2 border-bottom d-flex justify-content-between align-items-center">
                                 <span class="fw-bold text-truncate" style="max-width: 70%;">
-                                    <i class="fa fa-folder-open-o me-1 text-primary"/>
+                                    <i class="fa fa-folder-open-o me-1 text-primary" title="Grupo"/>
                                     <field name="group_name"/>
                                 </span>
                                 <span class="badge rounded-pill text-bg-dark">
@@ -321,13 +321,18 @@
                         </div>
                     </div>
                     <group string="Resumen Técnico" col="3" invisible="cylinder_to_code == 'CE-OT'">
+                        <div class="py-1" role="status" colspan="3">
+                            <div class="alert alert-info text-center fw-bold mx-2">
+                                <i class="fa fa-info-circle me-1"/> Todas las medidas técnicas se expresan en milímetros (mm).
+                            </div>
+                        </div>
                         <group string="Camisa" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
                             <field name="barrel_inner_diameter"/>
                             <field name="barrel_outer_diameter"/>
                             <field name="barrel_length"/>
                         </group>
 
-                        <group string="Vástago" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
+                        <group string="Vástago 1" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
                             <field name="diameter_rod"/>
                             <field name="rod_length" string="Longitud"/>
                         </group>
@@ -342,9 +347,14 @@
                             <field name="piston_length" string="Longitud"/>
                         </group>
 
-                        <group string="Cabeza" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
+                        <group string="Cabeza 1" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
                             <field name="head_diameter"/>
                             <field name="head_length" string="Longitud"/>
+                        </group>
+
+                        <group string="Cabeza 2" invisible="cylinder_to_code != 'CE-DV'">
+                            <field name="head_diameter2"/>
+                            <field name="head_length2" string="Longitud"/>
                         </group>
 
                         <field name="section_ids" nolabel="1" colspan="3" invisible="cylinder_to_code != 'CE-T'">

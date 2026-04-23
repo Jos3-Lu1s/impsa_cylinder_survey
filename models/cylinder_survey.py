@@ -55,9 +55,9 @@ class CylinderSurvey(models.Model):
     )
 
     # Camisa (Barrel)
-    barrel_inner_diameter = fields.Float(string='Ø Interior')
-    barrel_outer_diameter = fields.Float(string='Ø Exterior')
-    barrel_length = fields.Float(string='Longitud')
+    barrel_inner_diameter = fields.Float(string='Ø Interior', tracking=True)
+    barrel_outer_diameter = fields.Float(string='Ø Exterior', tracking=True)
+    barrel_length = fields.Float(string='Longitud', tracking=True)
     barrel_image_ids = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes de la Camisa", 
@@ -65,19 +65,19 @@ class CylinderSurvey(models.Model):
     )
 
     # Vástago (Rod)
-    diameter_rod = fields.Float(string="Ø Vástago")
-    rod_length = fields.Float(string='Longitud de Vástago')
+    diameter_rod = fields.Float(string="Ø Vástago 1", tracking=True)
+    rod_length = fields.Float(string='Longitud de Vástago 1', tracking=True)
     rod_image_ids = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes del Vástago", 
         domain=[('component', '=', 'rod')]
     )
-    diameter_rod2 = fields.Float(string="Ø Vástago 2")
-    rod_length2 = fields.Float(string='Longitud de Vástago 2')
+    diameter_rod2 = fields.Float(string="Ø Vástago 2", tracking=True)
+    rod_length2 = fields.Float(string='Longitud de Vástago 2', tracking=True)
 
     # Émbolo (Piston)
-    piston_diameter = fields.Float(string='Ø Émbolo') 
-    piston_length = fields.Float(string='Longitud de Émbolo')
+    piston_diameter = fields.Float(string='Ø Émbolo', tracking=True) 
+    piston_length = fields.Float(string='Longitud de Émbolo', tracking=True)
     piston_image_ids = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes del Émbolo", 
@@ -85,16 +85,18 @@ class CylinderSurvey(models.Model):
     )
 
     # Cabeza (Head)
-    head_diameter = fields.Float(string='Ø Cabeza')
-    head_length = fields.Float(string='Longitud de Cabeza')
+    head_diameter = fields.Float(string='Ø Cabeza 1', tracking=True)
+    head_length = fields.Float(string='Longitud de Cabeza 1', tracking=True)
     head_image_ids = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes de la Cabeza", 
         domain=[('component', '=', 'head')]
     )
+    head_diameter2 = fields.Float(string='Ø Cabeza 2', tracking=True)
+    head_length2 = fields.Float(string='Longitud de Cabeza 2', tracking=True)
 
     # Carrera (Stroke)
-    stroke_length = fields.Float(string='Longitud de Carrera')
+    stroke_length = fields.Float(string='Longitud de Carrera', tracking=True)
     stroke_image_ids = fields.One2many(
         'impsa.cylinder.image', 'survey_id', 
         string="Imágenes del Ensamble", 
@@ -107,10 +109,10 @@ class CylinderSurvey(models.Model):
         domain=[('component', '=', 'accessory')]
     )
 
-    date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True, required=True)
+    date = fields.Date(string="Fecha", default=fields.Date.context_today, index=True, required=True, tracking=True)
     description = fields.Text(string="Descripción")
     
-    date_delivery = fields.Date(string="Fecha de Entrega")
+    date_delivery = fields.Date(string="Fecha de Entrega", tracking=True)
 
     internal_notes = fields.Html(
         string="Notas Internas",
@@ -127,7 +129,8 @@ class CylinderSurvey(models.Model):
         "impsa.cylinder.options",
         string="Cilindro de",
         ondelete='restrict',
-        required=True
+        required=True,
+        tracking=True
     )
 
     cylinder_to_code = fields.Char(
@@ -169,10 +172,11 @@ class CylinderSurvey(models.Model):
     cylinder_type = fields.Selection([
         ('hydraulic', 'Hidráulico'),
         ('pneumatic', 'Neumático')
-    ],string='Tipo de Cilindro', required=True)
+    ],string='Tipo de Cilindro', required=True, tracking=True)
 
     is_standardized = fields.Boolean(
-        string='Normalizado'
+        string='Normalizado',
+        tracking=True
     )
     
     num_section = fields.Integer(
@@ -205,7 +209,8 @@ class CylinderSurvey(models.Model):
     lead_id = fields.Many2one(
         'crm.lead',
         string="Oportunidad",
-        ondelete='set null'
+        ondelete='set null',
+        tracking=True
     )
     
     has_confirmed_order = fields.Boolean(
@@ -388,6 +393,8 @@ class CylinderSurvey(models.Model):
             if code != 'CE-DV':
                 rec.diameter_rod2 = 0.0
                 rec.rod_length2 = 0.0
+                rec.head_diameter2 = 0.0
+                rec.head_length2 = 0.0
 
             # 3. Si NO es Otros (CE-OT), vaciamos la tabla de accesorios especiales
             if code != 'CE-OT':
@@ -467,7 +474,7 @@ class CylinderSurvey(models.Model):
     @api.constrains(
         'cylinder_to', 'barrel_inner_diameter', 'barrel_outer_diameter', 'barrel_length',
         'diameter_rod', 'rod_length', 'diameter_rod2', 'rod_length2', 'piston_diameter', 'piston_length', 
-        'head_diameter', 'head_length', 'stroke_length', 'section_ids',
+        'head_diameter', 'head_length', 'head_diameter2', 'head_length2', 'stroke_length', 'section_ids',
         'accessory_line_ids'
     )
     def _check_required_dimensions_by_type(self):
@@ -504,6 +511,8 @@ class CylinderSurvey(models.Model):
                 if code == 'CE-DV':
                     if rec.diameter_rod2 <= 0.0 or rec.rod_length2 <= 0.0:
                         missing_components.append('Vástago 2')
+                    if rec.head_diameter2 <= 0.0 or rec.head_length2 <= 0.0:
+                        missing_components.append('Cabeza 2')
                         
                 if rec.piston_diameter <= 0.0 or rec.piston_length <= 0.0:
                     missing_components.append('Émbolo')
