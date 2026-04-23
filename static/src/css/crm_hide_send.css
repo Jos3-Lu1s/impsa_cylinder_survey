@@ -11,3 +11,6 @@
 .o_form_status_indicator_buttons .o_form_button_cancel {
     margin-left: 30px !important;
 }
+.o-mail-Chatter-sendMessage {
+    display: none !important;
+}

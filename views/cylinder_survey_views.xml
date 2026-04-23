@@ -366,9 +366,7 @@
                                 
                                 <field name="inner_diameter" 
                                     force_save="1"
-                                    readonly="section_type == 'last'" 
-                                    decoration-danger="inner_diameter &lt;= 0 and section_type in ('main', 'intermediate')"
-                                    decoration-muted="section_type == 'last'"
+                                    decoration-danger="inner_diameter &lt;= 0 and section_type in ('main', 'intermediate', 'last')"
                                     string="Ø Interior"/>
                                     
                                 <field name="outer_diameter" 
