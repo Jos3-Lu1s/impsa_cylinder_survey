@@ -396,10 +396,10 @@
                                     decoration-muted="section_type == 'main'"/>
                                 
                                 <field name="head_diameter" 
-                                    readonly="section_type in ('last', 'main')" 
+                                    readonly="section_type in ('last')" 
                                     force_save="1"
-                                    decoration-danger="head_diameter &lt;= 0 and section_type == 'intermediate'"
-                                    decoration-muted="section_type in ('last', 'main')"/>
+                                    decoration-danger="head_diameter &lt;= 0 and section_type in ('intermediate', 'main')"
+                                    decoration-muted="section_type in ('last')"/>
                                     
                                 <field name="head_length" 
                                     string="Long. Cabeza"
@@ -533,6 +533,7 @@
                                     <field name="description_label" optional="show" />
                                     <field name="code_label" optional="show" />
                                     <field name="dimensions" optional="show" />
+                                    <field name="material_drop" optional="show" />
                                     <field name="type_piece" widget="radio" options="{'horizontal': True}" optional="show" width="220" />
                                     <field name="unit_quantity" optional="show" />
                                     <field name="unit_total" optional="show" />

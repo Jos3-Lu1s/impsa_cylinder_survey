@@ -1,6 +1,7 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 from odoo import exceptions, _
+from odoo.exceptions import ValidationError
 
 # HERENCIA DEL WIZARD ESTÁNDAR
 class CrmQuotationPartner(models.TransientModel):
@@ -116,6 +117,13 @@ class CrmDecision(models.Model):
         tracking=True
     )
     
+    def _get_mail_thread_data_attachments(self):
+        res = super()._get_mail_thread_data_attachments()
+        return res
+    
+    # Deshabilitar el compositor de mensajes
+    _mail_post_access = 'read'
+    
     def _message_get_suggested_recipients(self, **kwargs):
         return []
     
@@ -160,7 +168,7 @@ class CrmDecision(models.Model):
                 'stage_id': etapa.id
             })
     
-    def write(self, vals):
+    """ def write(self, vals):
         if 'stage_id' in vals:
             if self.env.context.get('sync_from_survey'):
                 return super().write(vals)
@@ -202,6 +210,86 @@ class CrmDecision(models.Model):
                 if nueva_etapa.stage_type == 'negotiation':
                     lev_cotizado   = lead.cylinder_survey_ids.filtered(lambda s: s.state == 'quoted')
                     apu_confirmado = lead.apu_survey_ids.filtered(lambda a: a.state == 'confirmed')
+                    if not lev_cotizado and not apu_confirmado:
+                        raise exceptions.ValidationError(_(
+                            'La oportunidad "%s" no puede avanzar a '
+                            'Negociación hasta que el levantamiento esté '
+                            'en Cotización o el APU esté confirmado.'
+                        ) % lead.name)
+
+        return super().write(vals) """
+    
+    def write(self, vals):
+        if 'stage_id' in vals:
+
+            if self.env.context.get('sync_from_survey'):
+                return super().write(vals)
+
+            nueva_etapa = self.env['crm.stage'].browse(vals['stage_id'])
+
+            for lead in self:
+
+                # ── Bloquear retroceso de etapa ───────────────────────
+                if nueva_etapa.sequence < lead.stage_id.sequence:
+
+                    # Definir desde qué etapa ya no se puede regresar
+                    bloqueos = {
+                        'survey':      'No puedes regresar a Oportunidad desde Levantamiento.',
+                        'apu':         'No puedes regresar a Levantamiento o Oportunidad desde APU.',
+                        'negotiation': 'No puedes regresar desde Negociación.',
+                        'won':         'No puedes regresar desde Ganado.',
+                    }
+
+                    mensaje = bloqueos.get(lead.stage_id.stage_type)
+                    if mensaje:
+                        raise exceptions.ValidationError(_(
+                            'La oportunidad "%s" no puede retroceder de etapa. %s'
+                        ) % (lead.name, mensaje))
+
+                # ── Bloqueado si ya está ganado ───────────────────────
+                if lead.final_lap:
+                    raise exceptions.ValidationError(_(
+                        'La oportunidad "%s" ya fue marcada como ganada '
+                        'y no puede cambiar de etapa.'
+                    ) % lead.name)
+
+                tipo = vals.get('selection_type', lead.selection_type)
+
+                # ── Sin tipo no puede avanzar a etapas especiales ─────
+                if not tipo and nueva_etapa.stage_type in ('apu', 'survey'):
+                    raise exceptions.ValidationError(_(
+                        'Debes seleccionar un tipo (Fabricación o Reparación) '
+                        'antes de avanzar a la etapa "%s".'
+                    ) % nueva_etapa.name)
+
+                # ── Fabricación no puede ir a etapa de levantamiento ──
+                if tipo == 'manufacturing' and nueva_etapa.stage_type == 'survey':
+                    raise exceptions.ValidationError(_(
+                        'La oportunidad "%s" es de tipo Fabricación y no '
+                        'puede avanzar a una etapa de Levantamiento.'
+                    ) % lead.name)
+
+                # ── Reparación solo puede ir a APU si el levantamiento
+                #    relacionado ya está en estado APU ─────────────────
+                if tipo == 'repair' and nueva_etapa.stage_type == 'apu':
+                    levantamiento_en_apu = lead.cylinder_survey_ids.filtered(
+                        lambda s: s.state == 'apu'
+                    )
+                    if not levantamiento_en_apu:
+                        raise exceptions.ValidationError(_(
+                            'La oportunidad "%s" es de tipo Reparación y solo '
+                            'puede avanzar a APU cuando el levantamiento '
+                            'relacionado esté en estado APU.'
+                        ) % lead.name)
+
+                # ── Negociación requiere cotización o APU confirmado ──
+                if nueva_etapa.stage_type == 'negotiation':
+                    lev_cotizado   = lead.cylinder_survey_ids.filtered(
+                        lambda s: s.state == 'quoted'
+                    )
+                    apu_confirmado = lead.apu_survey_ids.filtered(
+                        lambda a: a.state == 'confirmed'
+                    )
                     if not lev_cotizado and not apu_confirmado:
                         raise exceptions.ValidationError(_(
                             'La oportunidad "%s" no puede avanzar a '
@@ -334,8 +422,7 @@ class CrmStage(models.Model):
         ('survey',  'Requiere Levantamiento'),
         ('apu',     'Requiere APU'),
         ('negotiation', 'Negociación'),
-        ('lose', 'Perdido'),
-        ('none', 'Normal'),
+        ('none', 'Oportunidad'),
     ], string='Tipo de etapa', default='none')
     
     is_survey = fields.Boolean(compute='_compute_stage_flags', store=True)
@@ -350,3 +437,17 @@ class CrmStage(models.Model):
             stage.is_apu         = stage.stage_type == 'apu'
             stage.is_lose        = stage.stage_type == 'lose'
             stage.ganado_state   = stage.stage_type == 'negotiation'
+            
+    @api.constrains('is_won')
+    def _check_only_one_won_stage(self):
+        for record in self:
+            if record.is_won:
+                won_stages = self.search([
+                    ('is_won', '=', True),
+                    ('id', '!=', record.id)
+                ])
+                if won_stages:
+                    raise ValidationError(
+                        "Solo puede existir una etapa marcada como ganada."
+                    )
+                    

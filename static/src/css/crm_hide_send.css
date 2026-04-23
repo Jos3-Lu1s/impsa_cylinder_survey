@@ -1,0 +1,13 @@
+.o_form_view .o_lead_opportunity_form .o-mail-Chatter-sendMessage,
+.o_form_view .o_lead_opportunity_form button.o-mail-Chatter-sendMessage,
+.o_form_view .o_lead_opportunity_form .o_SendMessageButton,
+.o_form_view .o_lead_opportunity_form [title="Send message"],
+.o_lead_opportunity_form .o-mail-Chatter-sendMessage {
+    display: none !important;
+}
+.o_lead_opportunity_form .o_form_status_indicator_buttons .o_form_button_cancel {
+    margin-left: 30px !important;
+}
+.o_form_status_indicator_buttons .o_form_button_cancel {
+    margin-left: 30px !important;
+}

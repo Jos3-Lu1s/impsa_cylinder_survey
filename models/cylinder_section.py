@@ -90,13 +90,16 @@ class CylinderSection(models.Model):
                 # Requeridos > 0 (Solo medidas de la camisa en sí)
                 if sec.inner_diameter <= 0: 
                     errors.append("El Ø Interior debe ser mayor a 0.")
+                if sec.head_diameter <= 0: 
+                    errors.append("El Ø de Cabeza debe ser mayor a 0.")
+
                 
                 # Prohibidos: Ni Émbolo Ni Cabeza aplican en la Camisa Principal
                 if sec.piston_diameter != 0 or sec.piston_length != 0:
                     errors.append("La camisa principal no lleva medidas de Émbolo (Deben ser 0).")
-                if sec.head_diameter != 0 or sec.head_length != 0:
-                    errors.append("La camisa principal no lleva medidas de Cabeza (Deben ser 0).")
-
+                """ if sec.head_diameter != 0 or sec.head_length != 0:
+                    errors.append("La camisa principal no lleva medidas de Cabeza (Deben ser 0).") """
+ 
             elif sec.section_type == 'intermediate':
                 # Requeridos > 0 (Todo aplica)
                 if sec.inner_diameter <= 0: errors.append("El Ø Interior debe ser mayor a 0.")
