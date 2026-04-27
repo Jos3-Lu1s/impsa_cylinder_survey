@@ -78,7 +78,18 @@
                         </group>
                     </group>
                     <group>
-                        <field name="component" widget="selection_badge"/>
+                        <!-- Componente estático — siempre visible -->
+                        <field name="component"
+                               widget="selection_badge"
+                               string="Componente"/>
+
+                        <!-- Sección dinámica — solo visible si el levantamiento tiene secciones -->
+                        <field name="section_id"
+                               widget="selection_badge"
+                               invisible="section_count == 0"
+                               domain="[('survey_id', '=', survey_id)]"
+                               options="{'no_create': True, 'no_open': True}"
+                               string="Sección"/>
                     </group>
                     <div class="row mt-3">
                         <div class="col-12 text-center">
@@ -440,7 +451,7 @@
                     </group>
 
                     <notebook>
-                        <page string="Grupos y Operaciones" name="groups">
+                        <page string="Grupos y Operaciones" name="groups" invisible="not group_ids">
                             <field name="group_ids" readonly="state not in ('draft', 'apu')">
                                 <list string="Grupos de Cilindros">
                                     <field name="name"/>

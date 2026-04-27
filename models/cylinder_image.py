@@ -44,6 +44,33 @@ class CylinderImage(models.Model):
         ('stroke', 'Carrera'),
         ('accessory', 'Accesorio'),
     ], string="Componente", required=True)
+    
+    section_id = fields.Many2one(
+        'impsa.cylinder.section',
+        string='Sección',
+        ondelete='set null',
+        domain="[('survey_id', '=', survey_id)]",
+    )
+    section_name = fields.Char(
+        related='section_id.name',
+        string='Nombre de Sección',
+        readonly=True
+    )
+
+    # ── Compute: cuántas secciones tiene el levantamiento ─────────
+    section_count = fields.Integer(
+        string='Secciones',
+        compute='_compute_section_count',
+        store=False
+    )
+    
+    @api.depends('survey_id')
+    def _compute_section_count(self):
+        for img in self:
+            img.section_count = self.env['impsa.cylinder.section'].search_count([
+                ('survey_id', '=', img.survey_id.id)
+            ]) if img.survey_id else 0
+
 
     image = fields.Image(string="Imagen", max_width=1920, max_height=1920, required=True)
 
@@ -66,23 +93,32 @@ class CylinderImage(models.Model):
                 comp = vals.get('component', 'misc')
                 group = vals.get('group_id', False)
                 cyl_num = vals.get('cylinder_number', 1)
+                section_id = vals.get('section_id')
+                
+                if section_id:
+                    section  = self.env['impsa.cylinder.section'].browse(section_id)
+                    comp_key = section.name.upper().replace(' ', '_')
+                else:
+                    comp_key = vals.get('component', 'misc').upper()
                 
                 # llave de rastreo: (Grupo, Numero de cilindro, Componente)
                 tracker_key = (group, cyl_num, comp)
                 
                 if tracker_key not in count_tracker:
-                    existing_count = self.search_count([
-                        ('group_id', '=', group),
+                    domain = [
+                        ('group_id',        '=', group),
                         ('cylinder_number', '=', cyl_num),
-                        ('component', '=', comp)
-                    ])
-                    count_tracker[tracker_key] = existing_count
-                
+                    ]
+                    if section_id:
+                        domain.append(('section_id', '=', section_id))
+                    else:
+                        domain.append(('component', '=', comp))
+
+                    count_tracker[tracker_key] = self.search_count(domain)
+
                 count_tracker[tracker_key] += 1
-                current_number = count_tracker[tracker_key]
-                
-                comp_upper = comp.upper()
+
                 # formato de nomenclatura: IMG-CIL1-BARREL-1
-                vals['name'] = f"IMG-CIL{cyl_num}-{comp_upper}-{current_number}"
+                vals['name'] = f"IMG-CIL{cyl_num}-{comp_key}-{count_tracker[tracker_key]}"
 
         return super(CylinderImage, self).create(vals_list)
