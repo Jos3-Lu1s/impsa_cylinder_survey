@@ -82,14 +82,6 @@
                         <field name="component"
                                widget="selection_badge"
                                string="Componente"/>
-
-                        <!-- Sección dinámica — solo visible si el levantamiento tiene secciones -->
-                        <field name="section_id"
-                               widget="selection_badge"
-                               invisible="section_count == 0"
-                               domain="[('survey_id', '=', survey_id)]"
-                               options="{'no_create': True, 'no_open': True}"
-                               string="Sección"/>
                     </group>
                     <div class="row mt-3">
                         <div class="col-12 text-center">
