@@ -114,8 +114,8 @@ class CylinderSection(models.Model):
                 if sec.piston_length <= 0: errors.append("La Longitud de Émbolo debe ser mayor a 0.")
                 
                 # Prohibidos: No aplica Interior ni Cabeza
-                if sec.inner_diameter != 0: 
-                    errors.append("La última extensión es maciza, el Ø Interior debe ser 0.")
+                #if sec.inner_diameter != 0: 
+                #    errors.append("La última extensión es maciza, el Ø Interior debe ser 0.")
                 if sec.head_diameter != 0 or sec.head_length != 0:
                     errors.append("La última extensión no lleva medidas de Cabeza (Deben ser 0).")
 

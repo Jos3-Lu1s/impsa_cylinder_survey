@@ -98,6 +98,26 @@ class ApuSurvey(models.Model):
         compute="_compute_quote_count"
     )
     
+    #Financimiento
+    is_financed = fields.Boolean(string="Es financiado", default=False)
+    
+    porcentaje_gran_subtotal = fields.Float(
+        string="Porcentaje (%)",
+        digits=(16, 2),
+        default=0.0,
+        tracking=True
+    )
+
+    importe_porcentaje_gran_subtotal = fields.Monetary(
+        string="Importe del Porcentaje",
+        store=True,
+        currency_field="currency_id",
+        readonly=True,
+        compute='_compute_totales_lm'
+    )
+    
+    subtotal_fin = fields.Monetary(string="Subtotal", store=True, currency_field="currency_id", readonly=True, tracking=True, compute='_compute_totales_lm')
+    
     #CAMPOS PARA LOS COSTOS TOTALES DE LOS MATERIALES#
     subtotal_material_lm = fields.Monetary(string="Subtotal Material", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
     costos_indirectos_material_lm = fields.Monetary(string="Costos Indirectos Material", store=True, currency_field="currency_id", readonly=True, compute='_compute_totales_lm')
@@ -166,7 +186,8 @@ class ApuSurvey(models.Model):
         'porcentaje_cindirectos_material',
         'porcentaje_utaimp_material',
         'porcentaje_cindirectos_mo',
-        'porcentaje_utaimp_mo'
+        'porcentaje_utaimp_mo',
+        'porcentaje_gran_subtotal',
     )
     def _compute_totales_lm(self):
         for order in self:
@@ -184,9 +205,15 @@ class ApuSurvey(models.Model):
             order.utilidad_impuestos_mo_lm=subtotal_mo*order.porcentaje_utaimp_mo.percentage
             order.total_mo_lm= order.subtotal_mo_lm + order.costos_indirectos_mo_lm + order.utilidad_impuestos_mo_lm
 
-            order.gran_subtotal_lm=order.total_material_lm+order.total_mo_lm
+            order.subtotal_fin=order.total_material_lm+order.total_mo_lm
+            
+            
+            order.importe_porcentaje_gran_subtotal = (
+                order.subtotal_fin * order.porcentaje_gran_subtotal
+            )
+            
+            order.gran_subtotal_lm = order.subtotal_fin + order.importe_porcentaje_gran_subtotal
             order.gran_total_lm = order.gran_subtotal_lm + (order.gran_subtotal_lm*0.16)
-
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -384,3 +411,8 @@ class ApuSurvey(models.Model):
                     lead._sync_stage_from_type(sync_type)
     
         return result
+    
+    @api.onchange('is_financed')
+    def _onchange_is_financed(self):
+        if not self.is_financed:
+            self.porcentaje_gran_subtotal = 0.0

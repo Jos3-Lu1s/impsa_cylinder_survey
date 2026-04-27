@@ -145,6 +145,7 @@
                                    readonly="state != 'draft'" />
                             <field name="apu_product_id"
                                    readonly="state != 'draft'" />
+                            <field name="is_financed" />
                         </group>
                         <group name="Datos de Entrada de Cotizador"
                                class="border-2 border-start">
@@ -164,6 +165,22 @@
                             <field name="porcentaje_utaimp_mo"
                                    readonly="state != 'draft'"
                                    options="{'no_open': True,'no_create': True, 'no_quick_create': True, 'no_create_edit': True}" />
+                            <separator class="fw-bolder fs-6"
+                                       string="Financiamientos"
+                                       invisible="is_financed == False" />
+                            <field name="porcentaje_gran_subtotal"
+                                   string="Porcentaje (%)"
+                                   readonly="state != 'draft'"
+                                   widget="percentage"
+                                   invisible="is_financed == False" />
+                            <field name="importe_porcentaje_gran_subtotal"
+                                   string="Importe Calculado"
+                                   readonly="1"
+                                   invisible="is_financed == False" />
+                            <field name="subtotal_fin"
+                                   string="Subtotal Financiado"
+                                   readonly="1"
+                                   invisible="is_financed == False" />
                         </group>
                     </group>
                     <separator class="fw-bolder fs-5 mt-4 mb-3"

@@ -418,10 +418,10 @@ class CrmDecision(models.Model):
     @api.model
     def default_get(self, fields_list):
         defaults = super().default_get(fields_list)
-    
+
         # Verificar si el contexto trae una etapa por defecto
         stage_id = defaults.get('stage_id') or self.env.context.get('default_stage_id')
-    
+
         if stage_id:
             etapa = self.env['crm.stage'].browse(stage_id)
             if etapa.stage_type != 'none':
@@ -429,9 +429,9 @@ class CrmDecision(models.Model):
                     'Solo puedes crear oportunidades en la etapa "Oportunidad". '
                     'No es posible crear directamente en la etapa "%s".'
                 ) % etapa.name)
-    
+
         return defaults
-    
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -439,7 +439,7 @@ class CrmDecision(models.Model):
                 vals.get('stage_id') or
                 self.env.context.get('default_stage_id')
             )
-    
+
             if stage_id:
                 etapa = self.env['crm.stage'].browse(stage_id)
                 if etapa.stage_type != 'none':
@@ -447,7 +447,7 @@ class CrmDecision(models.Model):
                         'Solo puedes crear oportunidades en la etapa "Oportunidad". '
                         'No es posible crear directamente en la etapa "%s".'
                     ) % etapa.name)
-    
+
         return super().create(vals_list)
         
 class CrmStage(models.Model):
@@ -470,7 +470,7 @@ class CrmStage(models.Model):
         for stage in self:
             stage.is_survey      = stage.stage_type == 'survey'
             stage.is_apu         = stage.stage_type == 'apu'
-            stage.is_lose        = stage.stage_type == 'lose'
+            stage.is_lose        = stage.stage_type == 'negotiation'
             stage.ganado_state   = stage.stage_type == 'negotiation'
             
     @api.constrains('is_won')
