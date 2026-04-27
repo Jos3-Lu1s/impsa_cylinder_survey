@@ -24,10 +24,13 @@
                                 <field name="image" widget="image" options="{'size': [256, 256]}" />
                             </div>
 
-                            <div class="mt-2 px-2 d-flex justify-content-between">
+                            <div class="mt-2 px-2 d-flex justify-content-between flex-wrap gap-1">
                                 <field name="name" class="fw-bolder"/>
-                                <div class="mt-1 gap-2">
-                                    <span class="badge rounded-pill text-bg-primary me-1">
+                                <div class="d-flex gap-1">
+                                    <span t-if="record.section_id.raw_value" class="badge rounded-pill text-bg-info">
+                                        <field name="section_id"/>
+                                    </span>
+                                    <span class="badge rounded-pill text-bg-primary">
                                         <field name="component"/>
                                     </span>
                                 </div>
@@ -45,25 +48,15 @@
         <field name="arch" type="xml">
             <form string="Inspección Fotográfica">
                 <sheet>
+                    <field name="survey_id" invisible="1"/>
                     <div class="oe_title mb-3 w-100">
                         <label for="name" string="Referencia Fotográfica"/>
-                        
                         <h1 class="d-flex align-items-center flex-wrap gap-2">
-                            
-                            <span invisible="name" class="text-muted">
-                                Nueva Fotografía
-                            </span>
-                            
-                            <field name="name" 
-                                readonly="1" 
-                                force_save="1" 
-                                class="text-primary w-auto flex-grow-0 m-0" 
-                                invisible="not name"/>
-                            
+                            <span invisible="name" class="text-muted">Nueva Fotografía</span>
+                            <field name="name" readonly="1" force_save="1" class="text-primary w-auto flex-grow-0 m-0" invisible="not name"/>
                             <span invisible="not group_name" class="text-muted fs-4 d-flex align-items-center">
                                 (<field name="group_name" readonly="1" nolabel="1" class="w-auto m-0"/>)
                             </span>
-                            
                         </h1>
                     </div>
                     <group>
@@ -75,6 +68,9 @@
                                 <field name="group_qty" readonly="1" class="text-muted" style="width: 1rem !important;"/>
                                 <span class="badge rounded-pill text-bg-info ms-2">Total en grupo</span>
                             </div>
+                        </group>
+                        <group>
+                            <field name="section_id" options="{'no_create': True, 'no_open': True}"/>
                         </group>
                     </group>
                     <group>
@@ -498,6 +494,7 @@
                                             <page string="Fotografías por Cilindro" name="group_images">
                                                 <field name="image_ids" mode="kanban" context="{
                                                     'default_group_id': id,
+                                                    'default_survey_id': survey_id,
                                                     'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
                                                     'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared',
                                                     'default_group_name':name,
