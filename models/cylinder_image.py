@@ -25,6 +25,14 @@ class CylinderImage(models.Model):
         store=True,
         index=True,
     )
+
+    section_id = fields.Many2one(
+        'impsa.cylinder.section',
+        string="Sección",
+        domain="[('survey_id', '=', survey_id)]",
+        ondelete='cascade',
+        help="Permite asociar la imagen a una sección específica del cilindro (ej. si es telescópico)."
+    )
     
     cylinder_number = fields.Integer(
         string="Número de Cilindro", 
