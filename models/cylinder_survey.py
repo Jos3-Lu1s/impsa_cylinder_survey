@@ -130,7 +130,8 @@ class CylinderSurvey(models.Model):
         string="Cilindro de",
         ondelete='restrict',
         required=True,
-        tracking=True
+        tracking=True,
+        help="Indica el uso o configuración específica del cilindro (ej. Doble Efecto, Telescópico)."
     )
 
     cylinder_to_code = fields.Char(
@@ -172,11 +173,12 @@ class CylinderSurvey(models.Model):
     cylinder_type = fields.Selection([
         ('hydraulic', 'Hidráulico'),
         ('pneumatic', 'Neumático')
-    ],string='Tipo de Cilindro', required=True, tracking=True)
+    ],string='Tipo de Cilindro', required=True, tracking=True, help="Define si el cilindro opera con aceite (hidráulico) o aire (neumático).")
 
     is_standardized = fields.Boolean(
         string='Normalizado',
-        tracking=True
+        tracking=True,
+        help="Marca esta casilla si el cilindro cumple con normativas internacionales (ISO, NFPA, etc.) o es un equipo comercial de serie."
     )
     
     num_section = fields.Integer(

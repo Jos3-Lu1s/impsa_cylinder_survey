@@ -427,7 +427,15 @@
                         <group>
                             
                         </group>
+
                     </group>
+                    
+                    <div class="alert alert-warning text-center fw-bold" 
+                        role="alert" 
+                        invisible="cylinder_to_code and id">
+                        <i class="fa fa-exclamation-triangle me-2"/>
+                        <strong>¡Atención!</strong> Para registrar grupos e imágenes en un cilindro, asegúrate de guardar el registro antes.
+                    </div>
 
                     <group string="Configuración de Accesorios / Características" invisible="cylinder_to_code != 'CE-OT'">
                         <field name="accessory_line_ids" nolabel="1" colspan="2">
@@ -451,7 +459,7 @@
                     </group>
 
                     <notebook>
-                        <page string="Grupos y Operaciones" name="groups" invisible="not group_ids">
+                        <page string="Grupos y Operaciones" invisible="not id or not cylinder_to_code" name="groups">
                             <field name="group_ids" readonly="state not in ('draft', 'apu')">
                                 <list string="Grupos de Cilindros">
                                     <field name="name"/>
@@ -524,7 +532,7 @@
                             </field>
                         </page>
 
-                        <page string="Galería Fotográfica Total" name="gallery">
+                        <page string="Galería Fotográfica Total" invisible="not id or not cylinder_to_code" name="gallery">
                             <p class="text-muted mt-2 mb-2">
                                 <i class="fa fa-info-circle me-1" title="Información"></i>
                                 <em>Vista consolidada de todas las fotos de todos los grupos. Para agregar o modificar fotos, ingresa a la pestaña "Grupos y Operaciones".</em>
