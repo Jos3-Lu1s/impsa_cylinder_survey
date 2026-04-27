@@ -70,7 +70,11 @@
                             </div>
                         </group>
                         <group>
-                            <field name="section_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="cylinder_to_code" invisible="1"/>
+                            
+                            <field name="section_id" 
+                                options="{'no_create': True, 'no_open': True}" 
+                                invisible="cylinder_to_code != 'CE-T'"/>
                         </group>
                     </group>
                     <group>
@@ -308,9 +312,9 @@
                             </div>
 
                             <group>
-                                <field name="cylinder_to" string="Cilindro de" options="{'no_open': True}"/>
+                                <field name="cylinder_to" string="Cilindro de" options="{'no_open': True}" readonly="id != False"/>
                                 <field name="cylinder_to_code" invisible="1"/>
-                                <field name="num_section" invisible="cylinder_to_code != 'CE-T'"/>
+                                <field name="num_section" invisible="cylinder_to_code != 'CE-T'" readonly="id != False and cylinder_to_code == 'CE-T'"/>
                                 <field name="purchase_order_create" invisible="1"/>
                                 <field name="description" rows="3" placeholder="Cilindro Hidráulico" />
                             </group>
@@ -414,13 +418,6 @@
                         </group>
 
                     </group>
-                    
-                    <div class="alert alert-warning text-center fw-bold" 
-                        role="alert" 
-                        invisible="cylinder_to_code and id">
-                        <i class="fa fa-exclamation-triangle me-2"/>
-                        <strong>¡Atención!</strong> Para registrar grupos e imágenes en un cilindro, asegúrate de guardar el registro antes.
-                    </div>
 
                     <group string="Configuración de Accesorios / Características" invisible="cylinder_to_code != 'CE-OT'">
                         <field name="accessory_line_ids" nolabel="1" colspan="2">
@@ -442,6 +439,13 @@
                             </list>
                         </field>
                     </group>
+
+                    <div class="alert alert-warning text-center fw-bold" 
+                        role="alert" 
+                        invisible="cylinder_to_code and id">
+                        <i class="fa fa-exclamation-triangle me-2"/>
+                        <strong>¡Atención!</strong> Para registrar grupos e imágenes en un cilindro, asegúrate de guardar el registro antes.
+                    </div>
 
                     <notebook>
                         <page string="Grupos y Operaciones" invisible="not id or not cylinder_to_code" name="groups">
@@ -498,7 +502,6 @@
                                                     'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
                                                     'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared',
                                                     'default_group_name':name,
-                                                    
                                                 }"/>
                                             </page>
                                         </notebook>
@@ -518,7 +521,7 @@
                             </field>
                         </page>
 
-                        <page string="Galería Fotográfica Total" invisible="not id or not cylinder_to_code" name="gallery">
+                        <page string="Galería Fotográfica Total" invisible="not image_ids" name="gallery">
                             <p class="text-muted mt-2 mb-2">
                                 <i class="fa fa-info-circle me-1" title="Información"></i>
                                 <em>Vista consolidada de todas las fotos de todos los grupos. Para agregar o modificar fotos, ingresa a la pestaña "Grupos y Operaciones".</em>

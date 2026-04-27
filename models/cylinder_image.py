@@ -26,6 +26,12 @@ class CylinderImage(models.Model):
         index=True,
     )
 
+    cylinder_to_code = fields.Char(
+        string="Código de Cilindro",
+        related="survey_id.cylinder_to.code",
+        store=False
+    )
+
     section_id = fields.Many2one(
         'impsa.cylinder.section',
         string="Sección",
