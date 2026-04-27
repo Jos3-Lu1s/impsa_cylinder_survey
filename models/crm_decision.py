@@ -415,6 +415,41 @@ class CrmDecision(models.Model):
             }
         }
         
+    @api.model
+    def default_get(self, fields_list):
+        defaults = super().default_get(fields_list)
+    
+        # Verificar si el contexto trae una etapa por defecto
+        stage_id = defaults.get('stage_id') or self.env.context.get('default_stage_id')
+    
+        if stage_id:
+            etapa = self.env['crm.stage'].browse(stage_id)
+            if etapa.stage_type != 'none':
+                raise exceptions.ValidationError(_(
+                    'Solo puedes crear oportunidades en la etapa "Oportunidad". '
+                    'No es posible crear directamente en la etapa "%s".'
+                ) % etapa.name)
+    
+        return defaults
+    
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            stage_id = (
+                vals.get('stage_id') or
+                self.env.context.get('default_stage_id')
+            )
+    
+            if stage_id:
+                etapa = self.env['crm.stage'].browse(stage_id)
+                if etapa.stage_type != 'none':
+                    raise exceptions.ValidationError(_(
+                        'Solo puedes crear oportunidades en la etapa "Oportunidad". '
+                        'No es posible crear directamente en la etapa "%s".'
+                    ) % etapa.name)
+    
+        return super().create(vals_list)
+        
 class CrmStage(models.Model):
     _inherit = 'crm.stage'
 
