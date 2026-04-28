@@ -71,6 +71,17 @@ class CylinderSection(models.Model):
         required=True,
         string="Longitud de Cabeza"
     )
+    
+    has_apu = fields.Boolean(
+        string='Tiene APU',
+        compute='_compute_has_apu',
+        store=False
+    )
+    
+    @api.depends('survey_id', 'survey_id.apu_ids')
+    def _compute_has_apu(self):
+        for sec in self:
+            sec.has_apu = bool(sec.survey_id and sec.survey_id.apu_ids)
 
     @api.constrains('inner_diameter', 'outer_diameter', 'length', 'piston_diameter', 'piston_length', 'head_diameter', 'head_length')
     def _check_strict_dimensions(self):

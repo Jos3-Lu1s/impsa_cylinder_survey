@@ -329,35 +329,46 @@
                                 <i class="fa fa-info-circle me-1"/> Todas las medidas técnicas se expresan en milímetros (mm).
                             </div>
                         </div>
+                        
+                        <div class="py-1" role="status" colspan="3">    
+                            <div class="alert alert-warning fw-bold mx-2 text-center"
+                                 colspan="3"
+                                 invisible="not has_apu"
+                                 role="alert">
+                                <i class="fa fa-info-circle me-1"/>
+                                Las medidas técnicas están bloqueadas porque ya existe un APU generado.
+                            </div>
+                        </div>
+
                         <group string="Camisa" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
-                            <field name="barrel_inner_diameter"/>
-                            <field name="barrel_outer_diameter"/>
-                            <field name="barrel_length"/>
+                            <field name="barrel_inner_diameter" readonly="has_apu"/>
+                            <field name="barrel_outer_diameter" readonly="has_apu"/>
+                            <field name="barrel_length" readonly="has_apu"/>
                         </group>
 
                         <group string="Vástago 1" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
-                            <field name="diameter_rod"/>
-                            <field name="rod_length" string="Longitud"/>
+                            <field name="diameter_rod" readonly="has_apu"/>
+                            <field name="rod_length" string="Longitud" readonly="has_apu"/>
                         </group>
 
                         <group string="Vástago 2" invisible="cylinder_to_code != 'CE-DV'">
-                            <field name="diameter_rod2"/>
-                            <field name="rod_length2" string="Longitud"/>
+                            <field name="diameter_rod2" readonly="has_apu"/>
+                            <field name="rod_length2" string="Longitud" readonly="has_apu"/>
                         </group>
 
                         <group string="Émbolo" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
-                            <field name="piston_diameter"/>
-                            <field name="piston_length" string="Longitud"/>
+                            <field name="piston_diameter" readonly="has_apu"/>
+                            <field name="piston_length" string="Longitud" readonly="has_apu"/>
                         </group>
 
                         <group string="Cabeza 1" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
-                            <field name="head_diameter"/>
-                            <field name="head_length" string="Longitud"/>
+                            <field name="head_diameter" readonly="has_apu"/>
+                            <field name="head_length" string="Longitud" readonly="has_apu"/>
                         </group>
 
                         <group string="Cabeza 2" invisible="cylinder_to_code != 'CE-DV'">
-                            <field name="head_diameter2"/>
-                            <field name="head_length2" string="Longitud"/>
+                            <field name="head_diameter2" readonly="has_apu"/>
+                            <field name="head_length2" string="Longitud" readonly="has_apu"/>
                         </group>
 
                         <field name="section_ids" nolabel="1" colspan="3" invisible="cylinder_to_code != 'CE-T'">
@@ -367,12 +378,14 @@
                                 
                                 <field name="name" readonly="1" force_save="1" decoration-bf="1" width="200px"/>
                                 
-                                <field name="inner_diameter" 
+                                <field name="inner_diameter"
+                                    readonly="has_apu"
                                     force_save="1"
                                     decoration-danger="inner_diameter &lt;= 0 and section_type in ('main', 'intermediate')"
                                     string="Ø Interior"/>
                                     
-                                <field name="outer_diameter" 
+                                <field name="outer_diameter"
+                                    readonly="has_apu" 
                                     force_save="1" 
                                     string="Ø Vástago (Ext)" 
                                     decoration-danger="outer_diameter &lt;= 0"
@@ -381,23 +394,24 @@
                                 <field name="length" 
                                     string="Longitud" 
                                     force_save="1"
+                                    readonly="has_apu"
                                     decoration-danger="length &lt;= 0"/>
                                 
                                 <field name="piston_diameter" 
                                     force_save="1"
-                                    readonly="section_type == 'main'" 
+                                    readonly="section_type == 'main' or has_apu" 
                                     decoration-danger="piston_diameter &lt;= 0 and section_type in ('intermediate', 'last')"
                                     decoration-muted="section_type == 'main'"/>
                                     
                                 <field name="piston_length" 
                                     string="Long. Émbolo"
-                                    readonly="section_type == 'main'" 
+                                    readonly="section_type == 'main' or has_apu"
                                     force_save="1"
                                     decoration-danger="piston_length &lt;= 0 and section_type in ('intermediate', 'last')"
                                     decoration-muted="section_type == 'main'"/>
                                 
                                 <field name="head_diameter" 
-                                    readonly="section_type in ('last')" 
+                                    readonly="section_type in ('last') or has_apu" 
                                     force_save="1"
                                     decoration-danger="head_diameter &lt;= 0 and section_type in ('intermediate', 'main')"
                                     decoration-muted="section_type in ('last')"/>
@@ -405,14 +419,14 @@
                                 <field name="head_length" 
                                     string="Long. Cabeza"
                                     force_save="1"
-                                    readonly="section_type in ('last', 'main')" 
+                                    readonly="section_type in ('last', 'main') or has_apu" 
                                     decoration-danger="head_length &lt;= 0 and section_type == 'intermediate'"
                                     decoration-muted="section_type in ('last', 'main')"/>
                             </list>
                         </field>
 
                         <group string="Carrera" invisible="cylinder_to_code == 'CE-OT'">
-                            <field name="stroke_length" string="Longitud Total"/>
+                            <field name="stroke_length" string="Longitud Total" readonly="has_apu"/>
                         </group>
                     
 

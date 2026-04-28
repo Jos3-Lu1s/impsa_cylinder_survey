@@ -253,6 +253,12 @@ class CylinderSurvey(models.Model):
         compute="_compute_sale_order_count"
     )
 
+    has_apu = fields.Boolean(
+        string='Tiene APU',
+        compute='_compute_has_apu',
+        store=False
+    )
+
     ''' ------------------------
         COMPUTE METHODS
     -------------------------'''
@@ -581,6 +587,11 @@ class CylinderSurvey(models.Model):
                         "Integridad de datos: El número de secciones para un "
                         "cilindro telescópico debe estar estrictamente entre 1 y 5."
                     )
+                    
+    @api.depends('apu_ids')
+    def _compute_has_apu(self):
+        for rec in self:
+            rec.has_apu = bool(rec.apu_ids)
 
     ''' ------------------------
         ACTIONS
@@ -612,16 +623,26 @@ class CylinderSurvey(models.Model):
             
     def action_view_apus(self):
         self.ensure_one()
-        if self.apu_ids:
+        apus = self.apu_survey_ids
+    
+        if len(apus) == 1:
             return {
                 'type': 'ir.actions.act_window',
+                'name': 'APU',
+                'res_model': 'impsa.apu.survey',
+                'view_mode': 'form',
+                'res_id': apus.id,
+            }
+
+        return {
+            'type': 'ir.actions.act_window',
                 'name': 'Análisis de Precios Unitarios',
                 'res_model': 'impsa.apu.survey',
                 'view_mode': 'list,form',
                 'domain': [('survey_id', '=', self.id)],
                 'context': {'default_survey_id': self.id, 'default_partner_id': self.partner_id.id}
-            }
-
+        }
+        
     def action_view_sale_orders(self):
         self.ensure_one()
         return {
