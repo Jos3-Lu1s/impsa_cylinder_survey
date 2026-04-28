@@ -623,7 +623,7 @@ class CylinderSurvey(models.Model):
             
     def action_view_apus(self):
         self.ensure_one()
-        apus = self.apu_survey_ids
+        apus = self.apu_ids
     
         if len(apus) == 1:
             return {
