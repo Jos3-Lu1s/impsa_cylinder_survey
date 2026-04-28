@@ -396,3 +396,4 @@ class CrmStage(models.Model):
                     raise exceptions.ValidationError(
                         "Solo puede existir una etapa marcada como ganada."
                     )
+    #Cambios cambios
