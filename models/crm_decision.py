@@ -1,19 +1,12 @@
-from odoo import models, fields, api
-from odoo.exceptions import UserError
-from odoo import exceptions, _
-from odoo.exceptions import ValidationError
+from odoo import models, fields, api, exceptions, _
+# ---> MEJORA: Se consolidaron las importaciones redundantes de excepciones.
 
-# HERENCIA DEL WIZARD ESTÁNDAR
 class CrmQuotationPartner(models.TransientModel):
     _inherit = 'crm.quotation.partner'
 
     def action_apply(self):
-        """
-        Interceptamos el comportamiento estándar del wizard.
-        """
         res = super().action_apply()
         
-        # Flujo de LEVANTAMIENTO
         if self.env.context.get('open_survey'):
             return {
                 'type': 'ir.actions.act_window',
@@ -27,7 +20,6 @@ class CrmQuotationPartner(models.TransientModel):
                 }
             }
             
-        # Flujo de APU
         elif self.env.context.get('open_apu'):
             return {
                 'type': 'ir.actions.act_window',
@@ -43,7 +35,6 @@ class CrmQuotationPartner(models.TransientModel):
             
         return res
 
-# MODELO CRM.LEAD (OPORTUNIDAD)
 class CrmDecision(models.Model):
     _inherit = "crm.lead"
 
@@ -57,8 +48,7 @@ class CrmDecision(models.Model):
     ],string='Tipo de Cilindro')
     
     is_won_stage = fields.Boolean(
-        related='stage_id.is_won',
-        store=False
+        related='stage_id.is_won'
     )
     
     cylinder_survey_ids = fields.One2many(
@@ -84,30 +74,24 @@ class CrmDecision(models.Model):
     )
     
     stage_sequence = fields.Integer(
-        related='stage_id.sequence',
-        store=False
+        related='stage_id.sequence'
     )
     
     is_survey = fields.Boolean(
         related='stage_id.is_survey',
-        string="Requiere Levantamiento",
-        store=False
+        string="Requiere Levantamiento"
     )
     is_apu = fields.Boolean(
         related='stage_id.is_apu',
-        string="Requiere APU",
-        store=False
+        string="Requiere APU"
     )
     is_lose = fields.Boolean(
         related='stage_id.is_lose',
-        string="Etapa de Pérdida",
-        store=False
+        string="Etapa de Pérdida"
     )
-    
     ganado_state = fields.Boolean(
         related='stage_id.ganado_state',
-        store=False,
-        string="Ganado",
+        string="Ganado"
     )
     
     final_lap = fields.Boolean(
@@ -117,11 +101,6 @@ class CrmDecision(models.Model):
         tracking=True
     )
     
-    def _get_mail_thread_data_attachments(self):
-        res = super()._get_mail_thread_data_attachments()
-        return res
-    
-    # Deshabilitar el compositor de mensajes
     _mail_post_access = 'read'
     
     def _message_get_suggested_recipients(self, **kwargs):
@@ -129,18 +108,23 @@ class CrmDecision(models.Model):
     
     @api.model
     def default_get(self, fields): 
-        res = super().default_get(fields)
-        if 'name' in fields:
-            res['name'] = ' '
-        return res
+        defaults = super().default_get(fields)
+        
+        stage_id = defaults.get('stage_id') or self.env.context.get('default_stage_id')
     
-    @api.depends('stage_id', 'stage_id.stage_type')
-    def _compute_stage_type(self):
-        for lead in self:
-            lead.is_survey = lead.stage_id.stage_type == 'survey'
-            lead.is_apu    = lead.stage_id.stage_type == 'apu'
-            lead.is_lose   = lead.stage_id.stage_type == 'lose' 
-    
+        if stage_id:
+            etapa = self.env['crm.stage'].browse(stage_id)
+            if etapa.stage_type != 'none':
+                raise exceptions.ValidationError(_(
+                    'Solo puedes crear oportunidades en la etapa "Oportunidad". '
+                    'No es posible crear directamente en la etapa "%s".'
+                ) % etapa.name)
+                
+        if 'name' in fields and not defaults.get('name'):
+            defaults['name'] = ' '
+            
+        return defaults
+
     def action_set_won_rainbowman(self):
         res = super().action_set_won_rainbowman()
         self.sudo().write({'final_lap': True})
@@ -168,71 +152,15 @@ class CrmDecision(models.Model):
                 'stage_id': etapa.id
             })
     
-    """ def write(self, vals):
-        if 'stage_id' in vals:
-            if self.env.context.get('sync_from_survey'):
-                return super().write(vals)
-
-            nueva_etapa = self.env['crm.stage'].browse(vals['stage_id'])
-
-            for lead in self:
-                if lead.final_lap:
-                    raise exceptions.ValidationError(_(
-                        'La oportunidad "%s" ya fue marcada como ganada '
-                        'y no puede cambiar de etapa.'
-                    ) % lead.name)
-
-                tipo = vals.get('selection_type', lead.selection_type)
-
-                if not tipo and nueva_etapa.stage_type in ('apu', 'survey'):
-                    raise exceptions.ValidationError(_(
-                        'Debes seleccionar un tipo antes de avanzar '
-                        'a la etapa "%s".'
-                    ) % nueva_etapa.name)
-
-                if tipo == 'manufacturing' and nueva_etapa.stage_type == 'survey':
-                    raise exceptions.ValidationError(_(
-                        'La oportunidad "%s" es de tipo Fabricación y no '
-                        'puede avanzar a una etapa de Levantamiento.'
-                    ) % lead.name)
-
-                if tipo == 'repair' and nueva_etapa.stage_type == 'apu':
-                    levantamiento = lead.cylinder_survey_ids.filtered(
-                        lambda s: s.state == 'apu'
-                    )
-                    if not levantamiento:
-                        raise exceptions.ValidationError(_(
-                            'La oportunidad "%s" es de tipo Reparación y solo '
-                            'puede avanzar a APU cuando el levantamiento '
-                            'relacionado esté en estado APU.'
-                        ) % lead.name)
-
-                if nueva_etapa.stage_type == 'negotiation':
-                    lev_cotizado   = lead.cylinder_survey_ids.filtered(lambda s: s.state == 'quoted')
-                    apu_confirmado = lead.apu_survey_ids.filtered(lambda a: a.state == 'confirmed')
-                    if not lev_cotizado and not apu_confirmado:
-                        raise exceptions.ValidationError(_(
-                            'La oportunidad "%s" no puede avanzar a '
-                            'Negociación hasta que el levantamiento esté '
-                            'en Cotización o el APU esté confirmado.'
-                        ) % lead.name)
-
-        return super().write(vals) """
-    
     def write(self, vals):
         if 'stage_id' in vals:
-
             if self.env.context.get('sync_from_survey'):
                 return super().write(vals)
 
             nueva_etapa = self.env['crm.stage'].browse(vals['stage_id'])
 
             for lead in self:
-
-                # ── Bloquear retroceso de etapa ───────────────────────
                 if nueva_etapa.sequence < lead.stage_id.sequence:
-
-                    # Definir desde qué etapa ya no se puede regresar
                     bloqueos = {
                         'survey':      'No puedes regresar a Oportunidad desde Levantamiento.',
                         'apu':         'No puedes regresar a Levantamiento o Oportunidad desde APU.',
@@ -246,7 +174,6 @@ class CrmDecision(models.Model):
                             'La oportunidad "%s" no puede retroceder de etapa. %s'
                         ) % (lead.name, mensaje))
 
-                # ── Bloqueado si ya está ganado ───────────────────────
                 if lead.final_lap:
                     raise exceptions.ValidationError(_(
                         'La oportunidad "%s" ya fue marcada como ganada '
@@ -255,22 +182,18 @@ class CrmDecision(models.Model):
 
                 tipo = vals.get('selection_type', lead.selection_type)
 
-                # ── Sin tipo no puede avanzar a etapas especiales ─────
                 if not tipo and nueva_etapa.stage_type in ('apu', 'survey'):
                     raise exceptions.ValidationError(_(
                         'Debes seleccionar un tipo (Fabricación o Reparación) '
                         'antes de avanzar a la etapa "%s".'
                     ) % nueva_etapa.name)
 
-                # ── Fabricación no puede ir a etapa de levantamiento ──
                 if tipo == 'manufacturing' and nueva_etapa.stage_type == 'survey':
                     raise exceptions.ValidationError(_(
                         'La oportunidad "%s" es de tipo Fabricación y no '
                         'puede avanzar a una etapa de Levantamiento.'
                     ) % lead.name)
 
-                # ── Reparación solo puede ir a APU si el levantamiento
-                #    relacionado ya está en estado APU ─────────────────
                 if tipo == 'repair' and nueva_etapa.stage_type == 'apu':
                     levantamiento_en_apu = lead.cylinder_survey_ids.filtered(
                         lambda s: s.state == 'apu'
@@ -282,7 +205,6 @@ class CrmDecision(models.Model):
                             'relacionado esté en estado APU.'
                         ) % lead.name)
 
-                # ── Negociación requiere cotización o APU confirmado ──
                 if nueva_etapa.stage_type == 'negotiation':
                     lev_cotizado   = lead.cylinder_survey_ids.filtered(
                         lambda s: s.state == 'quoted'
@@ -309,7 +231,6 @@ class CrmDecision(models.Model):
         for rec in self:
             rec.apu_survey_count = len(rec.apu_survey_ids)
 
-    # ACCIONES DE LEVANTAMIENTO
     def action_open_cylinder_survey(self):
         self.ensure_one()
 
@@ -347,7 +268,7 @@ class CrmDecision(models.Model):
             'type': 'ir.actions.act_window',
             'name': 'Levantamientos',
             'res_model': 'impsa.cylinder.survey',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('lead_id', '=', self.id)],
             'context': {
                 'default_lead_id': self.id
@@ -392,7 +313,7 @@ class CrmDecision(models.Model):
             'type': 'ir.actions.act_window',
             'name': 'Análisis de Precios',
             'res_model': 'impsa.apu.survey',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('lead_id', '=', self.id)],
             'context': {
                 'default_lead_id': self.id
@@ -403,7 +324,7 @@ class CrmDecision(models.Model):
         self.ensure_one()
 
         if self.apu_survey_ids:
-            raise UserError(_("Ya existe un APU para esta oportunidad."))
+            raise exceptions.UserError(_("Ya existe un APU para esta oportunidad."))
 
         return {
             'type': 'ir.actions.act_window',
@@ -414,24 +335,7 @@ class CrmDecision(models.Model):
                 'default_lead_id': self.id
             }
         }
-        
-    @api.model
-    def default_get(self, fields_list):
-        defaults = super().default_get(fields_list)
-
-        # Verificar si el contexto trae una etapa por defecto
-        stage_id = defaults.get('stage_id') or self.env.context.get('default_stage_id')
-
-        if stage_id:
-            etapa = self.env['crm.stage'].browse(stage_id)
-            if etapa.stage_type != 'none':
-                raise exceptions.ValidationError(_(
-                    'Solo puedes crear oportunidades en la etapa "Oportunidad". '
-                    'No es posible crear directamente en la etapa "%s".'
-                ) % etapa.name)
-
-        return defaults
-
+    
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -439,7 +343,7 @@ class CrmDecision(models.Model):
                 vals.get('stage_id') or
                 self.env.context.get('default_stage_id')
             )
-
+    
             if stage_id:
                 etapa = self.env['crm.stage'].browse(stage_id)
                 if etapa.stage_type != 'none':
@@ -447,7 +351,7 @@ class CrmDecision(models.Model):
                         'Solo puedes crear oportunidades en la etapa "Oportunidad". '
                         'No es posible crear directamente en la etapa "%s".'
                     ) % etapa.name)
-
+    
         return super().create(vals_list)
         
 class CrmStage(models.Model):
@@ -482,7 +386,6 @@ class CrmStage(models.Model):
                     ('id', '!=', record.id)
                 ])
                 if won_stages:
-                    raise ValidationError(
+                    raise exceptions.ValidationError(
                         "Solo puede existir una etapa marcada como ganada."
                     )
-                    
