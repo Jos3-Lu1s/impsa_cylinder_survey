@@ -126,9 +126,10 @@ class CrmDecision(models.Model):
         return defaults
 
     def action_set_won_rainbowman(self):
-        res = super().action_set_won_rainbowman()
+        res = self.with_context(set_won_official=True).sudo()
+        result = super(CrmDecision, res).action_set_won_rainbowman()
         self.sudo().write({'final_lap': True})
-        return res
+        return result
 
     def action_set_won(self):
         res = super().action_set_won()
@@ -178,6 +179,12 @@ class CrmDecision(models.Model):
                     raise exceptions.ValidationError(_(
                         'La oportunidad "%s" ya fue marcada como ganada '
                         'y no puede cambiar de etapa.'
+                    ) % lead.name)
+                    
+                if nueva_etapa.is_won and not self.env.context.get('set_won_official'):
+                    raise exceptions.ValidationError(_(
+                        'La oportunidad "%s" solo puede marcarse como ganada '
+                        'desde la etapa de "Negociación".'
                     ) % lead.name)
 
                 tipo = vals.get('selection_type', lead.selection_type)
