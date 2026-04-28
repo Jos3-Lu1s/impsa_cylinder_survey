@@ -6,7 +6,6 @@ class ApuSurvey(models.Model):
     _description = "Análisis de Precios Unitarios"
     _inherit = ["mail.thread", "mail.activity.mixin"]
 
-    
     name = fields.Char(
         string="Referencia", required=True, copy=False, readonly=True, default="Nuevo"
     )
@@ -185,19 +184,17 @@ class ApuSurvey(models.Model):
             subtotal_material = sum(order.lm_ids.mapped('importe_material_lm'))
             subtotal_mo = sum(order.lm_ids.mapped('importe_mo_lm'))
             
-
             order.subtotal_material_lm = subtotal_material
-            order.costos_indirectos_material_lm=subtotal_material*order.porcentaje_cindirectos_material.percentage
-            order.utilidad_impuestos_material_lm=subtotal_material*order.porcentaje_utaimp_material.percentage
-            order.total_material_lm= order.subtotal_material_lm + order.costos_indirectos_material_lm + order.utilidad_impuestos_material_lm
+            order.costos_indirectos_material_lm = subtotal_material * (order.porcentaje_cindirectos_material.percentage or 0.0)
+            order.utilidad_impuestos_material_lm = subtotal_material * (order.porcentaje_utaimp_material.percentage or 0.0)
+            order.total_material_lm = order.subtotal_material_lm + order.costos_indirectos_material_lm + order.utilidad_impuestos_material_lm
 
             order.subtotal_mo_lm = subtotal_mo
-            order.costos_indirectos_mo_lm=subtotal_mo*order.porcentaje_cindirectos_mo.percentage
-            order.utilidad_impuestos_mo_lm=subtotal_mo*order.porcentaje_utaimp_mo.percentage
-            order.total_mo_lm= order.subtotal_mo_lm + order.costos_indirectos_mo_lm + order.utilidad_impuestos_mo_lm
+            order.costos_indirectos_mo_lm = subtotal_mo * (order.porcentaje_cindirectos_mo.percentage or 0.0)
+            order.utilidad_impuestos_mo_lm = subtotal_mo * (order.porcentaje_utaimp_mo.percentage or 0.0)
+            order.total_mo_lm = order.subtotal_mo_lm + order.costos_indirectos_mo_lm + order.utilidad_impuestos_mo_lm
 
-            order.subtotal_fin=order.total_material_lm+order.total_mo_lm
-            
+            order.subtotal_fin = order.total_material_lm + order.total_mo_lm
             
             order.importe_porcentaje_gran_subtotal = (
                 order.subtotal_fin * order.porcentaje_gran_subtotal
@@ -208,13 +205,6 @@ class ApuSurvey(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-         # Rescatar valores que serán pisados por el related
-        qty_by_group_values = {
-            i: vals.pop('cylinder_qty_by_group', None)
-            for i, vals in enumerate(vals_list)
-        }
-
-        # Generar secuencia
         for vals in vals_list:
             if vals.get("name", "Nuevo") == "Nuevo":
                 vals["name"] = (
@@ -222,23 +212,7 @@ class ApuSurvey(models.Model):
                     or "Nuevo"
                 )
 
-        records = super(ApuSurvey, self).create(vals_list)
-
-        # Reescribir el valor después de que el related lo haya recomputado
-        for i, record in enumerate(records):
-            qty = qty_by_group_values.get(i)
-            if qty is not None:
-                record.write({'cylinder_qty_by_group': qty})
-
-        return records
-        """ for vals in vals_list:
-            if vals.get("name", "Nuevo") == "Nuevo":
-                vals["name"] = (
-                    self.env["ir.sequence"].next_by_code("impsa.apu.survey")
-                    or "Nuevo"
-                )
-
-        return super(ApuSurvey, self).create(vals_list) """
+        return super(ApuSurvey, self).create(vals_list)
 
     def action_to_confirmed(self):
         for record in self:
@@ -246,15 +220,15 @@ class ApuSurvey(models.Model):
             if record.cylinder_qty_by_group <= 0:
                 raise ValidationError(_("Debes colocar un número mayor a 0 en el campo 'Cant. de cilindros'"))
             elif record.gran_total_lm <= 0:
-                raise ValidationError(_("El APU: '%s' no puede cotizardo con total 0, verfica tu lista de materiales")% record.name)
+                raise ValidationError(_("El APU: '%s' no puede ser cotizado con total 0, verifica tu lista de materiales") % record.name)
 
-            #qty = record.group_id.quantity or 1.0 
             qty = record.cylinder_qty_by_group or 1.0 
             unit_price = record.gran_subtotal_lm / qty if qty > 0 else record.gran_subtotal_lm
             product_variant = record.apu_product_id.product_variant_id
+            
             if not record.quote_ids:
                 if not product_variant:
-                    raise ValidationError(_("Debes colocar un cilindro a trabajar") % record.name)
+                    raise ValidationError(_("Debes colocar un cilindro a trabajar en el APU: %s") % record.name)
                 
                 order_lines.append(Command.create({
                     'product_id': product_variant.id,
@@ -281,30 +255,15 @@ class ApuSurvey(models.Model):
                         }))
 
                     quote.sudo().write({'order_line': order_lines})
-                """ order_lines.append(Command.update(record.quote_ids.id,{
-                    'product_uom_qty': qty,
-                    'price_unit': unit_price,
-                }))
-
-                so_vals = {
-                    'order_line': order_lines,
-                }
-                record.quote_ids.sudo().write(so_vals)   """  
-                
                 
             record.write({'state': 'confirmed'})
          
     def action_cancel(self):
         """Cancela el registro"""
         for record in self:
-            if record.survey_id:
-                selection_options = dict(self.env['impsa.cylinder.survey'].fields_get(allfields=['state'])['state']['selection'])
-                state_label = selection_options.get(record.survey_id.state, record.survey_id.state)
-                """ if record.survey_id.state not in ['draft' ,'apu']:
-                    raise ValidationError(f"No puedes cancelar el {record.name}, ya que el '{record.survey_id.name}' está en estatus {state_label}") """
-            else:
+            if not record.survey_id:
                 if any(quote.state != 'draft' for quote in record.quote_ids):
-                    raise ValidationError(f"No puedes cancelar el {record.name}, ya que tiene cotizaciones fuera de estado 'Borrador'.")
+                    raise ValidationError(_("No puedes cancelar el %s, ya que tiene cotizaciones fuera de estado 'Borrador'.") % record.name)
             
             record.write({'state': 'cancel'})
 
@@ -392,8 +351,6 @@ class ApuSurvey(models.Model):
                     apu.survey_id.sudo().write({'state': survey_state})
     
             # ── Sincronizar CRM ───────────────────────────────────────
-            # Camino 1 — APU directo desde CRM
-            # Camino 2 — APU desde levantamiento que tiene lead
             lead = apu.lead_id or apu.survey_id.lead_id
     
             if lead:
