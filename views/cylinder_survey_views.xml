@@ -466,7 +466,7 @@
 
                     <notebook>
                         <page string="Grupos y Operaciones" invisible="not id or not cylinder_to_code" name="groups">
-                            <field name="group_ids" readonly="state not in ('draft', 'apu')">
+                            <field name="group_ids" readonly="state not in ('draft')">
                                 <list string="Grupos de Cilindros">
                                     <field name="name"/>
                                     <field name="quantity" string="Total de cilindros" width="220"/>

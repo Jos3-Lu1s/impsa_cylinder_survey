@@ -203,6 +203,30 @@ class ApuSurvey(models.Model):
             order.gran_subtotal_lm = order.subtotal_fin + order.importe_porcentaje_gran_subtotal
             order.gran_total_lm = order.gran_subtotal_lm + (order.gran_subtotal_lm*0.16)
 
+    @api.model
+    def default_get(self, fields_list):
+        defaults = super().default_get(fields_list)
+        try:
+            if not defaults.get('porcentaje_cindirectos_material'):
+                defaults['porcentaje_cindirectos_material'] = self.env.ref(
+                    'impsa_cylinder_survey.apu_survey_margins_material_indirect_cost'
+                ).id
+            if not defaults.get('porcentaje_utaimp_material'):
+                defaults['porcentaje_utaimp_material'] = self.env.ref(
+                    'impsa_cylinder_survey.apu_survey_margins_material_profit'
+                ).id
+            if not defaults.get('porcentaje_cindirectos_mo'):
+                defaults['porcentaje_cindirectos_mo'] = self.env.ref(
+                    'impsa_cylinder_survey.apu_survey_margins_labour_indirect_cost'
+                ).id
+            if not defaults.get('porcentaje_utaimp_mo'):
+                defaults['porcentaje_utaimp_mo'] = self.env.ref(
+                    'impsa_cylinder_survey.apu_survey_margins_labour_profit'
+                ).id
+        except ValueError:
+            pass
+        return defaults
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
