@@ -30,7 +30,7 @@ class ApuSurvey(models.Model):
     lead_id = fields.Many2one(
         'crm.lead',
         string="Oportunidad",
-        ondelete='cascade'
+        ondelete='restrict'
     )
       
     lead_count = fields.Integer(
@@ -69,7 +69,7 @@ class ApuSurvey(models.Model):
     survey_id = fields.Many2one(
         "impsa.cylinder.survey",
         string="Levantamiento",
-        ondelete="cascade",
+        ondelete="restrict",
         index=True,
         help="Levantamiento técnico origen de este APU."
     )
@@ -77,7 +77,7 @@ class ApuSurvey(models.Model):
     group_id = fields.Many2one(
         "impsa.cylinder.group",
         string="Grupo de Cilindros",
-        ondelete="cascade",
+        ondelete="restrict",
         index=True,
         help="Grupo de cilindros específico que se está costeando."
     )
@@ -134,13 +134,6 @@ class ApuSurvey(models.Model):
     gran_subtotal_lm = fields.Monetary(string="Gran Subtotal", store=True, currency_field="currency_id", readonly=True, tracking=True, compute='_compute_totales_lm')
     gran_total_lm = fields.Monetary(string="Gran Total", store=True, currency_field="currency_id", readonly=True, tracking=True, compute='_compute_totales_lm')
 
-    #CAMPOS DE PORCENTAJES PARA MARGENES DE COSTOS
-    #porcentaje_cindirectos_material=fields.Float(string="Margen C. Indirectos Mat.",digits=(16, 2))
-    #porcentaje_utaimp_material=fields.Float(string="Margen Utilidad Mat.",digits=(16, 2))
-    
-    #porcentaje_cindirectos_mo=fields.Float(string="Margen C. Indirectos M.O.",digits=(16, 2))
-    #porcentaje_utaimp_mo=fields.Float(string="Margen Utilidad M.O.",digits=(16, 2))
-
     porcentaje_cindirectos_material=fields.Many2one(
         'impsa.apu.survey.margins', string='Margen C. Indirectos Mat.',
         tracking=True,
@@ -167,8 +160,6 @@ class ApuSurvey(models.Model):
     )
     
     def _message_get_suggested_recipients(self, **kwargs):
-        # En esta versión devuelve lista, no dict
-        # Simplemente retornamos lista vacía
         return []
 
     @api.onchange('survey_id')
@@ -403,7 +394,7 @@ class ApuSurvey(models.Model):
             # ── Sincronizar CRM ───────────────────────────────────────
             # Camino 1 — APU directo desde CRM
             # Camino 2 — APU desde levantamiento que tiene lead
-            lead = apu.lead_id or (apu.survey_id and apu.survey_id.lead_id)
+            lead = apu.lead_id or apu.survey_id.lead_id
     
             if lead:
                 sync_type = mapeo_crm.get(nuevo_state)
