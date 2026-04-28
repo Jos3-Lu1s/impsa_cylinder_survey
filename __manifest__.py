@@ -1,19 +1,34 @@
 {
-    'name': "Levantamiento de Cilindros IMPSA",
+    'name': "IMPSA: Levantamiento y Costeo de Cilindros",
 
-    'summary': "Formato digital F-05-01",
-
-    'description': """
-        Digitalización del formato F-05-01 para el levantamiento de cilindros hidráulicos.
-        Permite capturar medidas de:
-        - Camisa, Vástago, Pistón, Cabeza.
-        - Trabajos a realizar (Cromado, sellos, etc.).
+    'summary': """
+        Levantamiento técnico, Análisis de Precios Unitarios (APU), Cotizaciones y Suministros.
     """,
 
-    'author': "My Company",
-    'website': "https://www.yourcompany.com",
+    'description': """
+Gestión Integral de Taller de Cilindros (IMPSA)
+==============================================
 
-    'category': 'Services/Field Service',
+Módulo centralizado para el control de ingeniería y flujo comercial de cilindros. 
+Optimiza la transición desde el levantamiento físico en taller hasta la generación de suministros y cotizaciones.
+
+Características Principales:
+---------------------------
+* **Levantamiento Técnico (Survey):** Registro de dimensiones físicas, materiales, sellos y accesorios.
+* **Ingeniería y Grupos:** Organización de cilindros por grupos técnicos para estandarización.
+* **Análisis de Precios Unitarios (APU):** Motor de costeo detallado con márgenes configurables para materiales y mano de obra.
+* **Integración Comercial:** Vinculación directa con CRM (Oportunidades) y Ventas (Sale Orders).
+* **Gestión de Suministros:** Generación automática de Órdenes de Compra a proveedores basadas en los sellos detectados en el levantamiento.
+
+Integración con procesos:
+-------------------------
+1. CRM -> Levantamiento -> APU -> Cotización -> Orden de Compra.
+    """,
+
+    'author': "Tekuno",
+    'website': "https://tekuno.mx/",
+
+    'category': 'Manufacturing/Operations',
     'version': '19.0.1.0.0',
 
     'depends': ['base', "crm", "mail", 'purchase', 'sale_crm', 'sale_management','mrp','hr'],
