@@ -204,8 +204,8 @@ class ApuSurvey(models.Model):
             order.gran_total_lm = order.gran_subtotal_lm + (order.gran_subtotal_lm*0.16)
 
     @api.model
-    def default_get(self, fields_list):
-        defaults = super().default_get(fields_list)
+    def default_get(self, fields):
+        defaults = super().default_get(fields)
         try:
             if not defaults.get('porcentaje_cindirectos_material'):
                 defaults['porcentaje_cindirectos_material'] = self.env.ref(
