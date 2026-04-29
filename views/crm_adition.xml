@@ -33,6 +33,10 @@
                     <attribute name="invisible">selection_type in ('manufacturing', 'repair')</attribute>
                 </xpath>
 
+                <xpath expr="//header//button[@name='action_sale_quotations_new']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
                 <xpath expr="//field[@name='tag_ids']" position="after">
                     <field name="is_won_stage" invisible="1" />
                     <field name="final_lap" invisible="1" readonly="1"/>
