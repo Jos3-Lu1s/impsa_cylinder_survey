@@ -5,20 +5,20 @@
 
 
     <menuitem id="menu_crm_cylinder_survey_root" name="Taller de Cilindros" parent="crm.crm_menu_root" sequence="15"/>
-    <menuitem id="menu_sale_apu_survey_root" name="APU" parent="sale.sale_order_menu" action="action_apu_survey_all" sequence="5"/>
-    <menuitem id="menu_sale_apu_survey_actions_root" name="APU" parent="sale.menu_sale_config" sequence="60"/>
+    <menuitem id="menu_sale_apu_survey_root" name="APU" parent="sale.sale_order_menu" action="action_apu_survey_all" sequence="5" groups="sales_team.group_sale_salesman"/>
+    <menuitem id="menu_sale_apu_survey_actions_root" name="APU" parent="sale.menu_sale_config" sequence="60" groups="sales_team.group_sale_salesman"/>
     
     <menuitem id="menu_cylinder_survey_all" name="Todos los Registros" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_all" sequence="10"/>
     <menuitem id="menu_cylinder_survey_draft" name="Levantamientos" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_draft" sequence="20"/>
-    <menuitem id="menu_cylinder_survey_apus" name="APUS" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_apu" sequence="30"/>
+    <menuitem id="menu_cylinder_survey_apus" name="APUS" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_apu" sequence="30" groups="sales_team.group_sale_salesman"/>
     <menuitem id="menu_cylinder_survey_quoted" name="Cotizaciones" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_quoted" sequence="40"/>
     <menuitem id="menu_cylinder_survey_confirmed" name="Órdenes de Trabajo" parent="menu_crm_cylinder_survey_root" action="action_impsa_cylinder_survey_confirmed" sequence="50"/>
 
     <menuitem id="menu_cylinder_catalogos" name="Catálogos" parent="menu_crm_cylinder_survey_root" sequence="60"/>
     
-    <menuitem id="menu_sale_apu_survey_actions" name="Catálogo de acciones" parent="menu_sale_apu_survey_actions_root" action="action_apu_survey_actions_all" sequence="70"/>
+    <menuitem id="menu_sale_apu_survey_actions" name="Catálogo de acciones" parent="menu_sale_apu_survey_actions_root" action="action_apu_survey_actions_all" sequence="70" groups="sales_team.group_sale_salesman"/>
 
-    <menuitem id="menu_sale_apu_survey_margins" name="Catálogo de margenes" parent="menu_sale_apu_survey_actions_root" action="action_apu_survey_margins_passw" sequence="80"/>
+    <menuitem id="menu_sale_apu_survey_margins" name="Catálogo de margenes" parent="menu_sale_apu_survey_actions_root" action="action_apu_survey_margins_passw" sequence="80" groups="sales_team.group_sale_salesman"/>
 
     <menuitem id="menu_cylinder_options" name="Catálogo de cilindros" parent="menu_cylinder_catalogos" action="action_impsa_cylinder_options" sequence="70"/>
     

@@ -7,11 +7,11 @@ access_cylinder_options,access_cylinder_options,model_impsa_cylinder_options,bas
 access_cylinder_material,access_cylinder_material,model_impsa_cylinder_material,base.group_user,1,1,1,1
 access_impsa_cylinder_group,impsa.cylinder.group.access,model_impsa_cylinder_group,base.group_user,1,1,1,1
 access_impsa_cylinder_section,impsa.cylinder.section.access,model_impsa_cylinder_section,base.group_user,1,1,1,1
-access_impsa_apu_survey,impsa.apu.survey,model_impsa_apu_survey,base.group_user,1,1,1,1
-access_apu_survey_line,access_apu_survey_line,model_impsa_apu_survey_line,base.group_user,1,1,1,1
+access_impsa_apu_survey,impsa.apu.survey,model_impsa_apu_survey,sales_team.group_sale_salesman,1,1,1,1
+access_apu_survey_line,access_apu_survey_line,model_impsa_apu_survey_line,sales_team.group_sale_salesman,1,1,1,1
 access_impsa_cylinder_accessory,access_impsa_cylinder_accessory,model_impsa_cylinder_accessory,base.group_user,1,1,1,1
 access_impsa_accessory_type,access_impsa_accessory_type,model_impsa_accessory_type,base.group_user,1,1,1,1
-access_impsa_apu_survey_actions,impsa.apu.survey.actions,model_impsa_apu_survey_actions,base.group_user,1,1,1,1
-access_impsa_apu_survey_margins,impsa.apu.survey.margins,model_impsa_apu_survey_margins,base.group_user,1,1,1,1
-access_impsa_apu_survey_margins,impsa.apu.survey.margins,model_impsa_apu_survey_margins,base.group_user,1,1,1,1
-access_impsa_apu_survey_passw,impsa.apu.survey.passw,model_impsa_apu_survey_passw,base.group_user,1,1,1,1
+access_impsa_apu_survey_actions,impsa.apu.survey.actions,model_impsa_apu_survey_actions,sales_team.group_sale_salesman,1,1,1,1
+access_impsa_apu_survey_margins,impsa.apu.survey.margins,model_impsa_apu_survey_margins,sales_team.group_sale_salesman,1,1,1,1
+access_impsa_apu_survey_margins,impsa.apu.survey.margins,model_impsa_apu_survey_margins,sales_team.group_sale_salesman,1,1,1,1
+access_impsa_apu_survey_passw,impsa.apu.survey.passw,model_impsa_apu_survey_passw,sales_team.group_sale_salesman,1,1,1,1
