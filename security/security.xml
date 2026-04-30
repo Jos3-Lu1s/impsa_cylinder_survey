@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        <record model="ir.module.category" id="module_category_impsa_cylinder_survey">
+            <field name="name">Taller de Cilindros</field>
+            <field name="description">Ayuda a gestionar los levantamientos de cilindros.</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="group_cylinder_survey_user" model="res.groups">
+            <field name="name">Usuario de Taller de Cilindros</field>
+            <field name="category_id" ref="module_category_impsa_cylinder_survey"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">El usuario tendrá acceso al módulo de Taller de Cilindros para registrar levantamientos.</field>
+        </record>
+    </data>
+</odoo>

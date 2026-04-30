@@ -4,7 +4,7 @@
 
 
 
-    <menuitem id="menu_crm_cylinder_survey_root" name="Taller de Cilindros" parent="crm.crm_menu_root" sequence="15"/>
+    <menuitem id="menu_crm_cylinder_survey_root" name="Taller de Cilindros" parent="crm.crm_menu_root" sequence="15" groups="impsa_cylinder_survey.group_cylinder_survey_user"/>
     <menuitem id="menu_sale_apu_survey_root" name="APU" parent="sale.sale_order_menu" action="action_apu_survey_all" sequence="5" groups="sales_team.group_sale_salesman"/>
     <menuitem id="menu_sale_apu_survey_actions_root" name="APU" parent="sale.menu_sale_config" sequence="60" groups="sales_team.group_sale_salesman"/>
     
