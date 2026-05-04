@@ -205,7 +205,8 @@ class CylinderSurvey(models.Model):
     )
 
     purchase_order_count = fields.Integer(
-        compute="_compute_purchase_order_count"
+        compute="_compute_purchase_order_count",
+        compute_sudo=True
     )
 
     lead_id = fields.Many2one(
@@ -227,7 +228,8 @@ class CylinderSurvey(models.Model):
 
     lead_count = fields.Integer(
         string="Oportunidades",
-        compute="_compute_lead_count"
+        compute="_compute_lead_count",
+        compute_sudo=True
     )
     
     apu_count = fields.Integer(
@@ -250,7 +252,8 @@ class CylinderSurvey(models.Model):
 
     sale_order_count = fields.Integer(
         string="Cantidad de Cotizaciones",
-        compute="_compute_sale_order_count"
+        compute="_compute_sale_order_count",
+        compute_sudo=True
     )
 
     has_apu = fields.Boolean(

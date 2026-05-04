@@ -220,7 +220,7 @@
         <field name="arch" type="xml">
             <form string="Levantamiento de Cilindro">
                 <header>
-                    <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed' or purchase_order_create == True"/>
+                    <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed' or purchase_order_create == True" groups="purchase.group_purchase_user"/>
 
                     <button name="action_to_apu" string="Enviar a APU" type="object" class="oe_highlight" invisible="state != 'draft'" />
 
@@ -243,16 +243,16 @@
                     </div>
 
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_view_purchase_orders" type="object" class="oe_stat_button" icon="fa-credit-card" invisible="not purchase_order_ids">
+                        <button name="action_view_purchase_orders" type="object" class="oe_stat_button" icon="fa-credit-card" invisible="not purchase_order_ids" groups="purchase.group_purchase_user">
                             <field name="purchase_order_count" widget="statinfo" string="Compras"/>
                         </button>
-                        <button name="action_view_lead" type="object" class="oe_stat_button" icon="fa-star" invisible="not lead_id">
+                        <button name="action_view_lead" type="object" class="oe_stat_button" icon="fa-star" invisible="not lead_id" groups="sales_team.group_sale_salesman">
                             <field name="lead_count" widget="statinfo" string="Oportunidad"/>
                         </button>
                         <button name="action_view_apus" type="object" class="oe_stat_button" icon="fa-calculator" invisible="not apu_ids">
                             <field name="apu_count" widget="statinfo" string="APUs"/>
                         </button>
-                        <button name="action_view_sale_orders" type="object" class="oe_stat_button" icon="fa-usd" invisible="sale_order_count == 0">
+                        <button name="action_view_sale_orders" type="object" class="oe_stat_button" icon="fa-usd" invisible="sale_order_count == 0" groups="sales_team.group_sale_salesman">
                             <field name="sale_order_count" widget="statinfo" string="Cotizaciones"/>
                         </button>
                     </div>
