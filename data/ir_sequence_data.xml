@@ -17,7 +17,6 @@
             <field name="company_id" eval="False"/>
         </record>
 
-        
         <record id="seq_code_partner" model="ir.sequence">
             <field name="name">Código Contacto</field>
             <field name="code">res.partner.code</field>
@@ -33,8 +32,9 @@
            <field name="padding">5</field>
            <field name="company_id" eval="False"/>
        </record>
+       
         <record id="seq_impsa_apu_survey_margins" model="ir.sequence">
-           <field name="name">Secuencia Acciones</field>
+           <field name="name">Secuencia Márgenes APU</field>
            <field name="code">impsa.apu.survey.margins</field>
            <field name="prefix">MARG-</field>
            <field name="padding">5</field>
