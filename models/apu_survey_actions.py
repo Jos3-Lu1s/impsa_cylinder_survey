@@ -7,21 +7,27 @@ class ApuSurveyActions(models.Model):
     _description = "Listado de acciones en el APU"
 
     name = fields.Char(
-        string="Nombre", required=True, copy=False
+        string="Nombre", 
+        required=True, 
+        copy=False
     )
 
     action_code = fields.Char(
-        string="Código de acción", copy=False, readonly=True
+        string="Código de acción", 
+        copy=False, 
+        readonly=True,
+        default=lambda self: _('Nuevo')
     )
 
-    @api.model
-    def create(self, vals_list: Union[dict, list]):
-        # Si viene un solo dict, convertirlo en lista
-        if isinstance(vals_list, dict):
-            vals_list = [vals_list]
+    _action_code_uniq = models.Constraint(
+        'UNIQUE(action_code)',
+        'El código de acción debe ser único, ya existe un registro con este código.'
+    )
 
+    @api.model_create_multi
+    def create(self, vals_list):
         for vals in vals_list:
-            if not vals.get('action_code'):
-                vals['action_code'] = self.env['ir.sequence'].next_by_code('impsa.apu.survey.actions') or '0000'
-
+            if not vals.get('action_code') or vals.get('action_code') == _('Nuevo'):
+                vals['action_code'] = self.env['ir.sequence'].next_by_code('impsa.apu.survey.actions') or '00000'
+                
         return super().create(vals_list)

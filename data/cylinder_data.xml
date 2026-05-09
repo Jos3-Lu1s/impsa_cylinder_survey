@@ -112,194 +112,156 @@
 
         <!-- Acciones a cotizar-->
 
-        <record id="apu_survey_manufacture_piston" model="impsa.apu.survey.actions">
+        <record id="apu_survey_manufacture_piston_rod" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR VASTAGO</field>
-            <field name="action_code">ACT-0001</field>
         </record>
 
         <record id="apu_survey_polish_piston" model="impsa.apu.survey.actions">
             <field name="name">PULIR VASTAGO</field>
-            <field name="action_code">ACT-0002</field>
         </record>
 
         <record id="apu_survey_replate_piston_rod" model="impsa.apu.survey.actions">
             <field name="name">RECUPERAR CROMO DE VASTAGO</field>
-            <field name="action_code">ACT-0003</field>
         </record>
 
-        <record id="apu_survey_manufacture_piston" model="impsa.apu.survey.actions">
+        <record id="apu_survey_manufacture_camisa" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR CAMISA</field>
-            <field name="action_code">ACT-0004</field>
         </record>
 
         <record id="apu_survey_rehone_piston" model="impsa.apu.survey.actions">
             <field name="name">REHORNEAR CAMISA</field>
-            <field name="action_code">ACT-0005</field>
         </record>
 
         <record id="apu_survey_replate_piston_ring" model="impsa.apu.survey.actions">
             <field name="name">RECUPERAR CROMO DE CAMISA</field>
-            <field name="action_code">ACT-0006</field>
         </record>
 
         <record id="apu_survey_replate_manufacture_head" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR CABEZA</field>
-            <field name="action_code">ACT-0007</field>
         </record>
 
         <record id="apu_survey_manufacture_rebuild_cylinder_head" model="impsa.apu.survey.actions">
             <field name="name">REHABILITAR CABEZA</field>
-            <field name="action_code">ACT-0008</field>
         </record>
 
         <record id="apu_survey_mahcine_cylinder_head" model="impsa.apu.survey.actions">
             <field name="name">MAQUINAR CABEZA</field>
-            <field name="action_code">ACT-0009</field>
         </record>
 
         <record id="apu_survey_manufacture_cylinder_head" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR BUJE DE BRONCE DE CABEZA</field>
-            <field name="action_code">ACT-0010</field>
         </record>
 
         <record id="apu_survey_manufacture_enbolo" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR EMBOLO</field>
-            <field name="action_code">ACT-0011</field>
         </record>
 
         <record id="apu_survey_rehabilitate_enbolo" model="impsa.apu.survey.actions">
             <field name="name">REHABILITAR EMBOLO</field>
-            <field name="action_code">ACT-0012</field>
         </record>
 
         <record id="apu_survey_machine_enbolo" model="impsa.apu.survey.actions">
             <field name="name">MAQUINAR EMBOLO</field>
-            <field name="action_code">ACT-0013</field>
         </record>
 
         <record id="apu_survey_machine_bronze_bushing_enbolo" model="impsa.apu.survey.actions">
             <field name="name">MAQUINAR BRUJE DE BRONCE DE EMBOLO</field>
-            <field name="action_code">ACT-0014</field>
         </record>
 
         <record id="apu_survey_manufacture_culata" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR CULATA</field>
-            <field name="action_code">ACT-0015</field>
         </record>
 
         <record id="apu_survey_manufacture_culata_pin" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR MUÑON DE CULATA</field>
-            <field name="action_code">ACT-0016</field>
         </record>
 
         <record id="apu_survey_rehabilitate_culata_pin" model="impsa.apu.survey.actions">
             <field name="name">RHEABILITAR MUÑON DE CULATA</field>
-            <field name="action_code">ACT-0017</field>
         </record>
 
         <record id="apu_survey_manufacture_clevis" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR CLEVIS</field>
-            <field name="action_code">ACT-0018</field>
         </record>
 
         <record id="apu_survey_rehabilitate_clevis" model="impsa.apu.survey.actions">
             <field name="name">REHABILITAR CLEVIS</field>
-            <field name="action_code">ACT-0019</field>
         </record>
 
         <record id="apu_survey_manufacture_hanger" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR HORQUILLA</field>
-            <field name="action_code">ACT-0020</field>
         </record>
 
         <record id="apu_survey_rehabilitate_hanger" model="impsa.apu.survey.actions">
             <field name="name">REHABILITAR HORQUILLA</field>
-            <field name="action_code">ACT-0021</field>
         </record>
 
         <record id="apu_survey_manufacture_front_cover" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR TAPA DELANTERA</field>
-            <field name="action_code">ACT-0022</field>
         </record>
 
         <record id="apu_survey_machine_front_cover" model="impsa.apu.survey.actions">
             <field name="name">MAQUINAR TAPA DELANTERA</field>
-            <field name="action_code">ACT-0023</field>
         </record>
 
         <record id="apu_survey_rehabilitate_front_cover" model="impsa.apu.survey.actions">
             <field name="name">REHABILITAR TAPA DELANTERA</field>
-            <field name="action_code">ACT-0024</field>
         </record>
 
         <record id="apu_survey_manufacture_rear_cover" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR TAPA TRASERA</field>
-            <field name="action_code">ACT-0025</field>
         </record>
 
         <record id="apu_survey_machine_rear_cover" model="impsa.apu.survey.actions">
             <field name="name">MAQUINAR TAPA TRASERA</field>
-            <field name="action_code">ACT-0026</field>
         </record>
 
         <record id="apu_survey_rehabilitate_rear_cover" model="impsa.apu.survey.actions">
             <field name="name">REHABILITAR TAPA TRASERA</field>
-            <field name="action_code">ACT-0027</field>
         </record>
 
         <record id="apu_survey_manufacture_balancer" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR BALANCIN</field>
-            <field name="action_code">ACT-0028</field>
         </record>
 
         <record id="apu_survey_rehabilitate_balancer" model="impsa.apu.survey.actions">
             <field name="name">REHABILITAR BALANCIN</field>
-            <field name="action_code">ACT-0029</field>
         </record>
 
         <record id="apu_survey_manufacture_pin" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR PERNO</field>
-            <field name="action_code">ACT-0030</field>
         </record>
 
         <record id="apu_survey_manufacture_front_bushing" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR BRIDA FRONTAL</field>
-            <field name="action_code">ACT-0031</field>
         </record>
 
         <record id="apu_survey_manufacture_boring" model="impsa.apu.survey.actions">
             <field name="name">MACUELEAR BARRENOS</field>
-            <field name="action_code">ACT-0032</field>
         </record>
 
         <record id="apu_survey_machine_threads" model="impsa.apu.survey.actions">
             <field name="name">RECTIFICCADO DE ROSCAS</field>
-            <field name="action_code">ACT-0033</field>
         </record>
 
         <record id="apu_survey_manufacture_rod_bearings" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR BIRLOS</field>
-            <field name="action_code">ACT-0034</field>
         </record>
 
         <record id="apu_survey_machine_rod_bearings_threads" model="impsa.apu.survey.actions">
             <field name="name">RECTIFICADOR DE ROSCAS DE BIRLOS</field>
-            <field name="action_code">ACT-0035</field>
         </record>
 
         <record id="apu_survey_manufacture_separator" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR SEPARADOR</field>
-            <field name="action_code">ACT-0036</field>
         </record>
 
         <record id="apu_survey_manufacture_bearing" model="impsa.apu.survey.actions">
             <field name="name">FABRICAR CHUMACERA</field>
-            <field name="action_code">ACT-0037</field>
         </record>
 
         <record id="apu_survey_rehabilitate_bearing" model="impsa.apu.survey.actions">
             <field name="name">REHABILITAR CHUMACERA</field>
-            <field name="action_code">ACT-0038</field>
         </record>
 
 

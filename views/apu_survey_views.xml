@@ -145,7 +145,7 @@
                                    readonly="state != 'draft'" />
                             <field name="apu_product_id"
                                    readonly="state != 'draft'" />
-                            <field name="is_financed" />
+                            <field name="is_financed" readonly="state != 'draft'"/>
                         </group>
                         <group name="Datos de Entrada de Cotizador"
                                class="border-2 border-start">
