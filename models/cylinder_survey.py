@@ -770,6 +770,15 @@ class CylinderSurvey(models.Model):
             for group in record.group_ids:
                 # Evitar duplicar APUs si el usuario regresó a borrador y volvió a avanzar
                 if not group.apu_id:
+
+                    apu_lines_commands = []
+                    for op_line in group.operational_record_ids:
+                        apu_lines_commands.append(Command.create({
+                            'action_id': op_line.action_id.id,
+                            'operational_line_id': op_line.id,
+                            'cantidad_lm': 1.0,
+                        }))
+
                     apu_vals = {
                         'survey_id': record.id,
                         'group_id': group.id,
@@ -780,6 +789,10 @@ class CylinderSurvey(models.Model):
                         'porcentaje_utaimp_mo':self.env.ref('impsa_cylinder_survey.apu_survey_margins_labour_profit').id,
                         # Puedes inyectar más campos iniciales aquí si lo deseas
                     }
+
+                    if apu_lines_commands:
+                        apu_vals['lm_ids'] = apu_lines_commands
+
                     new_apu = self.env['impsa.apu.survey'].create(apu_vals)
                     group.apu_id = new_apu.id
 

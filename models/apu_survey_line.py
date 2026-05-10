@@ -24,6 +24,14 @@ class SaleOrderLM(models.Model):
         string='Acciones a cotizar',        # etiqueta en la vista
         required=False          # opcional
     )
+
+    operational_line_id = fields.Many2one(
+        'impsa.operational.record.line',
+        string='Línea Operativa Origen',
+        ondelete='cascade',
+        index=True,
+        help="Enlace técnico para sincronización automática con el levantamiento."
+    )
     
     #MÉTODOS PARA EL COMPORTAMIENTO DINÁMICO DEL COTIZADOR#
     @api.onchange('product_id')
@@ -61,5 +69,38 @@ class SaleOrderLM(models.Model):
             if record.apu_id.cylinder_qty_by_group > 0:            
                 record.cantidad_lm=(record.cantidad_lm*1)*record.apu_id.cylinder_qty_by_group """
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        lines = super().create(vals_list)
+        
+        if not self.env.context.get('skip_survey_sync'):
+            for line in lines:
+                if line.action_id and line.apu_id.group_id and not line.operational_line_id:
+                    op_line = self.env['impsa.operational.record.line'].with_context(skip_apu_sync=True).create({
+                        'group_id': line.apu_id.group_id.id,
+                        'action_id': line.action_id.id,
+                    })
+                    line.with_context(skip_survey_sync=True).write({'operational_line_id': op_line.id})
+                    
+        return lines
 
+    def write(self, vals):
+        res = super().write(vals)
+        
+        if 'action_id' in vals and not self.env.context.get('skip_survey_sync'):
+            for line in self:
+                if line.operational_line_id:
+                    line.operational_line_id.with_context(skip_apu_sync=True).write({
+                        'action_id': line.action_id.id
+                    })
+        return res
 
+    def unlink(self):
+        op_lines = self.mapped('operational_line_id')
+        
+        res = super().unlink()
+        
+        if op_lines and not self.env.context.get('skip_survey_sync'):
+            op_lines.with_context(skip_apu_sync=True).unlink()
+            
+        return res
