@@ -241,6 +241,7 @@
                                       edit="1"
                                       delete="1">
                                     <field name="action_id" />
+                                    <field name="obs" />
                                     <field name="product_id" />
                                     <field name="cantidad_lm" />
                                     <field name="unidad_lm" />

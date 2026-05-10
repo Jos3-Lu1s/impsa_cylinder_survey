@@ -25,6 +25,8 @@ class SaleOrderLM(models.Model):
         required=False          # opcional
     )
 
+    obs = fields.Text(string='Dimensiones / Observaciones')
+
     operational_line_id = fields.Many2one(
         'impsa.operational.record.line',
         string='Línea Operativa Origen',
@@ -79,6 +81,7 @@ class SaleOrderLM(models.Model):
                     op_line = self.env['impsa.operational.record.line'].with_context(skip_apu_sync=True).create({
                         'group_id': line.apu_id.group_id.id,
                         'action_id': line.action_id.id,
+                        'obs': line.obs,
                     })
                     line.with_context(skip_survey_sync=True).write({'operational_line_id': op_line.id})
                     
@@ -87,12 +90,17 @@ class SaleOrderLM(models.Model):
     def write(self, vals):
         res = super().write(vals)
         
-        if 'action_id' in vals and not self.env.context.get('skip_survey_sync'):
+        if ('action_id' in vals or 'obs' in vals) and not self.env.context.get('skip_survey_sync'):
             for line in self:
                 if line.operational_line_id:
-                    line.operational_line_id.with_context(skip_apu_sync=True).write({
-                        'action_id': line.action_id.id
-                    })
+                    vals_to_sync = {}
+                    if 'action_id' in vals:
+                        vals_to_sync['action_id'] = line.action_id.id
+                    if 'obs' in vals:
+                        vals_to_sync['obs'] = line.obs
+                    
+                    if vals_to_sync:
+                        line.operational_line_id.with_context(skip_apu_sync=True).write(vals_to_sync)
         return res
 
     def unlink(self):
