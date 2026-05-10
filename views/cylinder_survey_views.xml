@@ -508,7 +508,6 @@
                                                         <field name="sequence" widget="handle"/>
                                                         <field name="action_id" required="1" options="{'no_create': True, 'no_open': True}"/>
                                                         <field name="obs" optional="show"/>
-                                                        <field name="work_to_do" column_invisible="1"/>
                                                     </list>
                                                 </field>
                                             </page>
@@ -533,7 +532,6 @@
                                 <list editable="bottom" default_order="group_id, sequence">
                                     <field name="group_id" string="Grupo" options="{'no_create': True, 'no_open': True}" domain="[('survey_id', '=', parent.id)]" decoration-bf="1"/>
                                     <field name="action_id" options="{'no_create': True, 'no_open': True}"/>
-                                    <field name="work_to_do" column_invisible="1"/>
                                     <field name="obs" optional="show"/>
                                 </list>
                             </field>

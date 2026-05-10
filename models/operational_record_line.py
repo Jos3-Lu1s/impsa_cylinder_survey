@@ -24,11 +24,6 @@ class OperationalRecordLine(models.Model):
 
     sequence = fields.Integer(string='Secuencia', default=0)
     
-    work_to_do = fields.Text(
-        string='Trabajos a realizar (Obsoleto)', 
-        required=False
-    )
-    
     action_id = fields.Many2one(
         'impsa.apu.survey.actions',
         string='Trabajo a realizar',
