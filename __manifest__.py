@@ -34,6 +34,7 @@ Integración con procesos:
     'depends': ['base', "crm", "mail", 'purchase', 'sale_crm', 'sale_management','mrp','hr'],
 
     "data": [
+        "security/security_groups.xml",
         "security/ir.model.access.csv",
         'data/cylinder_data.xml',
         # 'data/paper_format.xml',
