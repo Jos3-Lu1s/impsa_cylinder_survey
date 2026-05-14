@@ -17,6 +17,7 @@ class CylinderSurvey(models.Model):
     partner_email = fields.Char(
         string="Correo Electrónico",
         related="partner_id.email",
+        store=False,
         readonly=True
     )
 
@@ -205,7 +206,8 @@ class CylinderSurvey(models.Model):
     )
 
     purchase_order_count = fields.Integer(
-        compute="_compute_purchase_order_count"
+        compute="_compute_purchase_order_count",
+        compute_sudo=True
     )
 
     lead_id = fields.Many2one(
@@ -227,7 +229,8 @@ class CylinderSurvey(models.Model):
 
     lead_count = fields.Integer(
         string="Oportunidades",
-        compute="_compute_lead_count"
+        compute="_compute_lead_count",
+        compute_sudo=True
     )
     
     apu_count = fields.Integer(
@@ -250,7 +253,8 @@ class CylinderSurvey(models.Model):
 
     sale_order_count = fields.Integer(
         string="Cantidad de Cotizaciones",
-        compute="_compute_sale_order_count"
+        compute="_compute_sale_order_count",
+        compute_sudo=True
     )
 
     has_apu = fields.Boolean(
@@ -290,26 +294,29 @@ class CylinderSurvey(models.Model):
         for rec in self:
             rec.apu_count = len(rec.apu_ids)
 
-    @api.depends('group_ids.operational_record_ids', 'group_ids.quantity')
+    @api.depends('group_ids.operational_record_ids')
     def _compute_operational_totals(self):
         for record in self:
-            total_tasks = 0
-            for group in record.group_ids:
-                total_tasks += len(group.operational_record_ids)
-            record.total_tasks = total_tasks
+            record.total_tasks = len(record.mapped('group_ids.operational_record_ids'))
         
     @api.depends('group_ids.quantity')
     def _compute_allocated_qty(self):
         for survey in self:
             survey.allocated_qty = sum(survey.group_ids.mapped('quantity'))
             
+    @api.depends('state', 'lead_id')
     def _compute_has_confirmed_order(self):
         for record in self:
-            existing = self.search([
-                ('state', '=', 'confirmed'),
-                ('id', '!=', record.id)
-            ], limit=1)
-            record.has_confirmed_order = bool(existing)
+            if record.lead_id:
+                # Busca si en LA MISMA OPORTUNIDAD ya hay otra OT confirmada
+                existing = self.env['impsa.cylinder.survey'].search([
+                    ('state', '=', 'confirmed'),
+                    ('id', '!=', record.id),
+                    ('lead_id', '=', record.lead_id.id)
+                ], limit=1)
+                record.has_confirmed_order = bool(existing)
+            else:
+                record.has_confirmed_order = False
 
     @api.model
     def _expand_states(self, states, domain, order=None):
@@ -767,7 +774,17 @@ class CylinderSurvey(models.Model):
             for group in record.group_ids:
                 # Evitar duplicar APUs si el usuario regresó a borrador y volvió a avanzar
                 if not group.apu_id:
-                    apu_vals = {
+
+                    apu_lines_commands = []
+                    for op_line in group.operational_record_ids:
+                        apu_lines_commands.append(Command.create({
+                            'action_id': op_line.action_id.id,
+                            'operational_line_id': op_line.id,
+                            'obs': op_line.obs,
+                            'cantidad_lm': 1.0,
+                        }))
+
+                    apu_vals: dict = {
                         'survey_id': record.id,
                         'group_id': group.id,
                         'partner_id': record.partner_id.id,
@@ -777,6 +794,10 @@ class CylinderSurvey(models.Model):
                         'porcentaje_utaimp_mo':self.env.ref('impsa_cylinder_survey.apu_survey_margins_labour_profit').id,
                         # Puedes inyectar más campos iniciales aquí si lo deseas
                     }
+
+                    if apu_lines_commands:
+                        apu_vals['lm_ids'] = apu_lines_commands
+
                     new_apu = self.env['impsa.apu.survey'].create(apu_vals)
                     group.apu_id = new_apu.id
 
