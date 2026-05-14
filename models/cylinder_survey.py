@@ -668,7 +668,7 @@ class CylinderSurvey(models.Model):
         """Valida e inicializa productos para pasar a Orden de Trabajo."""
         for record in self:
             existing_order = self.search([
-                ('state', 'in', ['confirmed', 'in_progress']),
+                ('state', 'in', ['confirmed']),
                 ('id', '!=', record.id)
             ], limit=1)
             """ if existing_order:

@@ -389,7 +389,9 @@ class ApuSurvey(models.Model):
             if lead:
                 sync_type = mapeo_crm.get(nuevo_state)
                 if sync_type:
-                    lead._sync_stage_from_type(sync_type)
+                    sync_method = getattr(lead, '_sync_stage_from_type', None)
+                    if callable(sync_method):
+                        sync_method(sync_type)
     
         return result
     
