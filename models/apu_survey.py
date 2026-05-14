@@ -360,23 +360,32 @@ class ApuSurvey(models.Model):
             'confirmed': 'negotiation',
         }
     
-        mapeo_survey = {
-            'confirmed': 'quoted',  # APU confirmado → levantamiento a cotización
-            'cancel':    'draft',   # APU cancelado  → levantamiento regresa a borrador
-        }
+        nuevo_state = vals['state']
     
         for apu in self:
-            nuevo_state = vals['state']
+            survey = apu.survey_id
     
-            # ── Sincronizar levantamiento padre ───────────────────────
-            if apu.survey_id:
-                survey_state = mapeo_survey.get(nuevo_state)
-                if survey_state:
-                    apu.survey_id.sudo().write({'state': survey_state})
+            if survey:
+                # Tras super().write(), los APUs hermanos ya reflejan el nuevo estado
+                apus_no_cancelados = survey.apu_ids.filtered(lambda a: a.state != 'cancel')
+                apus_confirmados   = survey.apu_ids.filtered(lambda a: a.state == 'confirmed')
+    
+                if nuevo_state == 'confirmed':
+                    # Basta con que UN APU esté confirmado para mover el survey a cotización
+                    survey.sudo().write({'state': 'quoted'})
+    
+                elif nuevo_state == 'cancel':
+                    if not apus_no_cancelados:
+                        # TODOS los APUs están cancelados → cancelar el levantamiento
+                        survey.sudo().write({'state': 'cancel'})
+                    elif not apus_confirmados:
+                        # Quedan APUs activos pero ninguno confirmado → volver a 'apu'
+                        survey.sudo().write({'state': 'apu'})
+                    # Si todavía hay APUs confirmados, NO tocamos el survey
+                    # (sigue en 'quoted' porque aún hay cotización vigente).
     
             # ── Sincronizar CRM ───────────────────────────────────────
-            lead = apu.lead_id or apu.survey_id.lead_id
-    
+            lead = apu.lead_id or (survey and survey.lead_id)
             if lead:
                 sync_type = mapeo_crm.get(nuevo_state)
                 if sync_type:

@@ -36,11 +36,12 @@ Integración con procesos:
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
+        "data/ir_sequence_data.xml",
         'data/cylinder_data.xml',
         # 'data/paper_format.xml',
         'reports/report_actions.xml',
         # 'reports/cylinder_survey_report.xml',
-        "data/ir_sequence_data.xml",
+        
         "views/cylinder_survey_views.xml",
         "views/cylinder_options_views.xml",
         "views/cylinder_materials_views.xml",

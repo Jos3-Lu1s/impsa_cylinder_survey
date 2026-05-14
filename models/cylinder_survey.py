@@ -668,13 +668,14 @@ class CylinderSurvey(models.Model):
         """Valida e inicializa productos para pasar a Orden de Trabajo."""
         for record in self:
             existing_order = self.search([
-                ('state', '=', 'confirmed'),
+                ('state', 'in', ['confirmed', 'in_progress']),
                 ('id', '!=', record.id)
             ], limit=1)
-            if existing_order:
+            """ if existing_order:
                 raise ValidationError(
-                    "Ya existe una Orden de Trabajo confirmada. No puedes crear otra."
-                )
+                    f"Ya existe la OT: {existing_order.display_name} "
+                    f"en estado {existing_order.state}"
+                ) """
             # 1. Validaciones
             if not record.group_ids:
                 raise ValidationError("Define al menos un Grupo de Cilindros.")
@@ -756,7 +757,7 @@ class CylinderSurvey(models.Model):
                     raise ValidationError(_("Debe existir al menos 1 APU en estado 'Para Cotizar' (aprobado) para poder confirmar la Orden de Trabajo."))
 
             # 3. Cambio de Estado                
-            record.write({'state': 'confirmed'})
+            record.state = 'confirmed'
     
     def action_to_apu(self):
         """Pasa de Levantamiento a APU y genera los registros de costeo."""
@@ -803,6 +804,7 @@ class CylinderSurvey(models.Model):
 
             record.write({'state': 'apu'})
 
+    """ Creación de APUs """
     def action_quoted(self):
         """Pasa de APU a Cotización y genera el Sale Order automáticamente."""
         for record in self:
@@ -953,6 +955,7 @@ class CylinderSurvey(models.Model):
 
         return super(CylinderSurvey, self).create(vals_list)
     
+    """ Conexion con las demas etapas del proceso """
     def write(self, vals):
         result = super().write(vals)
     
