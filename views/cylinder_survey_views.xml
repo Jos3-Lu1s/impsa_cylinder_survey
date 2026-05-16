@@ -168,15 +168,28 @@
         <field name="model">impsa.cylinder.survey</field>
         <field name="arch" type="xml">
             <graph string="Análisis de Levantamientos" type="bar" sample="1">
-                <field name="date" interval="month"/>
-                
                 <field name="state"/>
-                
+                <field name="date" interval="month"/>
                 <field name="cylinder_qty" type="measure"/>
+                <field name="barrel_inner_diameter" invisible="1"/>
+                <field name="barrel_outer_diameter" invisible="1"/>
+                <field name="barrel_length" invisible="1"/>
+                <field name="diameter_rod" invisible="1"/>
+                <field name="rod_length" invisible="1"/>
+                <field name="diameter_rod2" invisible="1"/>
+                <field name="rod_length2" invisible="1"/>
+                <field name="piston_diameter" invisible="1"/>
+                <field name="piston_length" invisible="1"/>
+                <field name="head_diameter" invisible="1"/>
+                <field name="head_length" invisible="1"/>
+                <field name="head_diameter2" invisible="1"/>
+                <field name="head_length2" invisible="1"/>
+                <field name="stroke_length" invisible="1"/>
+                <field name="num_section" invisible="1"/>
+                <field name="allocated_qty" invisible="1"/>
             </graph>
         </field>
     </record>
-
     <record id="view_impsa_cylinder_survey_tree" model="ir.ui.view">
         <field name="name">impsa.cylinder.survey.tree</field>
         <field name="model">impsa.cylinder.survey</field>

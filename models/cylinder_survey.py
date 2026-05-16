@@ -22,7 +22,7 @@ class CylinderSurvey(models.Model):
     )
 
     cylinder_qty = fields.Integer(
-        string="Cantidad", 
+        string="Cantidad de cilindros", 
         default=1, 
         required=True, 
         tracking=True,

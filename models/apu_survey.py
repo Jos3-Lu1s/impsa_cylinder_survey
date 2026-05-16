@@ -14,10 +14,16 @@ class ApuSurvey(models.Model):
         "res.partner", string="Cliente", required=True, tracking=True, ondelete='restrict', context={'search_by_ref': True}, index=True
     )
 
+    partner_email = fields.Char(
+        related='partner_id.email',
+        string="Correo del Cliente",
+        readonly=True
+    )
+
     cylinder_qty_by_group= fields.Integer(
         related='group_id.quantity',
         store=True,
-        string="Cantidad",
+        string="Cantidad de Cilindros",
         tracking=True
     )
     apu_product_id = fields.Many2one(
@@ -61,7 +67,7 @@ class ApuSurvey(models.Model):
     )
 
     costo_fijo_lm = fields.Monetary(
-        string="Costo",
+        string="Costo de Mano de Obra (Fijo)",
         currency_field="currency_id"
     )
 

@@ -14,4 +14,30 @@
             </list>
         </field>
     </record>
+
+    <record id="view_impsa_apu_survey_actions_search" model="ir.ui.view">
+        <field name="name">impsa.apu.survey.actions.search</field>
+        <field name="model">impsa.apu.survey.actions</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Acciones">
+                <field name="name" string="Nombre" filter_domain="['|', ('name', 'ilike', self), ('action_code', 'ilike', self)]"/>
+                <field name="action_code"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_apu_survey_actions_all" model="ir.actions.act_window">
+        <field name="name">Acciones de los Cilindros</field>
+        <field name="res_model">impsa.apu.survey.actions</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea tu primera Acción de Cilindro
+            </p>
+            <p>
+                Define aquí las operaciones técnicas (Maquinado, Cromado, Fabricación, etc.) 
+                que se utilizarán para costear los APUs y organizar el trabajo en el taller.
+            </p>
+        </field>
+    </record>
 </odoo>

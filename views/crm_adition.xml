@@ -103,6 +103,21 @@
                     </div>
                     
                 </xpath>
+
+                <xpath expr="//div[@class='d-flex' and @invisible='not partner_id']" position="replace">
+                    <div class="d-flex align-items-center" invisible="not partner_id">
+
+                        <field name="partner_id"
+                            widget="many2one_avatar"
+                            readonly="1"
+                            options="{'no_create': 1, 'no_open': 1}"/>
+
+                        <div class="ms-2 flex-grow-1 overflow-hidden" style="min-width: 0;">
+                            <field name="partner_id" class="text-truncate d-block"/>
+                        </div>
+
+                    </div>
+                </xpath>
                 
             </field>
         </record>

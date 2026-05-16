@@ -134,6 +134,7 @@
                                string="Información General">
                             <field name="partner_id"
                                    readonly="state != 'draft'" />
+                            <field name="partner_email" widget="email" string="" colspan="2" invisible="not partner_email"/>
                             <field name="cylinder_qty_by_group"
                                    readonly="survey_id or state != 'draft'" />
                             <field name="quote_ids"
@@ -241,7 +242,7 @@
                                       edit="1"
                                       delete="1">
                                     <field name="action_id" />
-                                    <field name="obs" />
+                                    <field name="obs" optional="show" />
                                     <field name="product_id" />
                                     <field name="cantidad_lm" />
                                     <field name="unidad_lm" />
@@ -265,11 +266,147 @@
         </field>
     </record>
     
+    <record id="view_impsa_apu_survey_kanban" model="ir.ui.view">
+        <field name="name">impsa.apu.survey.kanban</field>
+        <field name="model">impsa.apu.survey</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" quick_create="false" create="false" records_draggable="false" sample="1">
+                <field name="state" />
+                <field name="cylinder_qty_by_group" />
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click d-flex flex-column h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <field class="fs-5 fw-bolder text-dark text-truncate me-2" name="name"/>
+                                <div class="flex-shrink-0">
+                                    <field name="state" widget="badge"
+                                           decoration-warning="state == 'draft'"
+                                           decoration-success="state == 'confirmed'"
+                                           decoration-danger="state == 'cancel'"/>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="text-muted d-flex align-items-center mb-1 text-truncate" title="Cliente">
+                                    <i class="fa fa-building-o me-2 text-primary" title="Cliente"/>
+                                    <field name="partner_id" class="text-truncate"/>
+                                </div>
+                                <div class="text-muted d-flex align-items-center mb-1 text-truncate" title="Cantidad de Cilindros">
+                                    <i class="fa fa-cubes me-2 text-primary" title="Cantidad de Cilindros"/>
+                                    <field name="cylinder_qty_by_group"/>
+                                    <span class="ms-1">
+                                          <t t-if="record.cylinder_qty_by_group.raw_value == 1">Cilindro</t>
+                                          <t t-else="">Cilindros</t>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
+                                <div class="d-flex align-items-center">
+                                    <field name="activity_ids" widget="kanban_activity" class="me-2"/>
+                                   <span class="text-muted small">
+                                        <span class="text-muted small d-inline-flex align-items-center">
+                                            <i class="fa fa-calendar-o me-1" title="Fecha"></i>
+                                            <field name="date" widget="date" options="{'numeric': true}"/>
+                                        </span>
+                                    </span>
+                                </div>
+                                <div class="fw-bolder text-dark fs-5">
+                                    <i class="fa fa-dollar me-1 text-muted" title="Total"/>
+                                    <field name="gran_total_lm" widget="monetary"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_impsa_apu_survey_pivot" model="ir.ui.view">
+        <field name="name">impsa.apu.survey.pivot</field>
+        <field name="model">impsa.apu.survey</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis de APU" sample="1">
+                <field name="partner_id" type="row"/>
+                <field name="date" interval="month" type="col"/>
+                <field name="gran_subtotal_lm" type="measure"/>
+                <field name="gran_total_lm" type="measure"/>
+                <field name="costo_fijo_lm" invisible="1"/>
+                <field name="importe_porcentaje_gran_subtotal" invisible="1"/>
+                <field name="porcentaje_gran_subtotal" invisible="1"/>
+                <field name="subtotal_fin" invisible="1"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_impsa_apu_survey_graph" model="ir.ui.view">
+        <field name="name">impsa.apu.survey.graph</field>
+        <field name="model">impsa.apu.survey</field>
+        <field name="arch" type="xml">
+            <graph string="Análisis de APU" type="bar" sample="1">
+                <field name="partner_id"/>
+                <field name="gran_total_lm" type="measure"/>
+                <field name="costo_fijo_lm" invisible="1"/>
+                <field name="importe_porcentaje_gran_subtotal" invisible="1"/>
+                <field name="porcentaje_gran_subtotal" invisible="1"/>
+                <field name="subtotal_fin" invisible="1"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_impsa_apu_survey_search" model="ir.ui.view">
+        <field name="name">impsa.apu.survey.search</field>
+        <field name="model">impsa.apu.survey</field>
+        <field name="arch" type="xml">
+            <search string="Buscar APU">
+                <field name="name" string="Referencia" filter_domain="['|', ('name', 'ilike', self), ('partner_id', 'ilike', self)]"/>
+                <field name="partner_id" operator="child_of"/>
+                <field name="survey_id"/>
+                <field name="group_id"/>
+                <field name="apu_product_id"/>
+                <separator/>
+                <filter string="Mis APUs" name="my_apu" domain="[('create_uid', '=', uid)]"/>
+                <separator/>
+                <filter string="Borrador" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Para Cotizar" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Cancelado" name="cancel" domain="[('state', '=', 'cancel')]"/>
+                <separator/>
+                <filter string="Fecha" name="date" date="date"/>
+                <group>
+                    <filter string="Cliente" name="group_by_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Estado" name="group_by_state" context="{'group_by': 'state'}"/>
+                    <filter string="Creado por" name="group_by_creator" context="{'group_by': 'create_uid'}"/>
+                    <filter string="Levantamiento" name="group_by_survey" context="{'group_by': 'survey_id'}"/>
+                    <filter string="Producto/Cilindro" name="group_by_product" context="{'group_by': 'apu_product_id'}"/>
+                    <filter string="Fecha" name="group_by_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_impsa_apu_survey_calendar" model="ir.ui.view">
+        <field name="name">impsa.apu.survey.calendar</field>
+        <field name="model">impsa.apu.survey</field>
+        <field name="arch" type="xml">
+            <calendar string="APUs" date_start="date" color="state" hide_time="true" event_limit="5" create="0">
+                <field name="partner_id" avatar_field="avatar_128"/>
+                <field name="gran_total_lm" widget="monetary"/>
+                <field name="state" filters="1"/>
+            </calendar>
+        </field>
+    </record>
+
     <record id="action_apu_survey_all"
             model="ir.actions.act_window">
         <field name="name">Análisis de Precios Unitarios</field>
         <field name="res_model">impsa.apu.survey</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">list,kanban,form,calendar,pivot,graph</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crea tu primer Análisis de Precios Unitarios (APU)
+            </p>
+        </field>
     </record>
 
     <record id="action_apu_survey_actions_all"
