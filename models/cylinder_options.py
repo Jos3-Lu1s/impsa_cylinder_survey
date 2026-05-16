@@ -16,6 +16,7 @@ class CylinderOptions(models.Model):
         "- Simple efecto (CE-SE)\n"
         "- Telescópico (CE-T)\n"
         "- Doble vástago (CE-DV)\n"
+        "- Nivel de cadena (CE-NC)\n"
         "- Otros (CE-OT)"
     )
 

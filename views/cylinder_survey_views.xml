@@ -359,7 +359,7 @@
                             <field name="barrel_length" readonly="has_apu"/>
                         </group>
 
-                        <group string="Vástago 1" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
+                        <group string="Vástago 1" invisible="cylinder_to_code in ('CE-T', 'CE-OT', 'CE-NC')">
                             <field name="diameter_rod" readonly="has_apu"/>
                             <field name="rod_length" string="Longitud" readonly="has_apu"/>
                         </group>
@@ -374,7 +374,12 @@
                             <field name="piston_length" string="Longitud" readonly="has_apu"/>
                         </group>
 
-                        <group string="Cabeza 1" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
+                        <group string="Tapas" invisible="cylinder_to_code != 'CE-NC'">
+                            <field name="cap_diameter" readonly="has_apu"/>
+                            <field name="cap_length" string="Longitud" readonly="has_apu"/>
+                        </group>
+
+                        <group string="Cabeza 1" invisible="cylinder_to_code in ('CE-T', 'CE-OT', 'CE-NC')">
                             <field name="head_diameter" readonly="has_apu"/>
                             <field name="head_length" string="Longitud" readonly="has_apu"/>
                         </group>
@@ -438,7 +443,7 @@
                             </list>
                         </field>
 
-                        <group string="Carrera" invisible="cylinder_to_code == 'CE-OT'">
+                        <group string="Carrera" invisible="cylinder_to_code in ('CE-OT', 'CE-NC')">
                             <field name="stroke_length" string="Longitud Total" readonly="has_apu"/>
                         </group>
                     

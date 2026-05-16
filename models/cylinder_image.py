@@ -55,6 +55,7 @@ class CylinderImage(models.Model):
         ('rod', 'Vástago'),
         ('piston', 'Émbolo / Pistón'),
         ('head', 'Cabeza'),
+        ('cap', 'Tapa'),
         ('stroke', 'Carrera'),
         ('accessory', 'Accesorio'),
     ], string="Componente", required=True)

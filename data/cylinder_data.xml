@@ -33,6 +33,12 @@
             <field name="active">True</field>
         </record>
 
+        <record id="cylinder_option_ce_nc" model="impsa.cylinder.options">
+            <field name="name">Nivel de cadena</field>
+            <field name="code">CE-NC</field>
+            <field name="active">True</field>
+        </record>
+
         <!-- Materiales -->
 
         <record id="cylinder_material_nbr" model="impsa.cylinder.material">

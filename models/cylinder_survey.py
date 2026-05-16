@@ -96,6 +96,15 @@ class CylinderSurvey(models.Model):
     head_diameter2 = fields.Float(string='Ø Cabeza 2', tracking=True)
     head_length2 = fields.Float(string='Longitud de Cabeza 2', tracking=True)
 
+    # Tapas (Caps) - Específico para Nivel de Cadena
+    cap_diameter = fields.Float(string='Ø Tapa', tracking=True)
+    cap_length = fields.Float(string='Longitud de Tapa', tracking=True)
+    cap_image_ids = fields.One2many(
+        'impsa.cylinder.image', 'survey_id', 
+        string="Imágenes de la Tapa", 
+        domain=[('component', '=', 'cap')]
+    )
+
     # Carrera (Stroke)
     stroke_length = fields.Float(string='Longitud de Carrera', tracking=True)
     stroke_image_ids = fields.One2many(
@@ -415,20 +424,31 @@ class CylinderSurvey(models.Model):
             if code != 'CE-OT':
                 rec.accessory_line_ids = [Command.clear()]
                 
-            # 4. Si ES Telescópico o ES Otros, limpiamos las medidas de un cilindro estándar
-            if code in ['CE-T', 'CE-OT']:
-                rec.barrel_inner_diameter = 0.0
-                rec.barrel_outer_diameter = 0.0
-                rec.barrel_length = 0.0
+            # 4. Si ES Telescópico, Otros o Nivel de Cadena, limpiamos las medidas de un cilindro estándar
+            if code in ['CE-T', 'CE-OT', 'CE-NC']:
+                # La camisa NO se limpia si es Nivel de Cadena (CE-NC)
+                if code in ['CE-T', 'CE-OT']:
+                    rec.barrel_inner_diameter = 0.0
+                    rec.barrel_outer_diameter = 0.0
+                    rec.barrel_length = 0.0
+
                 rec.diameter_rod = 0.0
                 rec.rod_length = 0.0
-                rec.piston_diameter = 0.0
-                rec.piston_length = 0.0
                 rec.head_diameter = 0.0
                 rec.head_length = 0.0
+
+                # Las tapas NO se limpian si es Nivel de Cadena (CE-NC)
+                if code != 'CE-NC':
+                    rec.cap_diameter = 0.0
+                    rec.cap_length = 0.0
+
+                # El émbolo NO se limpia si es Nivel de Cadena (CE-NC)
+                if code in ['CE-T', 'CE-OT']:
+                    rec.piston_diameter = 0.0
+                    rec.piston_length = 0.0
                 
-                # El Telescópico SÍ usa carrera global, pero OTROS no.
-                if code == 'CE-OT':
+                # El Telescópico SÍ usa carrera global, pero OTROS y NC no.
+                if code in ['CE-OT', 'CE-NC']:
                     rec.stroke_length = 0.0
 
     ''' ------------------------
@@ -456,7 +476,7 @@ class CylinderSurvey(models.Model):
     def _check_standard_physics(self):
         """Valida que las medidas de un cilindro estándar tengan sentido físico."""
         for rec in self:
-            if rec.cylinder_to_code in ['CE-DE', 'CE-SE', 'CE-DV']:
+            if rec.cylinder_to_code in ['CE-DE', 'CE-SE', 'CE-DV', 'CE-NC']:
                 
                 # 1. Grosor de pared de la Camisa
                 if rec.barrel_inner_diameter and rec.barrel_outer_diameter:
@@ -465,8 +485,8 @@ class CylinderSurvey(models.Model):
                             'int': rec.barrel_inner_diameter, 'ext': rec.barrel_outer_diameter
                         })
                 
-                # 2. Vástago vs Camisa
-                if rec.diameter_rod and rec.barrel_inner_diameter:
+                # 2. Vástago vs Camisa (No aplica a CE-NC)
+                if rec.cylinder_to_code != 'CE-NC' and rec.diameter_rod and rec.barrel_inner_diameter:
                     if rec.diameter_rod >= rec.barrel_inner_diameter:
                         raise ValidationError(_("Error de Ensamble: El Vástago (Ø %(rod)s) no cabe dentro de la Camisa (Ø Int %(barrel)s).") % {
                             'rod': rec.diameter_rod, 'barrel': rec.barrel_inner_diameter
@@ -489,7 +509,9 @@ class CylinderSurvey(models.Model):
     @api.constrains(
         'cylinder_to', 'barrel_inner_diameter', 'barrel_outer_diameter', 'barrel_length',
         'diameter_rod', 'rod_length', 'diameter_rod2', 'rod_length2', 'piston_diameter', 'piston_length', 
-        'head_diameter', 'head_length', 'head_diameter2', 'head_length2', 'stroke_length', 'section_ids',
+        'head_diameter', 'head_length', 'head_diameter2', 'head_length2', 
+        'cap_diameter', 'cap_length',
+        'stroke_length', 'section_ids',
         'accessory_line_ids'
     )
     def _check_required_dimensions_by_type(self):
@@ -516,6 +538,14 @@ class CylinderSurvey(models.Model):
                     )
                 if rec.stroke_length <= 0.0:
                     missing_components.append('Carrera Total')
+
+            elif code == 'CE-NC':
+                if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0 or rec.barrel_length <= 0.0:
+                    missing_components.append('Camisa')
+                if rec.piston_diameter <= 0.0 or rec.piston_length <= 0.0:
+                    missing_components.append('Émbolo')
+                if rec.cap_diameter <= 0.0 or rec.cap_length <= 0.0:
+                    missing_components.append('Tapa')
 
             elif code in ['CE-DE', 'CE-SE', 'CE-DV']:
                 if rec.barrel_inner_diameter <= 0.0 or rec.barrel_outer_diameter <= 0.0 or rec.barrel_length <= 0.0:
