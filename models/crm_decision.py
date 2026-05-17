@@ -376,6 +376,12 @@ class CrmStage(models.Model):
     is_lose   = fields.Boolean(compute='_compute_stage_flags', store=True)
     ganado_state = fields.Boolean(compute='_compute_stage_flags', store=True)
     
+    authorized_user_ids = fields.Many2many(
+        'res.users', 
+        string='Usuarios Autorizados',
+        help='Si se seleccionan usuarios, solo ellos podrán interactuar con los leads en esta etapa.'
+    )
+    
     @api.depends('stage_type')
     def _compute_stage_flags(self):
         for stage in self:

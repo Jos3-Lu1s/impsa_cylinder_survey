@@ -12,6 +12,11 @@
                            widget="radio"
                            options="{'horizontal': True}"/>
                 </xpath>
+                <xpath expr="//field[@name='fold']" position="before">
+                    <field name="authorized_user_ids"
+                           widget="many2many_avatar_user"
+                           options="{'no_create': True}"/>
+                </xpath>
             </field>
         </record>
 

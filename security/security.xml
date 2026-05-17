@@ -51,5 +51,16 @@
             </field>
         </record>
 
+        <!-- REGLAS DE SEGURIDAD -->
+        <record id="rule_crm_lead_authorized_users" model="ir.rule">
+            <field name="name">CRM Lead: Restricción por Usuarios Autorizados en Etapa</field>
+            <field name="model_id" ref="crm.model_crm_lead"/>
+            <field name="domain_force">['|', ('stage_id.authorized_user_ids', '=', False), ('stage_id.authorized_user_ids', 'in', [user.id])]</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+
     </data>
 </odoo>
