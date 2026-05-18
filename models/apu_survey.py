@@ -246,6 +246,17 @@ class ApuSurvey(models.Model):
 
     def action_to_confirmed(self):
         for record in self:
+            if not record.lm_ids:
+                raise ValidationError(_("Debes agregar al menos una línea en el Cotizador de Materiales."))
+            
+            lines_without_product = record.lm_ids.filtered(lambda l: not l.product_id)
+            if lines_without_product:
+                raise ValidationError(_("Todas las líneas del Cotizador de Materiales deben tener un producto seleccionado."))
+
+            lines_without_uom = record.lm_ids.filtered(lambda l: not l.unidad_lm)
+            if lines_without_uom:
+                raise ValidationError(_("Todas las líneas del Cotizador de Materiales deben tener una unidad de medida seleccionada."))
+
             order_lines = []
             if record.cylinder_qty_by_group <= 0:
                 raise ValidationError(_("Debes colocar un número mayor a 0 en el campo 'Cant. de cilindros'"))
