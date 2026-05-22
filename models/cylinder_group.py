@@ -44,13 +44,14 @@ class CylinderGroup(models.Model):
         'impsa.apu.survey',
         string="Análisis de Precio (APU)",
         readonly=True,
-        help="APU generado para este grupo de cilindros."
+        help="APU generado para este grupo de cilindros.",
     )
 
     apu_state = fields.Selection(
         related='apu_id.state',
         string="Estado APU",
-        store=True
+        store=True,
+        related_sudo=True
     )
 
     @api.constrains('quantity')

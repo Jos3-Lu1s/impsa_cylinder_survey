@@ -237,7 +237,7 @@
 
                     <button name="action_to_apu" string="Enviar a APU" type="object" class="oe_highlight" invisible="state != 'draft'" />
 
-                    <button name="action_quoted" string="Confirmar Cotización" type="object" class="oe_highlight" invisible="state != 'apu'" />
+                    <button name="action_quoted" string="Confirmar Cotización" type="object" class="oe_highlight" invisible="state != 'apu'" groups="impsa_cylinder_survey.group_apu_user" />
 
                     <button name="action_confirm" string="Confirmar Levantamiento" type="object" class="oe_highlight" invisible="state != 'quoted'" />
 
@@ -262,7 +262,7 @@
                         <button name="action_view_lead" type="object" class="oe_stat_button" icon="fa-star" invisible="not lead_id" groups="sales_team.group_sale_salesman">
                             <field name="lead_count" widget="statinfo" string="Oportunidad"/>
                         </button>
-                        <button name="action_view_apus" type="object" class="oe_stat_button" icon="fa-calculator" invisible="not apu_ids">
+                        <button name="action_view_apus" type="object" class="oe_stat_button" icon="fa-calculator" invisible="not has_apu" groups="impsa_cylinder_survey.group_apu_user">
                             <field name="apu_count" widget="statinfo" string="APUs"/>
                         </button>
                         <button name="action_view_sale_orders" type="object" class="oe_stat_button" icon="fa-usd" invisible="sale_order_count == 0" groups="sales_team.group_sale_salesman">
@@ -493,23 +493,26 @@
                                         string="Doc. APU" 
                                         widget="badge" 
                                         decoration-info="True" 
-                                        column_invisible="not parent.apu_ids"/>
+                                        column_invisible="not parent.has_apu"
+                                        groups="impsa_cylinder_survey.group_apu_user"/>
                                         
                                     <field name="apu_state" 
                                         string="Estado APU" 
                                         widget="badge" 
-                                        column_invisible="not parent.apu_ids"
+                                        column_invisible="not parent.has_apu"
                                         decoration-warning="apu_state == 'draft'"
                                         decoration-success="apu_state == 'confirmed'"
-                                        decoration-danger="apu_state == 'cancel'"/>
+                                        decoration-danger="apu_state == 'cancel'"
+                                        groups="impsa_cylinder_survey.group_apu_user"/>
                                         
                                     <button name="action_open_apu" 
-                                            column_invisible="not parent.apu_ids"
+                                            column_invisible="not parent.has_apu"
                                             invisible="not apu_id"
                                             type="object"
                                             class="oe_link"
                                             icon="fa-external-link"
-                                            string="Ver APU">
+                                            string="Ver APU"
+                                            groups="impsa_cylinder_survey.group_apu_user">
                                     </button>
                                 </list>
 

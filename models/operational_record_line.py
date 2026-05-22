@@ -50,16 +50,16 @@ class OperationalRecordLine(models.Model):
         if not self.env.context.get('skip_apu_sync'):
             apu_vals = [
                 {
-                    'apu_id': record.group_id.apu_id.id,
+                    'apu_id': record.group_id.sudo().apu_id.id,
                     'action_id': record.action_id.id,
                     'obs': record.obs,
                     'operational_line_id': record.id,
                 }
                 for record in records
-                if record.group_id.apu_id
+                if record.group_id.sudo().apu_id
             ]
             if apu_vals:
-                self.env['impsa.apu.survey.line'] \
+                self.env['impsa.apu.survey.line'].sudo() \
                     .with_context(skip_survey_sync=True) \
                     .create(apu_vals)
 
@@ -80,9 +80,9 @@ class OperationalRecordLine(models.Model):
         res = super(OperationalRecordLine, records).write(vals)
 
         if ('action_id' in vals or 'obs' in vals) and not self.env.context.get('skip_apu_sync'):
-            records_with_apu = records.filtered(lambda r: r.group_id.apu_id)
+            records_with_apu = records.filtered(lambda r: r.group_id.sudo().apu_id)
             if records_with_apu:
-                apu_lines = self.env['impsa.apu.survey.line'].search([
+                apu_lines = self.env['impsa.apu.survey.line'].sudo().search([
                     ('operational_line_id', 'in', records_with_apu.ids)
                 ])
                 if apu_lines:

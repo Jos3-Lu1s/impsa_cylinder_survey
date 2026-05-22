@@ -233,7 +233,7 @@ class CylinderSurvey(models.Model):
     apu_ids = fields.One2many(
         'impsa.apu.survey',
         'survey_id',
-        string="Análisis de Precios (APUs)"
+        string="Análisis de Precios (APUs)",
     )
 
     lead_count = fields.Integer(
@@ -244,7 +244,8 @@ class CylinderSurvey(models.Model):
     
     apu_count = fields.Integer(
         string="Cantidad de APUs",
-        compute="_compute_apu_count"
+        compute="_compute_apu_count",
+        compute_sudo=True
     )
 
     accessory_line_ids = fields.One2many(
@@ -269,7 +270,8 @@ class CylinderSurvey(models.Model):
     has_apu = fields.Boolean(
         string='Tiene APU',
         compute='_compute_has_apu',
-        store=False
+        store=False,
+        compute_sudo=True
     )
 
     ''' ------------------------
@@ -301,7 +303,7 @@ class CylinderSurvey(models.Model):
     @api.depends('apu_ids')
     def _compute_apu_count(self):
         for rec in self:
-            rec.apu_count = len(rec.apu_ids)
+            rec.apu_count = len(rec.sudo().apu_ids)
 
     @api.depends('group_ids.operational_record_ids')
     def _compute_operational_totals(self):
@@ -628,7 +630,7 @@ class CylinderSurvey(models.Model):
     @api.depends('apu_ids')
     def _compute_has_apu(self):
         for rec in self:
-            rec.has_apu = bool(rec.apu_ids)
+            rec.has_apu = bool(rec.sudo().apu_ids)
 
     ''' ------------------------
         ACTIONS
@@ -660,7 +662,7 @@ class CylinderSurvey(models.Model):
             
     def action_view_apus(self):
         self.ensure_one()
-        apus = self.apu_ids
+        apus = self.sudo().apu_ids
     
         if len(apus) == 1:
             return {
@@ -829,8 +831,8 @@ class CylinderSurvey(models.Model):
                     if apu_lines_commands:
                         apu_vals['lm_ids'] = apu_lines_commands
 
-                    new_apu = self.env['impsa.apu.survey'].create(apu_vals)
-                    group.apu_id = new_apu.id
+                    new_apu = self.env['impsa.apu.survey'].sudo().create(apu_vals)
+                    group.sudo().apu_id = new_apu.id
 
             record.write({'state': 'apu'})
 
@@ -842,7 +844,7 @@ class CylinderSurvey(models.Model):
                 raise ValidationError(_("Operación inválida: No hay grupos definidos."))
             
             # Extraer APUs que estén en estado 'confirmed'
-            confirmed_apus = record.apu_ids.filtered(lambda a: a.state == 'confirmed')
+            confirmed_apus = record.sudo().apu_ids.filtered(lambda a: a.state == 'confirmed')
             
             if not confirmed_apus:
                 raise ValidationError(_("Para generar una cotización, debe existir al menos una APU en estado 'Para Cotizar' (Confirmada)."))

@@ -384,8 +384,8 @@ class ApuSurvey(models.Model):
     
             if survey:
                 # Tras super().write(), los APUs hermanos ya reflejan el nuevo estado
-                apus_no_cancelados = survey.apu_ids.filtered(lambda a: a.state != 'cancel')
-                apus_confirmados   = survey.apu_ids.filtered(lambda a: a.state == 'confirmed')
+                apus_no_cancelados = survey.sudo().apu_ids.filtered(lambda a: a.state != 'cancel')
+                apus_confirmados   = survey.sudo().apu_ids.filtered(lambda a: a.state == 'confirmed')
     
                 if nuevo_state == 'confirmed':
                     # Basta con que UN APU esté confirmado para mover el survey a cotización

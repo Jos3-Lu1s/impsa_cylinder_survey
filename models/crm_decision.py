@@ -60,17 +60,19 @@ class CrmDecision(models.Model):
     apu_survey_ids = fields.One2many(
         'impsa.apu.survey',
         'lead_id',
-        string="Levantamientos de APU"
+        string="Levantamientos de APU",
     )
     
     cylinder_survey_count = fields.Integer(
         string="Levantamientos",
-        compute="_compute_cylinder_survey_count"
+        compute="_compute_cylinder_survey_count",
+        compute_sudo=True
     )
     
     apu_survey_count = fields.Integer(
         string="APU",
-        compute="_compute_apu_survey_count"
+        compute="_compute_apu_survey_count",
+        compute_sudo=True
     )
     
     stage_sequence = fields.Integer(
@@ -213,10 +215,10 @@ class CrmDecision(models.Model):
                         ) % lead.name)
 
                 if nueva_etapa.stage_type == 'negotiation':
-                    lev_cotizado   = lead.cylinder_survey_ids.filtered(
+                    lev_cotizado   = lead.sudo().cylinder_survey_ids.filtered(
                         lambda s: s.state == 'quoted'
                     )
-                    apu_confirmado = lead.apu_survey_ids.filtered(
+                    apu_confirmado = lead.sudo().apu_survey_ids.filtered(
                         lambda a: a.state == 'confirmed'
                     )
                     if not lev_cotizado and not apu_confirmado:
@@ -231,12 +233,12 @@ class CrmDecision(models.Model):
     @api.depends('cylinder_survey_ids')
     def _compute_cylinder_survey_count(self):
         for rec in self:
-            rec.cylinder_survey_count = len(rec.cylinder_survey_ids)
+            rec.cylinder_survey_count = len(rec.sudo().cylinder_survey_ids)
             
     @api.depends('apu_survey_ids')
     def _compute_apu_survey_count(self):
         for rec in self:
-            rec.apu_survey_count = len(rec.apu_survey_ids)
+            rec.apu_survey_count = len(rec.sudo().apu_survey_ids)
 
     def action_open_cylinder_survey(self):
         self.ensure_one()

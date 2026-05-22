@@ -30,7 +30,7 @@ class SaleOrderSmart(models.Model):
         'impsa.apu.survey',
         string="APU Relacionado",
         ondelete="set null",
-        copy=False
+        copy=False,
     )
     
     apu_survey_count = fields.Integer(

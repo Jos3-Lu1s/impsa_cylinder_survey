@@ -21,7 +21,8 @@
                         type="object"
                         class="oe_stat_button"
                         icon="fa-calculator"
-                        invisible="apu_survey_count == 0">
+                        invisible="apu_survey_count == 0"
+                        groups="impsa_cylinder_survey.group_apu_user">
                         <field name="apu_survey_count" widget="statinfo" string="APU" />
                     </button>
                 </xpath>
@@ -57,7 +58,8 @@
                         string="APU"
                         type="object"
                         class="oe_highlight"
-                        invisible="is_apu == False or selection_type != 'manufacturing' or apu_survey_count >= 1 or not selection_type" />
+                        invisible="is_apu == False or selection_type != 'manufacturing' or apu_survey_count >= 1 or not selection_type"
+                        groups="impsa_cylinder_survey.group_apu_user" />
                 </xpath>
 
                 <!-- Ocultar botón GANADO -->

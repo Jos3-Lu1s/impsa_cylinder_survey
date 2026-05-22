@@ -78,10 +78,10 @@ class CylinderSection(models.Model):
         store=False
     )
     
-    @api.depends('survey_id', 'survey_id.apu_ids')
+    @api.depends('survey_id', 'survey_id.has_apu')
     def _compute_has_apu(self):
         for sec in self:
-            sec.has_apu = bool(sec.survey_id and sec.survey_id.apu_ids)
+            sec.has_apu = bool(sec.survey_id and sec.survey_id.sudo().has_apu)
 
     @api.constrains('inner_diameter', 'outer_diameter', 'length', 'piston_diameter', 'piston_length', 'head_diameter', 'head_length')
     def _check_strict_dimensions(self):
