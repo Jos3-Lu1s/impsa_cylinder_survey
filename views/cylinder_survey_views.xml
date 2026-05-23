@@ -493,8 +493,7 @@
                                         string="Doc. APU" 
                                         widget="badge" 
                                         decoration-info="True" 
-                                        column_invisible="not parent.has_apu"
-                                        groups="impsa_cylinder_survey.group_apu_user"/>
+                                        column_invisible="not parent.has_apu"/>
                                         
                                     <field name="apu_state" 
                                         string="Estado APU" 
@@ -502,8 +501,7 @@
                                         column_invisible="not parent.has_apu"
                                         decoration-warning="apu_state == 'draft'"
                                         decoration-success="apu_state == 'confirmed'"
-                                        decoration-danger="apu_state == 'cancel'"
-                                        groups="impsa_cylinder_survey.group_apu_user"/>
+                                        decoration-danger="apu_state == 'cancel'"/>
                                         
                                     <button name="action_open_apu" 
                                             column_invisible="not parent.has_apu"
