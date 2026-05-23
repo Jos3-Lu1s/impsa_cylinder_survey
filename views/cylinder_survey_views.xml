@@ -549,7 +549,7 @@
                         </page>
 
                         <page string="Resumen de Operaciones" name="all_operations_summary" invisible="not group_ids">
-                            <field name="all_operational_record_ids" readonly="state not in ('draft', 'apu')">
+                            <field name="all_operational_record_ids" readonly="state != 'draft'">
                                 <list editable="bottom" default_order="group_id, sequence">
                                     <field name="group_id" string="Grupo" options="{'no_create': True, 'no_open': True}" domain="[('survey_id', '=', parent.id)]" decoration-bf="1"/>
                                     <field name="action_id" options="{'no_create': True, 'no_open': True}"/>

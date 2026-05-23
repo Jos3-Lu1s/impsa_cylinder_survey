@@ -39,10 +39,10 @@ class OperationalRecordLine(models.Model):
         for vals in vals_list:
             if vals.get('group_id'):
                 group = self.env['impsa.cylinder.group'].browse(vals['group_id'])
-                if group.survey_id.state not in ('draft', 'apu'):
+                if group.survey_id.state != 'draft' and not self.env.context.get('skip_apu_sync'):
                     raise ValidationError(_(
                         "No se pueden agregar operaciones después de que el "
-                        "levantamiento ha salido de la etapa de APU."
+                        "levantamiento ha salido de la etapa inicial."
                     ))
 
         records = super().create(vals_list)
@@ -72,7 +72,7 @@ class OperationalRecordLine(models.Model):
             return True
 
         for record in records:
-            if record.survey_id and record.survey_id.state not in ('draft', 'apu'):
+            if record.survey_id and record.survey_id.state != 'draft' and not self.env.context.get('skip_apu_sync'):
                 raise ValidationError(_(
                     "No se pueden modificar operaciones en este estado (%s)."
                 ) % record.survey_id.state)
@@ -107,7 +107,7 @@ class OperationalRecordLine(models.Model):
         for record in records:
             if not record.group_id.exists():
                 continue
-            if record.survey_id and record.survey_id.state not in ('draft', 'apu'):
+            if record.survey_id and record.survey_id.state != 'draft' and not self.env.context.get('skip_apu_sync'):
                 raise ValidationError(_(
                     "No se pueden eliminar operaciones en este estado."
                 ))
