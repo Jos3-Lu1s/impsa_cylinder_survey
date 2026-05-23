@@ -54,15 +54,16 @@ class CrmDecision(models.Model):
     cylinder_survey_ids = fields.One2many(
         'impsa.cylinder.survey',
         'lead_id',
-        string="Levantamientos de Cilindro"
+        string="Levantamientos de Cilindro",
+        groups="impsa_cylinder_survey.group_cylinder_survey_user"
     )
-    
+
     apu_survey_ids = fields.One2many(
         'impsa.apu.survey',
         'lead_id',
         string="Levantamientos de APU",
-    )
-    
+        groups="impsa_cylinder_survey.group_apu_user"
+    )    
     cylinder_survey_count = fields.Integer(
         string="Levantamientos",
         compute="_compute_cylinder_survey_count",

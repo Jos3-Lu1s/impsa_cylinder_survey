@@ -13,7 +13,8 @@
                         type="object"
                         class="oe_stat_button"
                         icon="fa-cogs"
-                        invisible="cylinder_survey_count == 0">
+                        invisible="cylinder_survey_count == 0"
+                        groups="impsa_cylinder_survey.group_cylinder_survey_user">
                         <field name="cylinder_survey_count" widget="statinfo" string="Levantamientos" />
                     </button>
 
@@ -45,6 +46,16 @@
                            readonly="stage_sequence > 2 or cylinder_survey_count >= 1 or apu_survey_count >= 1" 
                            widget="radio" 
                            options="{'horizontal': True}"/>
+                    <label for="cylinder_survey_count" invisible="cylinder_survey_count == 0"/>
+                    <div class="d-flex align-items-center" invisible="cylinder_survey_count == 0">
+                         <field name="cylinder_survey_count" class="oe_inline me-2"/>
+                         <span class="text-muted">(Levantamientos registrados)</span>
+                    </div>
+                    <label for="apu_survey_count" invisible="apu_survey_count == 0"/>
+                    <div class="d-flex align-items-center" invisible="apu_survey_count == 0">
+                         <field name="apu_survey_count" class="oe_inline me-2"/>
+                         <span class="text-muted">(APUs registrados)</span>
+                    </div>
                 </xpath>
 
                 <xpath expr="//button[@name='action_set_won_rainbowman']" position="before">
