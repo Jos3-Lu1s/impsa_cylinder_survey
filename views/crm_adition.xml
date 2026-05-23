@@ -9,12 +9,15 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//div[@name='button_box']" position="inside">
+                    <field name="is_survey" invisible="1" />
+                    <field name="is_apu" invisible="1" />
+                    <field name="is_user_authorized" invisible="1" />
+                    
                     <button name="action_view_cylinder_surveys"
                         type="object"
                         class="oe_stat_button"
                         icon="fa-cogs"
-                        invisible="cylinder_survey_count == 0"
-                        groups="impsa_cylinder_survey.group_cylinder_survey_user">
+                        invisible="cylinder_survey_count == 0 or is_survey == False or is_user_authorized == False">
                         <field name="cylinder_survey_count" widget="statinfo" string="Levantamientos" />
                     </button>
 
@@ -22,8 +25,7 @@
                         type="object"
                         class="oe_stat_button"
                         icon="fa-calculator"
-                        invisible="apu_survey_count == 0"
-                        groups="impsa_cylinder_survey.group_apu_user">
+                        invisible="apu_survey_count == 0 or is_apu == False or is_user_authorized == False">
                         <field name="apu_survey_count" widget="statinfo" string="APU" />
                     </button>
                 </xpath>
@@ -63,14 +65,13 @@
                         string="Levantamiento"
                         type="object"
                         class="oe_highlight"
-                        invisible="is_survey == False or selection_type != 'repair' or cylinder_survey_count >= 1 or not selection_type" />
+                        invisible="is_survey == False or selection_type != 'repair' or cylinder_survey_count >= 1 or not selection_type or is_user_authorized == False" />
                         
                     <button name="action_open_apu"
                         string="APU"
                         type="object"
                         class="oe_highlight"
-                        invisible="is_apu == False or selection_type != 'manufacturing' or apu_survey_count >= 1 or not selection_type"
-                        groups="impsa_cylinder_survey.group_apu_user" />
+                        invisible="is_apu == False or selection_type != 'manufacturing' or apu_survey_count >= 1 or not selection_type or is_user_authorized == False" />
                 </xpath>
 
                 <!-- Ocultar botón GANADO -->

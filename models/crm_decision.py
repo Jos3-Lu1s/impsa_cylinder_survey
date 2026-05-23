@@ -96,6 +96,19 @@ class CrmDecision(models.Model):
         related='stage_id.ganado_state',
         string="Ganado"
     )
+
+    is_user_authorized = fields.Boolean(
+        compute='_compute_is_user_authorized',
+        string="Usuario Autorizado"
+    )
+
+    @api.depends('stage_id.authorized_user_ids')
+    def _compute_is_user_authorized(self):
+        for lead in self:
+            if not lead.stage_id.authorized_user_ids:
+                lead.is_user_authorized = True
+            else:
+                lead.is_user_authorized = self.env.user in lead.stage_id.authorized_user_ids
     
     final_lap = fields.Boolean(
         string="Terminado",
