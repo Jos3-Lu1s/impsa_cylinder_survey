@@ -218,7 +218,7 @@ class CrmDecision(models.Model):
                     ) % lead.name)
 
                 if tipo == 'repair' and nueva_etapa.stage_type == 'apu':
-                    levantamiento_en_apu = lead.cylinder_survey_ids.filtered(
+                    levantamiento_en_apu = lead.sudo().cylinder_survey_ids.filtered(
                         lambda s: s.state == 'apu'
                     )
                     if not levantamiento_en_apu:
