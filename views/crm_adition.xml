@@ -17,7 +17,7 @@
                         type="object"
                         class="oe_stat_button"
                         icon="fa-cogs"
-                        invisible="cylinder_survey_count == 0 or is_survey == False or is_user_authorized == False"
+                        invisible="cylinder_survey_count == 0"
                         groups="impsa_cylinder_survey.group_cylinder_survey_user">
                         <field name="cylinder_survey_count" widget="statinfo" string="Levantamientos" />
                     </button>
@@ -26,7 +26,7 @@
                         type="object"
                         class="oe_stat_button"
                         icon="fa-calculator"
-                        invisible="apu_survey_count == 0 or is_apu == False or is_user_authorized == False"
+                        invisible="apu_survey_count == 0"
                         groups="impsa_cylinder_survey.group_apu_user">
                         <field name="apu_survey_count" widget="statinfo" string="APU" />
                     </button>
