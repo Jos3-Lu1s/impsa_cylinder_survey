@@ -1076,3 +1076,5 @@ class CylinderSurvey(models.Model):
                     survey.lead_id._sync_stage_from_type(sync_type)
     
         return result
+
+""" Cambios change """
