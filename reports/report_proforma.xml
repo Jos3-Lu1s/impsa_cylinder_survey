@@ -133,7 +133,7 @@
                                         <span t-field="line.product_uom_id" />
                                     </td>
                                     <td>
-                                        <span t-field="line.name" />
+                                        <span t-field="line.product_id.name" />
                                     </td>
                                     <td style="text-align:center;">
                                         <span t-field="line.price_unit" />
