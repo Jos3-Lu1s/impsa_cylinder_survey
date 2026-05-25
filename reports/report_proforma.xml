@@ -65,8 +65,8 @@
                     <div class="header" style="width:100%; font-size:12px;">
                         <table style="width:100%; border:0 !important; border-width:0 !important; border-color:transparent !important; border-style:none !important;">
                             <tr>
-                                <td style="width:40%; vertical-align:top;">
-                                    <img src="/impsa_cylinder_survey/static/src/img/Imagen-impsa.png"
+                                <td style="width:50%; vertical-align:top;">
+                                    <img src="/impsa_cylinder_survey/static/src/img/imagen-impsa.png"
                                          style="max-height:80px;"/>
                                 </td>
                                 <td style="width:25%; vertical-align:top;">
