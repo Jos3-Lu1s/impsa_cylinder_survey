@@ -165,7 +165,7 @@
                                     <t t-else="">No definido</t>
                                     <br />
                                     <strong>Condiciones de pago:</strong> <span t-field="doc.payment_term_id" /><br />
-                                    <strong>Entrega:</strong> <span t-field="doc.warehouse_id" /><br />
+                                    <strong>Entrega:</strong> LAB NUESTRAS INSTALACIONES <br />
                                     <strong>Vigencia:</strong> <span t-field="doc.validity_date" /><br />
                                     EL FLETE CORRE POR CUENTA Y RIESGO DEL CLIENTE:
                                 </td>

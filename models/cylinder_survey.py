@@ -913,17 +913,22 @@ class CylinderSurvey(models.Model):
     def action_create_purchase_order(self):
         """Crea Órdenes de Compra agrupadas por proveedor del empaque."""
         self.ensure_one()
-        
+
         if self.purchase_order_create:
             raise UserError(_("Ya se generó una Orden de Compra para este registro."))
-
         if not self.cylinder_survey_line_ids:
-             raise UserError(_("No hay empaques para generar órdenes de compra."))
+            raise UserError(_("No hay empaques para generar órdenes de compra."))
 
-        # Agrupar líneas por proveedor
+        # 1. Crear los productos faltantes en una transacción INDEPENDIENTE.
+        # Así persisten en BD aunque la validación de proveedor falle después.
+        self._ensure_line_products_persisted()
+
+        # 2. Recargar las líneas para ver los product_id recién asignados
+        self.cylinder_survey_line_ids.invalidate_recordset(['product_id'])
+
+        # 3. Agrupar líneas por proveedor
         lines_by_supplier = {}
         planned_datetime = fields.Datetime.to_datetime(self.date_delivery) if self.date_delivery else fields.Datetime.now()
-
         for line in self.cylinder_survey_line_ids:
             seller = line.product_id.seller_ids[:1]
             if not seller:
@@ -931,20 +936,18 @@ class CylinderSurvey(models.Model):
                     "El producto '%(prod)s' no tiene un proveedor definido (pestaña Compras).",
                     prod=line.product_id.display_name
                 ))
-
             supplier = seller.partner_id
             if supplier not in lines_by_supplier:
                 lines_by_supplier[supplier] = []
-
             lines_by_supplier[supplier].append((0, 0, {
                 'product_id': line.product_id.id,
                 'name': line.product_id.name,
                 'product_qty': line.unit_total,
-                'price_unit': seller.price, #Usar precio del vendor, NO el standard_price (costo).
+                'price_unit': seller.price,
                 'date_planned': planned_datetime,
             }))
 
-        # Crear las POs iterando por cada proveedor detectado.
+        # 4. Crear las POs
         created_pos = self.env['purchase.order']
         for supplier, po_lines in lines_by_supplier.items():
             po = self.env['purchase.order'].create({
@@ -954,10 +957,9 @@ class CylinderSurvey(models.Model):
                 'date_planned': planned_datetime,
             })
             created_pos += po
-            
-        self.purchase_order_create  = True
 
-        # Retornar vista dinámica dependiendo si se creó 1 o varias POs
+        self.purchase_order_create = True
+
         if len(created_pos) == 1:
             return {
                 'type': 'ir.actions.act_window',
@@ -966,14 +968,76 @@ class CylinderSurvey(models.Model):
                 'view_mode': 'form',
                 'res_id': created_pos.id,
             }
-        else:
-            return {
-                'type': 'ir.actions.act_window',
-                'name': _('Órdenes de Compra'),
-                'res_model': 'purchase.order',
-                'view_mode': 'list,form',
-                'domain': [('id', 'in', created_pos.ids)],
-            }
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Órdenes de Compra'),
+            'res_model': 'purchase.order',
+            'view_mode': 'list,form',
+            'domain': [('id', 'in', created_pos.ids)],
+        }
+
+
+    def _ensure_line_products_persisted(self):
+        self.ensure_one()
+        with self.env.registry.cursor() as new_cr:
+            new_env = self.env(cr=new_cr)
+            self.with_env(new_env)._ensure_line_products()
+            # commit automático al salir del with sin excepción
+
+
+    def _ensure_line_products(self):
+        """Crea productos faltantes para las líneas sin product_id.
+        No toca líneas que ya tengan producto."""
+        self.ensure_one()
+        Product = self.env['product.product']
+
+        lines_without_product = self.cylinder_survey_line_ids.filtered(lambda l: not l.product_id)
+        if not lines_without_product:
+            return
+
+        category = self.env['product.category'].search([('name', '=', 'SELLOS')], limit=1)
+        categ_id = category.id if category else False
+
+        lines_with_code = lines_without_product.filtered(lambda l: l.code_label)
+        lines_without_code = lines_without_product.filtered(lambda l: not l.code_label)
+
+        codes = lines_with_code.mapped('code_label')
+        existing_products = Product.search([('default_code', 'in', codes)]) if codes else Product
+        product_map = {p.default_code: p for p in existing_products}
+        seen_codes = set(product_map.keys())
+
+        products_to_create_vals = []
+        for line in lines_with_code:
+            code = line.code_label
+            if code not in seen_codes:
+                seen_codes.add(code)
+                products_to_create_vals.append({
+                    'name': line.description_label or f"Empaque {code}",
+                    'default_code': code,
+                    'type': 'consu',
+                    'categ_id': categ_id,
+                })
+
+        for line in lines_without_code:
+            products_to_create_vals.append({
+                'name': line.description_label or "Empaque sin Código",
+                'default_code': False,
+                'type': 'consu',
+                'categ_id': categ_id,
+            })
+
+        new_products = Product.create(products_to_create_vals) if products_to_create_vals else Product
+        for p in new_products:
+            if p.default_code:
+                product_map[p.default_code] = p
+
+        products_no_code_iter = iter([p for p in new_products if not p.default_code])
+
+        for line in lines_without_product:
+            if line.code_label:
+                line.product_id = product_map.get(line.code_label, False)
+            else:
+                line.product_id = next(products_no_code_iter, False)
 
 
     @api.model_create_multi
