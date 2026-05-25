@@ -208,6 +208,7 @@
                                             <p style="margin:0;" t-if="bank.l10n_mx_edi_clabe">
                                                 Clabe: <span t-esc="bank.l10n_mx_edi_clabe" />
                                             </p>
+                                            <p style="margin:0;">No. Sucursal: <span t-esc="bank.branch_code" /></p>
                                         </td>
                                     </t>
                                 </tr>
