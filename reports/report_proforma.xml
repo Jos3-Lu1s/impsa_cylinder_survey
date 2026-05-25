@@ -99,7 +99,7 @@
                                     <span t-field="doc.name" /><br />
                                     Fecha : <br />
                                     <span t-field="doc.date_order" /><br />
-                                    AT'N : <span t-field="doc.partner_id.name" /><br />
+                                    AT'N : <span t-field="doc.partner_contact_id.name" /><br />
                                 </td>
                             </tr>
                         </table>
