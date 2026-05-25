@@ -493,8 +493,7 @@
                                         string="Doc. APU" 
                                         widget="badge" 
                                         decoration-info="True" 
-                                        column_invisible="not parent.has_apu"
-                                        groups="impsa_cylinder_survey.group_apu_user"/>
+                                        column_invisible="not parent.has_apu"/>
                                         
                                     <field name="apu_state" 
                                         string="Estado APU" 
@@ -502,8 +501,7 @@
                                         column_invisible="not parent.has_apu"
                                         decoration-warning="apu_state == 'draft'"
                                         decoration-success="apu_state == 'confirmed'"
-                                        decoration-danger="apu_state == 'cancel'"
-                                        groups="impsa_cylinder_survey.group_apu_user"/>
+                                        decoration-danger="apu_state == 'cancel'"/>
                                         
                                     <button name="action_open_apu" 
                                             column_invisible="not parent.has_apu"
@@ -549,7 +547,7 @@
                         </page>
 
                         <page string="Resumen de Operaciones" name="all_operations_summary" invisible="not group_ids">
-                            <field name="all_operational_record_ids" readonly="state not in ('draft', 'apu')">
+                            <field name="all_operational_record_ids" readonly="state != 'draft'">
                                 <list editable="bottom" default_order="group_id, sequence">
                                     <field name="group_id" string="Grupo" options="{'no_create': True, 'no_open': True}" domain="[('survey_id', '=', parent.id)]" decoration-bf="1"/>
                                     <field name="action_id" options="{'no_create': True, 'no_open': True}"/>

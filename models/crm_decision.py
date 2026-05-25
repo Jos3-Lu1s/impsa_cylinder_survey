@@ -54,15 +54,16 @@ class CrmDecision(models.Model):
     cylinder_survey_ids = fields.One2many(
         'impsa.cylinder.survey',
         'lead_id',
-        string="Levantamientos de Cilindro"
+        string="Levantamientos de Cilindro",
+        groups="impsa_cylinder_survey.group_cylinder_survey_user"
     )
-    
+
     apu_survey_ids = fields.One2many(
         'impsa.apu.survey',
         'lead_id',
         string="Levantamientos de APU",
-    )
-    
+        groups="impsa_cylinder_survey.group_apu_user"
+    )    
     cylinder_survey_count = fields.Integer(
         string="Levantamientos",
         compute="_compute_cylinder_survey_count",
@@ -95,6 +96,19 @@ class CrmDecision(models.Model):
         related='stage_id.ganado_state',
         string="Ganado"
     )
+
+    is_user_authorized = fields.Boolean(
+        compute='_compute_is_user_authorized',
+        string="Usuario Autorizado"
+    )
+
+    @api.depends('stage_id.authorized_user_ids')
+    def _compute_is_user_authorized(self):
+        for lead in self:
+            if not lead.stage_id.authorized_user_ids:
+                lead.is_user_authorized = True
+            else:
+                lead.is_user_authorized = self.env.user in lead.stage_id.authorized_user_ids
     
     final_lap = fields.Boolean(
         string="Terminado",
@@ -204,7 +218,7 @@ class CrmDecision(models.Model):
                     ) % lead.name)
 
                 if tipo == 'repair' and nueva_etapa.stage_type == 'apu':
-                    levantamiento_en_apu = lead.cylinder_survey_ids.filtered(
+                    levantamiento_en_apu = lead.sudo().cylinder_survey_ids.filtered(
                         lambda s: s.state == 'apu'
                     )
                     if not levantamiento_en_apu:

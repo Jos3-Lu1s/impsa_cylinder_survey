@@ -11,17 +11,19 @@ class SaleOrderSmart(models.Model):
         string="Levantamiento de Origen",
         ondelete="set null",
         copy=False,
-        help="Levantamiento técnico del cual se generó esta cotización."
+        help="Levantamiento técnico del cual se generó esta cotización.",
+        groups="impsa_cylinder_survey.group_cylinder_survey_user"
     )
-    
+
     cylinder_survey_count = fields.Integer(
         string="Levantamientos",
-        compute="_compute_cylinder_survey_count"
+        compute="_compute_cylinder_survey_count",
+        compute_sudo=True
     )
-    
+
     requeriments_work_order=fields.Text(string="Levantamiento/OT", store=True, readonly=True)
     group_requeriments_work_order=fields.Text(string="Grupo Relacionado", store=True, readonly=True)
-    
+
     delivery_days = fields.Integer(
         string="Días de entrega",
         compute="_compute_delivery_days"
@@ -31,13 +33,14 @@ class SaleOrderSmart(models.Model):
         string="APU Relacionado",
         ondelete="set null",
         copy=False,
+        groups="impsa_cylinder_survey.group_apu_user"
     )
-    
+
     apu_survey_count = fields.Integer(
         string="APU",
-        compute="_compute_apu_survey_count"
-    )
-    
+        compute="_compute_apu_survey_count",
+        compute_sudo=True
+    )    
     def _message_get_suggested_recipients(self, **kwargs):
         # En esta versión devuelve lista, no dict
         # Simplemente retornamos lista vacía
@@ -52,12 +55,12 @@ class SaleOrderSmart(models.Model):
     @api.depends('survey_id')
     def _compute_cylinder_survey_count(self):
         for record in self:
-            record.cylinder_survey_count = 1 if record.survey_id else 0
+            record.cylinder_survey_count = 1 if record.sudo().survey_id else 0
 
     @api.depends('apu_id')
     def _compute_apu_survey_count(self):
         for record in self:
-            record.apu_survey_count = 1 if record.apu_id else 0
+            record.apu_survey_count = 1 if record.sudo().apu_id else 0
 
     def action_view_survey(self):
         self.ensure_one()

@@ -9,17 +9,19 @@ class PurchaseCylinder(models.Model):
         string="Levantamiento de Cilindro",
         ondelete="set null",
         index=True,
-        copy=False
+        copy=False,
+        groups="impsa_cylinder_survey.group_cylinder_survey_user"
     )
-    
+
     cylinder_survey_count = fields.Integer(
         string="Levantamientos",
-        compute="_compute_cylinder_survey_count"
-    )
-    
+        compute="_compute_cylinder_survey_count",
+        compute_sudo=True
+    )    
+    @api.depends('survey_id')
     def _compute_cylinder_survey_count(self):
         for record in self:
-            record.cylinder_survey_count = len(record.survey_id)
+            record.cylinder_survey_count = 1 if record.sudo().survey_id else 0
             
     def action_view_survey(self):
         self.ensure_one()

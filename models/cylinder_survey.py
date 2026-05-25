@@ -720,8 +720,8 @@ class CylinderSurvey(models.Model):
                 )
             
             # 2. Creación de Productos en Lote
-            Product = self.env['product.product']
-            category = self.env['product.category'].search([('name', '=', 'SELLOS')], limit=1)
+            Product = self.env['product.product'].sudo()
+            category = self.env['product.category'].sudo().search([('name', '=', 'SELLOS')], limit=1)
             categ_id = category.id if category else False
 
             # Extraer códigos de los empaques de este registro
@@ -783,7 +783,9 @@ class CylinderSurvey(models.Model):
             if record.group_ids:
                 count_apu_confirmed = 0
                 for group in record.group_ids:
-                    if group.apu_id and group.apu_id.state == 'confirmed':
+                    # Se usa sudo() para validar el estado del APU, ya que el usuario de levantamiento
+                    # puede no tener permisos de lectura sobre el modelo de APU.
+                    if group.apu_id and group.apu_id.sudo().state == 'confirmed':
                         count_apu_confirmed += 1
                 if count_apu_confirmed == 0:
                     raise ValidationError(_("Debe existir al menos 1 APU en estado 'Para Cotizar' (aprobado) para poder confirmar la Orden de Trabajo."))
@@ -947,10 +949,10 @@ class CylinderSurvey(models.Model):
                 'date_planned': planned_datetime,
             }))
 
-        # 4. Crear las POs
-        created_pos = self.env['purchase.order']
+        # Crear las POs iterando por cada proveedor detectado.
+        created_pos = self.env['purchase.order'].sudo()
         for supplier, po_lines in lines_by_supplier.items():
-            po = self.env['purchase.order'].create({
+            po = self.env['purchase.order'].sudo().create({
                 'survey_id': self.id,
                 'partner_id': supplier.id,
                 'order_line': po_lines,

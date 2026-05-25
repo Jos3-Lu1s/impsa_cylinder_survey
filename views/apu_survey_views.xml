@@ -104,7 +104,8 @@
                                 type="object"
                                 class="oe_stat_button"
                                 icon="fa-gears"
-                                invisible="not survey_id">
+                                invisible="not survey_id"
+                                groups="impsa_cylinder_survey.group_cylinder_survey_user">
                             <field name="cylinder_survey_count"
                                    widget="statinfo"
                                    string="Levantamiento" />
@@ -112,8 +113,9 @@
                         <button name="action_view_quote"
                                 type="object"
                                 class="oe_stat_button"
-                                icon="fa-shopping-cart"
-                                invisible="not quote_ids">
+                                icon="fa-usd"
+                                invisible="not quote_ids"
+                                groups="sales_team.group_sale_salesman">
                             <field name="quote_count"
                                    widget="statinfo"
                                    string="Cotización" />
@@ -122,7 +124,8 @@
                                 type="object"
                                 class="oe_stat_button d-flex align-items-center gap-2"
                                 icon="fa-handshake-o"
-                                invisible="lead_count == 0">
+                                invisible="lead_count == 0"
+                                groups="sales_team.group_sale_salesman">
                             <field name="lead_count"
                                    widget="statinfo"
                                    string="Oportunidad" />

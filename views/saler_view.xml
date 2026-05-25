@@ -10,7 +10,8 @@
                             type="object" 
                             class="oe_stat_button" 
                             icon="fa-gears" 
-                            invisible="cylinder_survey_count == 0">
+                            invisible="cylinder_survey_count == 0"
+                            groups="impsa_cylinder_survey.group_cylinder_survey_user">
                         <field name="cylinder_survey_count" widget="statinfo" string="Levantamiento"/>
                     </button>
                 </div>
