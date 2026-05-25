@@ -915,55 +915,63 @@ class CylinderSurvey(models.Model):
             record.write({'state': 'cancel'})
 
     def action_create_purchase_order(self):
-        """Crea Órdenes de Compra agrupadas por proveedor del empaque."""
+        """Crea Órdenes de Compra agrupadas por proveedor del empaque.
+        Si una línea no tiene proveedor configurado en el producto,
+        se usa el proveedor predeterminado como fallback."""
         self.ensure_one()
-
+    
         if self.purchase_order_create:
             raise UserError(_("Ya se generó una Orden de Compra para este registro."))
         if not self.cylinder_survey_line_ids:
             raise UserError(_("No hay empaques para generar órdenes de compra."))
-
-        # 1. Crear los productos faltantes en una transacción INDEPENDIENTE.
-        # Así persisten en BD aunque la validación de proveedor falle después.
+    
+        # 1. Crear productos faltantes (en cursor independiente para que persistan)
         self._ensure_line_products_persisted()
-
-        # 2. Recargar las líneas para ver los product_id recién asignados
         self.cylinder_survey_line_ids.invalidate_recordset(['product_id'])
-
-        # 3. Agrupar líneas por proveedor
+    
+        # 2. Resolver proveedor predeterminado (fallback)
+        default_supplier = self.env['res.partner'].browse(self.DEFAULT_SUPPLIER_ID).exists()
+        if not default_supplier:
+            raise UserError(_(
+                "El proveedor predeterminado (ID %s) no existe.") % self.DEFAULT_SUPPLIER_ID
+            )
+    
+        # 3. Agrupar líneas por proveedor (con fallback al predeterminado)
         lines_by_supplier = {}
         planned_datetime = fields.Datetime.to_datetime(self.date_delivery) if self.date_delivery else fields.Datetime.now()
         for line in self.cylinder_survey_line_ids:
             seller = line.product_id.seller_ids[:1]
-            if not seller:
-                raise UserError(_(
-                    "El producto '%(prod)s' no tiene un proveedor definido (pestaña Compras).",
-                    prod=line.product_id.display_name
-                ))
-            supplier = seller.partner_id
+            if seller:
+                supplier = seller.partner_id
+                price = seller.price
+            else:
+                # Fallback: producto sin proveedor configurado
+                supplier = default_supplier
+                price = 0.0
+    
             if supplier not in lines_by_supplier:
                 lines_by_supplier[supplier] = []
             lines_by_supplier[supplier].append((0, 0, {
                 'product_id': line.product_id.id,
                 'name': line.product_id.name,
                 'product_qty': line.unit_total,
-                'price_unit': seller.price,
+                'price_unit': price,
                 'date_planned': planned_datetime,
             }))
-
-        # Crear las POs iterando por cada proveedor detectado.
-        created_pos = self.env['purchase.order'].sudo()
+    
+        # 4. Crear las POs
+        created_pos = self.env['purchase.order']
         for supplier, po_lines in lines_by_supplier.items():
-            po = self.env['purchase.order'].sudo().create({
+            po = self.env['purchase.order'].create({
                 'survey_id': self.id,
                 'partner_id': supplier.id,
                 'order_line': po_lines,
                 'date_planned': planned_datetime,
             })
             created_pos += po
-
+    
         self.purchase_order_create = True
-
+    
         if len(created_pos) == 1:
             return {
                 'type': 'ir.actions.act_window',
