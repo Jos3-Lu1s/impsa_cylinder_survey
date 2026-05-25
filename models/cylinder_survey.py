@@ -919,23 +919,23 @@ class CylinderSurvey(models.Model):
         Si una línea no tiene proveedor configurado en el producto,
         se usa el proveedor predeterminado como fallback."""
         self.ensure_one()
-    
+
         if self.purchase_order_create:
             raise UserError(_("Ya se generó una Orden de Compra para este registro."))
         if not self.cylinder_survey_line_ids:
             raise UserError(_("No hay empaques para generar órdenes de compra."))
-    
+
         # 1. Crear productos faltantes (en cursor independiente para que persistan)
         self._ensure_line_products_persisted()
         self.cylinder_survey_line_ids.invalidate_recordset(['product_id'])
-    
+
         # 2. Resolver proveedor predeterminado (fallback)
         default_supplier = self.env['res.partner'].browse(self.DEFAULT_SUPPLIER_ID).exists()
         if not default_supplier:
             raise UserError(_(
                 "El proveedor predeterminado (ID %s) no existe.") % self.DEFAULT_SUPPLIER_ID
             )
-    
+
         # 3. Agrupar líneas por proveedor (con fallback al predeterminado)
         lines_by_supplier = {}
         planned_datetime = fields.Datetime.to_datetime(self.date_delivery) if self.date_delivery else fields.Datetime.now()
@@ -948,7 +948,7 @@ class CylinderSurvey(models.Model):
                 # Fallback: producto sin proveedor configurado
                 supplier = default_supplier
                 price = 0.0
-    
+
             if supplier not in lines_by_supplier:
                 lines_by_supplier[supplier] = []
             lines_by_supplier[supplier].append((0, 0, {
@@ -958,7 +958,7 @@ class CylinderSurvey(models.Model):
                 'price_unit': price,
                 'date_planned': planned_datetime,
             }))
-    
+
         # 4. Crear las POs
         created_pos = self.env['purchase.order']
         for supplier, po_lines in lines_by_supplier.items():
@@ -969,9 +969,9 @@ class CylinderSurvey(models.Model):
                 'date_planned': planned_datetime,
             })
             created_pos += po
-    
+
         self.purchase_order_create = True
-    
+
         if len(created_pos) == 1:
             return {
                 'type': 'ir.actions.act_window',
@@ -1102,5 +1102,3 @@ class CylinderSurvey(models.Model):
                     survey.lead_id._sync_stage_from_type(sync_type)
     
         return result
-
-""" Cambios change """
