@@ -5,6 +5,8 @@ class CylinderSurvey(models.Model):
     _name = "impsa.cylinder.survey"
     _description = "Levantamiento de Cilindros (F-05-01)"
     _inherit = ["mail.thread", "mail.activity.mixin"]
+    
+    DEFAULT_SUPPLIER_ID = 1040
 
     name = fields.Char(
         string="Referencia", required=True, copy=False, readonly=True, default="Nuevo"
@@ -989,7 +991,7 @@ class CylinderSurvey(models.Model):
 
     def _ensure_line_products(self):
         """Crea productos faltantes para las líneas sin product_id.
-        No toca líneas que ya tengan producto."""
+        Los productos nuevos se crean con un proveedor predeterminado."""
         self.ensure_one()
         Product = self.env['product.product']
 
@@ -999,6 +1001,28 @@ class CylinderSurvey(models.Model):
 
         category = self.env['product.category'].search([('name', '=', 'SELLOS')], limit=1)
         categ_id = category.id if category else False
+
+        # Validar que el proveedor predeterminado exista
+        default_supplier = self.env['res.partner'].browse(self.DEFAULT_SUPPLIER_ID).exists()
+        if not default_supplier:
+            raise UserError(_(
+                "El proveedor predeterminado (ID %s) no existe. "
+                "Contacta al administrador.") % self.DEFAULT_SUPPLIER_ID
+            )
+
+        # Función helper para armar los vals comunes (con proveedor)
+        def _build_vals(name, code):
+            return {
+                'name': name,
+                'default_code': code,
+                'type': 'consu',
+                'categ_id': categ_id,
+                'seller_ids': [Command.create({
+                    'partner_id': default_supplier.id,
+                    'price': 0.0,  # Ajustar luego desde la ficha del producto
+                    'min_qty': 0.0,
+                })],
+            }
 
         lines_with_code = lines_without_product.filtered(lambda l: l.code_label)
         lines_without_code = lines_without_product.filtered(lambda l: not l.code_label)
@@ -1013,20 +1037,14 @@ class CylinderSurvey(models.Model):
             code = line.code_label
             if code not in seen_codes:
                 seen_codes.add(code)
-                products_to_create_vals.append({
-                    'name': line.description_label or f"Empaque {code}",
-                    'default_code': code,
-                    'type': 'consu',
-                    'categ_id': categ_id,
-                })
+                products_to_create_vals.append(
+                    _build_vals(line.description_label or f"Empaque {code}", code)
+                )
 
         for line in lines_without_code:
-            products_to_create_vals.append({
-                'name': line.description_label or "Empaque sin Código",
-                'default_code': False,
-                'type': 'consu',
-                'categ_id': categ_id,
-            })
+            products_to_create_vals.append(
+                _build_vals(line.description_label or "Empaque sin Código", False)
+            )
 
         new_products = Product.create(products_to_create_vals) if products_to_create_vals else Product
         for p in new_products:
