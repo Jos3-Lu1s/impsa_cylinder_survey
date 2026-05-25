@@ -40,7 +40,22 @@ class SaleOrderSmart(models.Model):
         string="APU",
         compute="_compute_apu_survey_count",
         compute_sudo=True
-    )    
+    )
+
+    partner_contact_ids = fields.Many2many(
+        'res.partner',
+        string='Contactos de la Empresa',
+        compute='_compute_partner_contact_ids',
+        store=False,
+    )
+
+    partner_contact_id = fields.Many2one(
+        'res.partner',
+        string='Contacto',
+        domain="[('id', 'in', partner_contact_ids)]",
+        context={'no_company_prefix': True}
+    )
+    
     def _message_get_suggested_recipients(self, **kwargs):
         # En esta versión devuelve lista, no dict
         # Simplemente retornamos lista vacía
@@ -139,3 +154,30 @@ class SaleOrderSmart(models.Model):
             result['context']['default_attachment_ids'] = [attachment.id]
     
         return result
+
+    @api.depends('partner_id')
+    def _compute_partner_contact_ids(self):
+        for order in self:
+            if order.partner_id:
+                # Si el cliente es una empresa → traer sus contactos
+                if order.partner_id.is_company:
+                    order.partner_contact_ids = order.partner_id.child_ids
+                # Si el cliente es un contacto → traer hermanos (misma empresa)
+                elif order.partner_id.parent_id:
+                    order.partner_contact_ids = order.partner_id.parent_id.child_ids
+                else:
+                    order.partner_contact_ids = False
+            else:
+                order.partner_contact_ids = False
+
+    @api.onchange('partner_id')
+    def _onchange_partner_contact(self):
+        """Limpiar el contacto seleccionado si cambia el cliente."""
+        self.partner_contact_id = False
+
+    def _compute_display_name(self):
+        if self.env.context.get('no_company_prefix'):
+            for partner in self:
+                partner.display_name = partner.name or ''
+        else:
+            super()._compute_display_name()
