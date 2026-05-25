@@ -50,10 +50,10 @@ class SaleOrderSmart(models.Model):
     )
 
     partner_contact_id = fields.Many2one(
-        'res.partner',
-        string='Contacto',
-        domain="[('id', 'in', partner_contact_ids)]",
-        context={'no_company_prefix': True}
+    'res.partner',
+    string='Contacto',
+    domain="[('id', 'in', partner_contact_ids)]",
+    context={'no_company_prefix': True},
     )
     
     def _message_get_suggested_recipients(self, **kwargs):
@@ -174,10 +174,3 @@ class SaleOrderSmart(models.Model):
     def _onchange_partner_contact(self):
         """Limpiar el contacto seleccionado si cambia el cliente."""
         self.partner_contact_id = False
-
-    def _compute_display_name(self):
-        if self.env.context.get('no_company_prefix'):
-            for partner in self:
-                partner.display_name = partner.name or ''
-        else:
-            super()._compute_display_name()

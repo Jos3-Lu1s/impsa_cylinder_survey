@@ -36,3 +36,16 @@ class ResPartnerInherit(models.Model):
             domain = Domain(domain) | Domain([('code_partner', operator, value)])
             
         return domain
+
+    def _compute_display_name(self):
+        if self.env.context.get('no_company_prefix'):
+            for partner in self:
+                partner.display_name = partner.name or ''
+        else:
+            super()._compute_display_name()
+
+    @api.model
+    def _search_display_name(self, operator, value):
+        if self.env.context.get('no_company_prefix'):
+            return [('name', operator, value)]
+        return super()._search_display_name(operator, value)
