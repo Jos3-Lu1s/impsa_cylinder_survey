@@ -21,8 +21,11 @@
 
                         <field name="partner_contact_id"
                             context="{'no_company_prefix': True}"
-                            options="{'no_create': True, 'no_open': True, 'no_quick_create': True}"
-                            domain="[('id', 'in', partner_contact_ids)]"/>
+                            options="{
+                                'no_create': True,
+                                'no_open': True,
+                                'no_quick_create': True
+                            }"/>
                      <field name="survey_id"
                      invisible="True"/>
                      <field name="dropship_option"/>
