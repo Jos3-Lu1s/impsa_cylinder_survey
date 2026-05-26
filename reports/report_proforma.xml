@@ -62,8 +62,8 @@
                     </style>
 
                     <!-- HEADER -->
-                    <div class="header" style="width:100%; font-size:12px;">
-                        <table style="width:100%; border:0 !important; border-width:0 !important; border-color:transparent !important; border-style:none !important;">
+                    <div class="header" style="width:100%; font-size:12px; margin: 0 0 0px 0;">
+                        <table style="width:100%; border:0 !important; bo1rder-width:0 !important; border-color:transparent !important; border-style:none !important;">
                             <tr>
                                 <td style="width:50%; vertical-align:top;">
                                     <img src="/impsa_cylinder_survey/static/src/img/imagen-impsa.png"
@@ -79,14 +79,14 @@
                                 </td>
                             </tr>
                         </table>
-                        <div style="border-top:1px solid orange; margin-top:5px; margin-bottom:10px;"></div>
+                        <div style="border-top:1px solid orange; margin-top:5px; margin-bottom:0px;"></div>
                     </div>
 
                     <!-- PAGE -->
-                    <div class="page">
+                    <div class="page" style="margin:0 0 0 0;">
 
                         <!-- DATOS EMPRESA Y COTIZACIÓN -->
-                        <table style="width:90%; margin:0 auto 10px auto; font-size:16px; border:0 !important; border-width:0 !important; border-color:transparent !important; border-style:none !important;">
+                        <table style="width:90%; margin:0px 0px 30px 30px; font-size:16px; border:0 !important; border-width:0 !important; border-color:transparent !important; border-style:none !important;">
                             <tr>
                                 <td style="width:50%; vertical-align:top;">
                                     <span t-esc="doc.partner_id.name"/><br />
@@ -132,7 +132,7 @@
                                     <td style="text-align:center;">
                                         <span t-field="line.product_uom_id" />
                                     </td>
-                                    <td>
+                                    <td style="font-size:14px;">
                                         <span t-field="line.name" />
                                     </td>
                                     <td style="text-align:center;">
@@ -165,7 +165,7 @@
                                     <t t-else="">No definido</t>
                                     <br />
                                     <strong>Condiciones de pago:</strong> <span t-field="doc.payment_term_id" /><br />
-                                    <strong>Entrega:</strong> LAB NUESTRAS INSTALACIONES <br />
+                                    <strong>Entrega:</strong> <span t-field="doc.dropship_option"/> <br />
                                     <strong>Vigencia:</strong> <span t-field="doc.validity_date" /><br />
                                     EL FLETE CORRE POR CUENTA Y RIESGO DEL CLIENTE:
                                 </td>
@@ -208,7 +208,6 @@
                                             <p style="margin:0;" t-if="bank.l10n_mx_edi_clabe">
                                                 Clabe: <span t-esc="bank.l10n_mx_edi_clabe" />
                                             </p>
-                                            <p style="margin:0;">No. Sucursal: <span t-esc="bank.branch_code" /></p>
                                         </td>
                                     </t>
                                 </tr>
