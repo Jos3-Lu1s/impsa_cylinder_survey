@@ -25,6 +25,7 @@
                             domain="[('id', 'in', partner_contact_ids)]"/>
                      <field name="survey_id"
                      invisible="True"/>
+                     <field name="dropship_option"/>
                      <field name="apu_id" invisible="True" groups="impsa_cylinder_survey.group_apu_user"/>
                 </xpath>
                 <xpath expr="//div[@name='button_box']" position="inside">

@@ -38,6 +38,7 @@ Integración con procesos:
         "security/ir.model.access.csv",
         "data/ir_sequence_data.xml",
         'data/cylinder_data.xml',
+        'data/paperformat.xml',
         # 'data/paper_format.xml',
         'reports/report_actions.xml',
         # 'reports/cylinder_survey_report.xml',

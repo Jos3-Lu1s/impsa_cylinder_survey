@@ -56,6 +56,14 @@ class SaleOrderSmart(models.Model):
         context={'no_company_prefix': True}
     )
     
+    dropship_option = fields.Selection(
+        [('labnues', 'LAB NUESTRAS INSTALACIONES'), 
+         ('labsus', 'LAB SUS INSTALACIONES')],
+        string="Entrega",
+        default='labnues',
+    )
+        
+    
     def _message_get_suggested_recipients(self, **kwargs):
         # En esta versión devuelve lista, no dict
         # Simplemente retornamos lista vacía
