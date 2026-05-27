@@ -264,7 +264,7 @@ class ApuSurvey(models.Model):
                 raise ValidationError(_("El APU: '%s' no puede ser cotizado con total 0, verifica tu lista de materiales") % record.name)
 
             qty = record.cylinder_qty_by_group or 1.0 
-            unit_price = record.gran_subtotal_lm / qty if qty > 0 else record.gran_subtotal_lm
+            unit_price = record.gran_subtotal_lm
             product_variant = record.apu_product_id.product_variant_id
             
             if not record.quote_ids:
