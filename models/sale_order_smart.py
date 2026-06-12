@@ -134,6 +134,16 @@ class SaleOrderSmart(models.Model):
     def _get_report_base_filename(self):
         self.ensure_one()
         return self.name
+    
+    def action_view_crm_lead(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Oportunidad',
+            'res_model': 'crm.lead',
+            'view_mode': 'form',
+            'res_id': self.opportunity_id.id,
+        }
 
     def action_quotation_send(self):
         self.ensure_one()

@@ -44,7 +44,8 @@ class CrmDecision(models.Model):
     
     selection_type = fields.Selection([
         ('manufacturing', 'Fabricación'),
-        ('repair', 'Reparación')
+        ('repair', 'Reparación'),
+        ('material', 'Material de línea'),
     ],string='Tipo de Cilindro')
     
     is_won_stage = fields.Boolean(
@@ -101,6 +102,23 @@ class CrmDecision(models.Model):
         compute='_compute_is_user_authorized',
         string="Usuario Autorizado"
     )
+    
+    sale_order_ids = fields.One2many(
+        'sale.order',
+        'opportunity_id',  # campo nativo de Odoo en sale.order
+        string="Cotizaciones",
+    )
+
+    sale_order_count = fields.Integer(
+        string="Cotizaciones",
+        compute="_compute_sale_order_count",
+        compute_sudo=True
+    )
+    
+    @api.depends('sale_order_ids')
+    def _compute_sale_order_count(self):
+        for rec in self:
+            rec.sale_order_count = len(rec.sudo().sale_order_ids)
 
     @api.depends('stage_id.authorized_user_ids')
     def _compute_is_user_authorized(self):
@@ -216,6 +234,12 @@ class CrmDecision(models.Model):
                         'La oportunidad "%s" es de tipo Fabricación y no '
                         'puede avanzar a una etapa de Levantamiento.'
                     ) % lead.name)
+                    
+                if tipo == 'material' and nueva_etapa.stage_type != 'negotiation':
+                    raise exceptions.ValidationError(_(
+                        'La oportunidad "%s" es de tipo Material de línea y no '
+                        'puede avanzar a una etapa de Levantamiento.'
+                    ) % lead.name)
 
                 if tipo == 'repair' and nueva_etapa.stage_type == 'apu':
                     levantamiento_en_apu = lead.sudo().cylinder_survey_ids.filtered(
@@ -228,7 +252,7 @@ class CrmDecision(models.Model):
                             'relacionado esté en estado APU.'
                         ) % lead.name)
 
-                if nueva_etapa.stage_type == 'negotiation':
+                if nueva_etapa.stage_type == 'negotiation' and tipo != 'material':
                     lev_cotizado   = lead.sudo().cylinder_survey_ids.filtered(
                         lambda s: s.state == 'quoted'
                     )
@@ -376,6 +400,51 @@ class CrmDecision(models.Model):
                     ) % etapa.name)
     
         return super().create(vals_list)
+    
+    def action_create_quotation(self):
+        self.ensure_one()
+    
+        if not self.partner_id:
+            action = self.env["ir.actions.actions"]._for_xml_id("sale_crm.crm_quotation_partner_action")
+            action['name'] = 'Nueva Cotización'
+            action['context'] = dict(self.env.context)
+            return action
+    
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Nueva Cotización',
+            'res_model': 'sale.order',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_opportunity_id': self.id,
+                'default_partner_id': self.partner_id.id,
+                'default_team_id': self.team_id.id if self.team_id else False,
+                'default_user_id': self.user_id.id if self.user_id else False,
+            }
+        }
+    
+    def action_view_quotations(self):
+        self.ensure_one()
+        orders = self.sale_order_ids
+    
+        if len(orders) == 1:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Cotización',
+                'res_model': 'sale.order',
+                'view_mode': 'form',
+                'res_id': orders.id,
+            }
+    
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Cotizaciones',
+            'res_model': 'sale.order',
+            'view_mode': 'list,form',
+            'domain': [('opportunity_id', '=', self.id)],
+            'context': {'default_opportunity_id': self.id}
+        }
         
 class CrmStage(models.Model):
     _inherit = 'crm.stage'
