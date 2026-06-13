@@ -31,29 +31,21 @@
                         <field name="apu_survey_count" widget="statinfo" string="APU" />
                     </button>
 
-                    <button name="action_view_quotations"
-                            type="object"
-                            class="oe_stat_button"
-                            icon="fa-dollar"
-                            invisible="sale_order_count == 0">
-                        <field name="sale_order_count" widget="statinfo" string="Cotizaciones"/>
-                    </button>
-                </xpath>
-
-                <xpath expr="//button[@name='action_set_won_rainbowman']" position="before">
-                    <div invisible="not ganado_state">
-                        <button name="action_create_quotation"
-                                type="object"
-                                string="Generar Cotización"
-                                class="btn btn-primary"/>
-                    </div>
                 </xpath>
 
                 <xpath expr="//button[@name='action_view_sale_quotation']" position="attributes">
-                    <attribute name="invisible">selection_type in ('manufacturing', 'repair')</attribute>
+                    <attribute name="invisible">quotation_count == 0</attribute>
                 </xpath>
-                <xpath expr="//header//button[@name='action_sale_quotations_new']" position="attributes">
+                <xpath expr="//button[@name='iap_enrich'][1]" position="attributes">
                     <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//button[@name='iap_enrich'][2]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//header//button[@name='action_sale_quotations_new']" position="attributes">
+                    <attribute name="invisible">selection_type != 'material' or not ganado_state</attribute>
                 </xpath>
 
                 <xpath expr="//field[@name='tag_ids']" position="after">
@@ -98,10 +90,10 @@
             <field name="inherit_id" ref="crm.quick_create_opportunity_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//div[div/field[@name='expected_revenue']]" position="after">
-                    <div class="d-flex align-items-center" colspan="2">
-                        <i class="fa fa-check-circle-o" title="selection_type"/>
+                    <div class="d-flex" colspan="2">
+                        <i class="fa fa-check-circle-o mt-1" title="selection_type"/>
                         <div class="d-flex">
-                            <field name="selection_type" class="m-0" widget="radio" options="{'horizontal': True}"/><span class="fw-bolder text-danger">*</span>
+                            <field name="selection_type" class="m-0" widget="radio"/>
                         </div>
                     </div>
                 </xpath>

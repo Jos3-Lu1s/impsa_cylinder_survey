@@ -37,10 +37,6 @@ class CrmQuotationPartner(models.TransientModel):
 
 class CrmDecision(models.Model):
     _inherit = "crm.lead"
-
-    selection_crm = fields.Boolean(
-        string="Reparación de cilindro"
-    )
     
     selection_type = fields.Selection([
         ('manufacturing', 'Fabricación'),
@@ -102,23 +98,6 @@ class CrmDecision(models.Model):
         compute='_compute_is_user_authorized',
         string="Usuario Autorizado"
     )
-    
-    sale_order_ids = fields.One2many(
-        'sale.order',
-        'opportunity_id',  # campo nativo de Odoo en sale.order
-        string="Cotizaciones",
-    )
-
-    sale_order_count = fields.Integer(
-        string="Cotizaciones",
-        compute="_compute_sale_order_count",
-        compute_sudo=True
-    )
-    
-    @api.depends('sale_order_ids')
-    def _compute_sale_order_count(self):
-        for rec in self:
-            rec.sale_order_count = len(rec.sudo().sale_order_ids)
 
     @api.depends('stage_id.authorized_user_ids')
     def _compute_is_user_authorized(self):
@@ -166,7 +145,7 @@ class CrmDecision(models.Model):
         return result
 
     def action_set_won(self):
-        res = super().action_set_won()
+        res = super(CrmDecision, self.with_context(set_won_official=True)).action_set_won()
         self.sudo().write({'final_lap': True})
         return res
     
@@ -211,35 +190,30 @@ class CrmDecision(models.Model):
 
                 if lead.final_lap:
                     raise exceptions.ValidationError(_(
-                        'La oportunidad "%s" ya fue marcada como ganada '
-                        'y no puede cambiar de etapa.'
+                        'La oportunidad "%s" ya ha finalizado su ciclo comercial y no puede ser modificada.'
                     ) % lead.name)
                     
                 if nueva_etapa.is_won and not self.env.context.get('set_won_official'):
                     raise exceptions.ValidationError(_(
-                        'La oportunidad "%s" solo puede marcarse como ganada '
-                        'desde la etapa de "Negociación".'
-                    ) % lead.name)
+                        'Para marcar la oportunidad como ganada, favor de utilizar el botón oficial desde la etapa de Negociación.'
+                    ))
 
                 tipo = vals.get('selection_type', lead.selection_type)
 
                 if not tipo and nueva_etapa.stage_type in ('apu', 'survey'):
                     raise exceptions.ValidationError(_(
-                        'Debes seleccionar un tipo (Fabricación o Reparación) '
-                        'antes de avanzar a la etapa "%s".'
+                        'Es necesario seleccionar un tipo (Fabricación, Reparación o Material) antes de avanzar a la etapa "%s".'
                     ) % nueva_etapa.name)
 
                 if tipo == 'manufacturing' and nueva_etapa.stage_type == 'survey':
                     raise exceptions.ValidationError(_(
-                        'La oportunidad "%s" es de tipo Fabricación y no '
-                        'puede avanzar a una etapa de Levantamiento.'
-                    ) % lead.name)
+                        'Las oportunidades de Fabricación no requieren levantamiento técnico. Favor de avanzar directamente a la etapa de APU.'
+                    ))
                     
-                if tipo == 'material' and nueva_etapa.stage_type != 'negotiation':
+                if tipo == 'material' and nueva_etapa.stage_type in ('survey', 'apu'):
                     raise exceptions.ValidationError(_(
-                        'La oportunidad "%s" es de tipo Material de línea y no '
-                        'puede avanzar a una etapa de Levantamiento.'
-                    ) % lead.name)
+                        'Las oportunidades de Material de Línea son de venta directa y no requieren proceso de ingeniería (Levantamiento/APU). Favor de avanzar directamente a Negociación.'
+                    ))
 
                 if tipo == 'repair' and nueva_etapa.stage_type == 'apu':
                     levantamiento_en_apu = lead.sudo().cylinder_survey_ids.filtered(
@@ -366,22 +340,6 @@ class CrmDecision(models.Model):
                 'default_lead_id': self.id
             }
         }
-        
-    def action_view_apu(self):
-        self.ensure_one()
-
-        if self.apu_survey_ids:
-            raise exceptions.UserError(_("Ya existe un APU para esta oportunidad."))
-
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'APU',
-            'res_model': 'impsa.apu.survey',
-            'view_mode': 'form',
-            'context': {
-                'default_lead_id': self.id
-            }
-        }
     
     @api.model_create_multi
     def create(self, vals_list):
@@ -390,7 +348,7 @@ class CrmDecision(models.Model):
                 vals.get('stage_id') or
                 self.env.context.get('default_stage_id')
             )
-    
+
             if stage_id:
                 etapa = self.env['crm.stage'].browse(stage_id)
                 if etapa.stage_type != 'none':
@@ -398,53 +356,8 @@ class CrmDecision(models.Model):
                         'Solo puedes crear oportunidades en la etapa "Oportunidad". '
                         'No es posible crear directamente en la etapa "%s".'
                     ) % etapa.name)
-    
+
         return super().create(vals_list)
-    
-    def action_create_quotation(self):
-        self.ensure_one()
-    
-        if not self.partner_id:
-            action = self.env["ir.actions.actions"]._for_xml_id("sale_crm.crm_quotation_partner_action")
-            action['name'] = 'Nueva Cotización'
-            action['context'] = dict(self.env.context)
-            return action
-    
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Nueva Cotización',
-            'res_model': 'sale.order',
-            'view_mode': 'form',
-            'target': 'current',
-            'context': {
-                'default_opportunity_id': self.id,
-                'default_partner_id': self.partner_id.id,
-                'default_team_id': self.team_id.id if self.team_id else False,
-                'default_user_id': self.user_id.id if self.user_id else False,
-            }
-        }
-    
-    def action_view_quotations(self):
-        self.ensure_one()
-        orders = self.sale_order_ids
-    
-        if len(orders) == 1:
-            return {
-                'type': 'ir.actions.act_window',
-                'name': 'Cotización',
-                'res_model': 'sale.order',
-                'view_mode': 'form',
-                'res_id': orders.id,
-            }
-    
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Cotizaciones',
-            'res_model': 'sale.order',
-            'view_mode': 'list,form',
-            'domain': [('opportunity_id', '=', self.id)],
-            'context': {'default_opportunity_id': self.id}
-        }
         
 class CrmStage(models.Model):
     _inherit = 'crm.stage'
@@ -487,4 +400,3 @@ class CrmStage(models.Model):
                     raise exceptions.ValidationError(
                         "Solo puede existir una etapa marcada como ganada."
                     )
-    #Cambios cambios

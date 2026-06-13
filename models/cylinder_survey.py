@@ -823,6 +823,7 @@ class CylinderSurvey(models.Model):
 
                     apu_vals: dict = {
                         'survey_id': record.id,
+                        'lead_id': record.lead_id.id,
                         'group_id': group.id,
                         'partner_id': record.partner_id.id,
                         'porcentaje_cindirectos_material':self.env.ref('impsa_cylinder_survey.apu_survey_margins_material_indirect_cost').id,
@@ -1077,7 +1078,7 @@ class CylinderSurvey(models.Model):
                     or "Nuevo"
                 )
 
-        return super(CylinderSurvey, self).create(vals_list)
+        return super().create(vals_list)
     
     """ Conexion con las demas etapas del proceso """
     def write(self, vals):

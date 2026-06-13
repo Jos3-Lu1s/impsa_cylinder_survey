@@ -242,7 +242,7 @@ class ApuSurvey(models.Model):
                     or "Nuevo"
                 )
 
-        return super(ApuSurvey, self).create(vals_list)
+        return super().create(vals_list)
 
     def action_to_confirmed(self):
         for record in self:
@@ -267,6 +267,8 @@ class ApuSurvey(models.Model):
             unit_price = record.gran_subtotal_lm
             product_variant = record.apu_product_id.product_variant_id
             
+            lead = record.lead_id or (record.survey_id and record.survey_id.lead_id)
+
             if not record.quote_ids:
                 if not product_variant:
                     raise ValidationError(_("Debes colocar un cilindro a trabajar en el APU: %s") % record.name)
@@ -280,6 +282,7 @@ class ApuSurvey(models.Model):
 
                 so_vals = {
                     'partner_id': record.partner_id.id,
+                    'opportunity_id': lead.id if lead else False,
                     'apu_id': record.id, 
                     'survey_id': record.survey_id.id,
                     'origin': record.name,  
