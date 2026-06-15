@@ -193,11 +193,24 @@ class SaleOrderSmart(models.Model):
         """Limpiar el contacto seleccionado si cambia el cliente."""
         self.partner_contact_id = False
         
-    def action_confirm(self):
-        result = super().action_confirm()
+    def write(self, vals):
+        result = super().write(vals)
+
+        if 'state' not in vals:
+            return result
+
+        mapeo_crm = {
+            'sale':   'won',
+            'draft':  'negotiation',
+            'sent':   'negotiation',
+            'cancel': 'negotiation',
+        }
+
+        sync_type = mapeo_crm.get(vals['state'])
+        if not sync_type:
+            return result
 
         for order in self:
-            # Ruta nativa: CRM → Cotización
             lead = order.opportunity_id
 
             if not lead and order.apu_id:
@@ -205,7 +218,13 @@ class SaleOrderSmart(models.Model):
                     order.apu_id.survey_id and order.apu_id.survey_id.lead_id
                 )
 
-            if lead:
-                self.env['crm.lead'].browse(lead.id)._sync_stage_from_type('won')
+            # ✅ lead._sync_stage_from_type, NO self.env['crm.lead']
+            if lead and lead._name == 'crm.lead':
+                crm_lead = self.env['crm.lead'].browse(lead.id)
+                crm_lead._sync_stage_from_type(sync_type)
 
         return result
+
+    # ✅ action_confirm ya no necesita lógica extra
+    def action_confirm(self):
+        return super().action_confirm()

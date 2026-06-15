@@ -98,6 +98,9 @@ class CrmDecision(models.Model):
         compute='_compute_is_user_authorized',
         string="Usuario Autorizado"
     )
+    sale_order_count = fields.Integer(
+        compute='_compute_sale_order_count'
+    )
 
     @api.depends('stage_id.authorized_user_ids')
     def _compute_is_user_authorized(self):
@@ -340,6 +343,15 @@ class CrmDecision(models.Model):
                 'default_lead_id': self.id
             }
         }
+        
+    @api.depends('apu_survey_ids.quote_ids', 'order_ids')
+    def _compute_sale_order_count(self):
+        for lead in self:
+            # Cotizaciones nativas del CRM
+            native = len(lead.order_ids)
+            # Cotizaciones via APU
+            apu = len(lead.apu_survey_ids.mapped('quote_ids'))
+            lead.sale_order_count = native + apu   
     
     @api.model_create_multi
     def create(self, vals_list):
@@ -400,3 +412,4 @@ class CrmStage(models.Model):
                     raise exceptions.ValidationError(
                         "Solo puede existir una etapa marcada como ganada."
                     )
+                     
