@@ -192,3 +192,20 @@ class SaleOrderSmart(models.Model):
     def _onchange_partner_contact(self):
         """Limpiar el contacto seleccionado si cambia el cliente."""
         self.partner_contact_id = False
+        
+    def action_confirm(self):
+        result = super().action_confirm()
+
+        for order in self:
+            # Ruta nativa: CRM → Cotización
+            lead = order.opportunity_id
+
+            if not lead and order.apu_id:
+                lead = order.apu_id.lead_id or (
+                    order.apu_id.survey_id and order.apu_id.survey_id.lead_id
+                )
+
+            if lead:
+                self.env['crm.lead'].browse(lead.id)._sync_stage_from_type('won')
+
+        return result
