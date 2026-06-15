@@ -98,7 +98,7 @@ class CrmDecision(models.Model):
         compute='_compute_is_user_authorized',
         string="Usuario Autorizado"
     )
-    sale_order_count = fields.Integer(
+    sale_order_count_crm = fields.Integer(
         compute='_compute_sale_order_count'
     )
 
@@ -351,7 +351,7 @@ class CrmDecision(models.Model):
             native = len(lead.order_ids)
             # Cotizaciones via APU
             apu = len(lead.apu_survey_ids.mapped('quote_ids'))
-            lead.sale_order_count = native + apu   
+            lead.sale_order_count_crm = native + apu   
     
     @api.model_create_multi
     def create(self, vals_list):

@@ -45,7 +45,7 @@
                 </xpath>
 
                 <xpath expr="//header//button[@name='action_sale_quotations_new']" position="attributes">
-                    <attribute name="invisible">selection_type != 'material' or not ganado_state or sale_order_count > 0</attribute>
+                    <attribute name="invisible">selection_type != 'material' or not ganado_state or sale_order_count_crm > 0</attribute>
                 </xpath>
 
                 <xpath expr="//field[@name='tag_ids']" position="after">
