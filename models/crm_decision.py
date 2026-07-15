@@ -350,7 +350,7 @@ class CrmDecision(models.Model):
             # Cotizaciones nativas del CRM
             native = len(lead.order_ids)
             # Cotizaciones via APU
-            apu = len(lead.apu_survey_ids.mapped('quote_ids'))
+            apu = len(lead.sudo().apu_survey_ids.mapped('quote_ids'))
             lead.sale_order_count_crm = native + apu   
     
     @api.model_create_multi
