@@ -18,11 +18,16 @@ class ResPartnerInherit(models.Model):
                 vals['code_partner'] = self.env['ir.sequence'].next_by_code('res.partner.code') or '0000'
 
         return super().create(vals_list)
-    
+
     @api.depends('is_company', 'name', 'parent_id.display_name', 'type', 'company_name', 'code_partner')
     def _compute_display_name(self):
+        if self.env.context.get('no_company_prefix'):
+            for partner in self:
+                partner.display_name = partner.name or ''
+            return
+
         super()._compute_display_name()
-        
+
         for partner in self:
             if partner.code_partner:
                 # incluir el código entre corchetes
@@ -30,22 +35,13 @@ class ResPartnerInherit(models.Model):
 
     @api.model
     def _search_display_name(self, operator, value):
+        if self.env.context.get('no_company_prefix'):
+            return Domain([('name', operator, value)])
+
         domain = super()._search_display_name(operator, value)
-        
+
         if value:
             domain = Domain(domain) | Domain([('code_partner', operator, value)])
-            
+
         return domain
-
-    def _compute_display_name(self):
-        if self.env.context.get('no_company_prefix'):
-            for partner in self:
-                partner.display_name = partner.name or ''
-        else:
-            super()._compute_display_name()
-
-    @api.model
-    def _search_display_name(self, operator, value):
-        if self.env.context.get('no_company_prefix'):
-            return [('name', operator, value)]
-        return super()._search_display_name(operator, value)
+  
