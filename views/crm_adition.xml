@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="crm_lead_view_form_inherit_impsa_cylinder" model="ir.ui.view">
+            <field name="name">crm.lead.view.form.inherit.impsa</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor" />
+            <field name="arch" type="xml">
+
+                <xpath expr="//div[@name='button_box']" position="inside">
+                    <field name="is_survey" invisible="1" />
+                    <field name="is_apu" invisible="1" />
+                    <field name="is_user_authorized" invisible="1" />
+                    
+                    <button name="action_view_cylinder_surveys"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-cogs"
+                        invisible="cylinder_survey_count == 0"
+                        groups="impsa_cylinder_survey.group_cylinder_survey_user">
+                        <field name="cylinder_survey_count" widget="statinfo" string="Levantamientos" />
+                    </button>
+
+                    <button name="action_view_apus"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-calculator"
+                        invisible="apu_survey_count == 0"
+                        groups="impsa_cylinder_survey.group_apu_user">
+                        <field name="apu_survey_count" widget="statinfo" string="APU" />
+                    </button>
+
+                </xpath>
+
+                <xpath expr="//button[@name='action_view_sale_quotation']" position="attributes">
+                    <attribute name="invisible">quotation_count == 0</attribute>
+                </xpath>
+                <xpath expr="//button[@name='iap_enrich'][1]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//button[@name='iap_enrich'][2]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//header//button[@name='action_sale_quotations_new']" position="attributes">
+                    <attribute name="invisible">selection_type != 'material' or not ganado_state or sale_order_count_crm > 0</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                    <field name="is_won_stage" invisible="1" />
+                    <field name="final_lap" invisible="1" readonly="1"/>
+                    <field name="selection_type"  
+                           readonly="stage_sequence > 2 or cylinder_survey_count >= 1 or apu_survey_count >= 1" 
+                           widget="radio" 
+                           options="{'horizontal': True}"/>
+                </xpath>
+
+                <xpath expr="//button[@name='action_set_won_rainbowman']" position="before">
+                    <button name="action_open_cylinder_survey"
+                        string="Levantamiento"
+                        type="object"
+                        class="oe_highlight"
+                        invisible="is_survey == False or selection_type != 'repair' or cylinder_survey_count >= 1 or not selection_type or is_user_authorized == False"
+                        groups="impsa_cylinder_survey.group_cylinder_survey_user" />
+                        
+                    <button name="action_open_apu"
+                        string="APU"
+                        type="object"
+                        class="oe_highlight"
+                        invisible="is_apu == False or selection_type != 'manufacturing' or apu_survey_count >= 1 or not selection_type or is_user_authorized == False"
+                        groups="impsa_cylinder_survey.group_apu_user" />
+                </xpath>
+
+                <xpath expr="//button[@name='action_set_won_rainbowman']" position="attributes">
+                    <attribute name="invisible">ganado_state == False</attribute>
+                </xpath>
+                
+                <xpath expr="//button[@name='%(crm.crm_lead_lost_action)d']" position="attributes">
+                    <attribute name="invisible">is_lose == False</attribute>
+                </xpath>
+
+                <xpath expr="//chatter" position="attributes">
+                    <attribute name="disable_composer">1</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="quick_create_opportunity_form_inherit_selection" model="ir.ui.view">
+            <field name="name">crm.lead.quick.create.inherit.selection</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.quick_create_opportunity_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//div[div/field[@name='expected_revenue']]" position="after">
+                    <div class="d-flex" colspan="2">
+                        <i class="fa fa-check-circle-o mt-1" title="selection_type"/>
+                        <div class="d-flex">
+                            <field name="selection_type" class="m-0" widget="radio"/>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="crm_case_kanban_view_leads_inherit_selection" model="ir.ui.view">
+            <field name="name">crm.lead.kanban.inherit.selection</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//field[@name='activity_ids']" position="after">
+                    <div t-if="record.selection_type.raw_value" class="text-muted small">
+                        <i class="fa fa-circle-o fa-fw me-1" title="Tipo de Selección"/>
+                        <field name="selection_type"/>
+                    </div>
+                </xpath>
+
+                <xpath expr="//div[@class='d-flex' and @invisible='not partner_id']" position="replace">
+                    <div class="d-flex align-items-center" invisible="not partner_id">
+                        <field name="partner_id"
+                            widget="many2one_avatar"
+                            readonly="1"
+                            options="{'no_create': 1, 'no_open': 1}"/>
+                        <div class="ms-2 flex-grow-1 overflow-hidden" style="min-width: 0;">
+                            <field name="partner_id" class="text-truncate d-block"/>
+                        </div>
+                    </div>
+                </xpath>
+                
+            </field>
+        </record>
+
+        <record id="view_crm_case_opportunities_filter_inherit_cylinder" model="ir.ui.view">
+            <field name="name">crm.lead.search.inherit.cylinder.type</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//field[@name='user_id']" position="after">
+                    <field name="selection_type"/>
+                </xpath>
+
+                <xpath expr="//filter[@name='assigned_to_me']" position="after">
+                    <separator/>
+                    <filter string="Fabricación" 
+                            name="filter_type_manufacturing" 
+                            domain="[('selection_type', '=', 'manufacturing')]"/>
+                    <filter string="Reparación" 
+                            name="filter_type_repair" 
+                            domain="[('selection_type', '=', 'repair')]"/>
+                    <separator/>
+                </xpath>
+
+                <xpath expr="//filter[@name='stage']" position="after">
+                    <filter string="Tipo de Cilindro" 
+                            name="groupby_selection_type" 
+                            context="{'group_by':'selection_type'}"/>
+                </xpath>
+                
+            </field>
+        </record>
+
+        <record id="crm_quotation_partner_view_form_inherit_impsa" model="ir.ui.view">
+            <field name="name">crm.quotation.partner.view.form.inherit.impsa</field>
+            <field name="model">crm.quotation.partner</field>
+            <field name="inherit_id" ref="sale_crm.crm_quotation_partner_view_form"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="//field[@name='action']" position="replace">
+                    <field name="action" widget="radio" string="Cliente para Levantamiento" 
+                           invisible="not context.get('open_survey')"/>
+                    <field name="action" widget="radio" string="Cliente para APU" 
+                           invisible="not context.get('open_apu')"/>
+                    <field name="action" widget="radio" string="Cotización del cliente" 
+                           invisible="context.get('open_survey') or context.get('open_apu')"/>
+                </xpath>
+
+            </field>
+        </record>
+    </data>
+</odoo>

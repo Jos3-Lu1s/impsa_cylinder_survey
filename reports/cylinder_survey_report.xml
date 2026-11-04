@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_cylinder_survey_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+
+                    <div class="header" style="position: relative; width: 100%;">
+                        <table class="table table-sm mb-0">
+                            <tbody>
+                                <tr>
+                                    <td rowspan="2" width="160">
+                                        <img width="150" t-if="o.env.company.logo" t-att-src="image_data_uri(o.env.company.logo)" class="img-fluid" alt="Logo"/>
+                                    </td>
+                                    <td width="120" class="ps-3">
+                                        <h5 class="m-0 fw-bold">Proceso</h5>
+                                    </td>
+                                    <td>
+                                        <h5 class="m-0 text-muted">Control operacional</h5>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="ps-3">
+                                        <h5 class="m-0 fw-bold">Formato para levantamiento de cilindros</h5>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="table table-sm mt-2 lh-sm">
+                            <tbody>
+                                <tr>
+                                    <td width="25%">
+                                        <span class="fw-bold">CLIENTE:</span>
+                                        <!-- <span t-field="o.partner_id" class="ms-2"/> -->
+                                    </td>
+                                    <td width="25%">
+                                        <span class="fw-bold">Ø CAMISA:</span>
+                                        <!-- <span t-field="o.diameter_sleeve" class="ms-2"/> -->
+                                    </td>
+                                    <td colspan="2">
+                                        <span class="fw-bold">FECHA:</span>
+                                        <!-- <span t-field="o.date" class="ms-2"/> -->
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" width="50%">
+                                        <span class="fw-bold">DESCRIPCIÓN:</span>
+                                        <!-- <span t-field="o.description" class="ms-2"/> -->
+                                    </td>
+                                    <td width="25%">
+                                        <span class="fw-bold">Ø VÁSTAGO:</span>
+                                        <!-- <span t-field="o.diameter_rod" class="ms-2"/> -->
+                                    </td>
+                                    <td colspan="2" width="25%">
+                                        <span class="fw-bold">DOC:</span>
+                                        <!-- <span t-field="o.name" class="ms-2 text-danger fw-bold"/> -->
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold">CILINDRO DE:</span>
+                                        <!-- <span t-field="o.cylinder_type" class="ms-2"/> -->
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">CARRERA:</span>
+                                        <!-- <span t-field="o.stroke" class="ms-2"/> -->
+                                    </td>
+                                    <td colspan="2" width="50%">
+                                        <span class="fw-bold">IDENTIFICACIÓN:</span>
+                                        <!-- <span t-field="o.identification_marks" class="ms-2"/> -->
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div style="position: absolute; right: 0; top: 177px; width: 53%; padding: 36px 0;" class="p-1">
+                            <div style="position: relative; width: 100%; display: block;">
+                                <img src="/impsa_cylinder_survey/static/src/img/esquema_base.png" class="img-fluid w-100" alt="Esquema base" style="position: relative; z-index: 1;"/>
+                                <div t-if="o.assembly_length" style="position: absolute; top: 2%; left: 13%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 294px; text-align: center; color: #5d5d5d;">
+                                    <!-- <span t-field="o.assembly_length"/> -->
+                                </div>
+
+                                <div t-if="o.barrel_length" style="position: absolute; top: 38%; left: 15%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 230px; text-align: center; color: #5d5d5d;">
+                                    <!-- <span t-field="o.barrel_length"/> -->
+                                </div>
+
+                                <div t-if="o.piston_width" style="position: absolute; top: 38%; left: 61%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 63px; text-align: center; color: #5d5d5d;">
+                                    <!-- <span t-field="o.piston_width"/> -->
+                                </div>
+
+                                <div t-if="o.head_width" style="position: absolute; top: 38%; left: 78%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 60px; text-align: center; color: #5d5d5d;">
+                                    <!-- <span t-field="o.head_width"/> -->
+                                </div>
+
+                                <div t-if="o.head_diameter" style="position: absolute; top: 50%; left: 91%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 60px; text-align: center; color: #5d5d5d;">
+                                    <!-- <span t-field="o.head_diameter"/> -->
+                                </div>
+
+                                <div t-if="o.rod_length" style="position: absolute; top: 77%; left: 15%; z-index: 10; font-weight: bold; font-size: 12px; padding: 2px 4px; width: 250px; text-align: center; color: #5d5d5d;">
+                                    <!-- <span t-field="o.rod_length"/> -->
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="page">
+                        <style>
+                            .dynamic-table { width: 47%; border-collapse: collapse; table-layout: fixed; }
+                            .dynamic-table tr { page-break-inside: avoid; }
+
+                            /* Borde estándar para todas las celdas */
+                            .dynamic-table th, .dynamic-table td { 
+                                border: 1px solid #adb5bd; 
+                                padding: 4px; 
+                                background-color: #f8f9fa;
+                                word-wrap: break-word;
+                                overflow-wrap: break-word;
+                            }
+
+                            /* Quitamos el borde izquierdo de la primera columna */
+                            .dynamic-table th:first-child, 
+                            .dynamic-table td:first-child { 
+                                border-left: none !important; 
+                            }
+
+                            /* Quitamos el borde derecho de la última columna */
+                            .dynamic-table th:last-child, 
+                            .dynamic-table td:last-child { 
+                                border-right: none !important; 
+                            }
+                        </style>
+
+                        <table class="dynamic-table mt-2">
+                            <thead>
+                                <tr>
+                                    <th class="fw-bold text-center" style="width:9%">HRS</th>
+                                    <th class="fw-bold" style="width: 50%;">TRABAJOS A REALIZAR</th>
+                                    <th class="fw-bold" style="width: 41%;">OBS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.operational_record_ids" t-as="line">
+                                    <tr>
+                                        <td class="text-center">
+                                            <span t-esc="line.hr" t-options='{"widget": "float_time"}'/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="line.work_to_do"/>
+                                        </td>
+                                        <td>
+                                            <span t-esc="line.obs"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="footer">
+                        <div class="row w-100 mt-2 border-top pt-2">
+                            <div class="col-2">
+                                <span class="text-muted small">Código:  F-05-01</span>
+                            </div>
+                            <div class="col-5">
+                                <span class="text-muted small">Nombre: F-05-01-Formato para levantamiento de cilindros</span>
+                            </div>
+                            <div class="col-4">
+                                <span class="text-muted small">Fecha de revisión: 31 de marzo 2023</span>
+                            </div>
+                            <div class="col-1">
+                                <span class="text-muted small">Versión: 01</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_cylinder_image_kanban_shared" model="ir.ui.view">
+        <field name="name">impsa.cylinder.image.kanban.shared</field>
+        <field name="model">impsa.cylinder.image</field>
+        <field name="arch" type="xml">
+            <kanban string="Imágenes del cilindro" default_group_by="group_id" records_draggable="0">
+                <templates>
+                    <t t-name="card">
+                        <div class="p-0 pb-2 shadow-sm border-0 h-100">
+                            
+                            <div class="bg-light p-2 border-bottom d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-truncate" style="max-width: 70%;">
+                                    <i class="fa fa-folder-open-o me-1 text-primary" title="Grupo"/>
+                                    <field name="group_name"/>
+                                </span>
+                                <span class="badge rounded-pill text-bg-dark">
+                                    Cil. <field name="cylinder_number"/> / <field name="group_qty"/>
+                                </span>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-center overflow-hidden" style="height: 200px; background-color: #f8f9fa;">
+                                <field name="image" widget="image" options="{'size': [256, 256]}" />
+                            </div>
+
+                            <div class="mt-2 px-2 d-flex justify-content-between flex-wrap gap-1">
+                                <field name="name" class="fw-bolder"/>
+                                <div class="d-flex gap-1">
+                                    <span t-if="record.section_id.raw_value" class="badge rounded-pill text-bg-info">
+                                        <field name="section_id"/>
+                                    </span>
+                                    <span class="badge rounded-pill text-bg-primary">
+                                        <field name="component"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_cylinder_image_form_shared" model="ir.ui.view">
+        <field name="name">impsa.cylinder.image.form.shared</field>
+        <field name="model">impsa.cylinder.image</field>
+        <field name="arch" type="xml">
+            <form string="Inspección Fotográfica">
+                <sheet>
+                    <field name="survey_id" invisible="1"/>
+                    <div class="oe_title mb-3 w-100">
+                        <label for="name" string="Referencia Fotográfica"/>
+                        <h1 class="d-flex align-items-center flex-wrap gap-2">
+                            <span invisible="name" class="text-muted">Nueva Fotografía</span>
+                            <field name="name" readonly="1" force_save="1" class="text-primary w-auto flex-grow-0 m-0" invisible="not name"/>
+                            <span invisible="not group_name" class="text-muted fs-4 d-flex align-items-center">
+                                (<field name="group_name" readonly="1" nolabel="1" class="w-auto m-0"/>)
+                            </span>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <label for="cylinder_number" string="Cilindro Identificado"/>
+                            <div class="o_row align-items-center">
+                                <field name="cylinder_number" class="fw-bold" style="width: 3rem !important;"/>
+                                <span class="text-muted fs-4">/</span>
+                                <field name="group_qty" readonly="1" class="text-muted" style="width: 1rem !important;"/>
+                                <span class="badge rounded-pill text-bg-info ms-2">Total en grupo</span>
+                            </div>
+                        </group>
+                        <group>
+                            <field name="cylinder_to_code" invisible="1"/>
+                            
+                            <field name="section_id" 
+                                options="{'no_create': True, 'no_open': True}" 
+                                invisible="cylinder_to_code != 'CE-T'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <!-- Componente estático — siempre visible -->
+                        <field name="component"
+                               widget="selection_badge"
+                               string="Componente"/>
+                    </group>
+                    <div class="row mt-3">
+                        <div class="col-12 text-center">
+                            <field name="image" widget="image" nolabel="1" style="max-width: 100%; background-color: #f8f9fa; border-radius: 8px;" />
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_impsa_cylinder_survey_kanban" model="ir.ui.view">
+        <field name="name">impsa.cylinder.survey.kanban</field>
+        <field name="model">impsa.cylinder.survey</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_mobile" sample="1" quick_create="false" records_draggable="0">                
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click d-flex flex-column h-100">
+                            
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <field class="fs-5 fw-bolder text-dark text-truncate me-2" name="name"/>
+                                
+                                <div t-if="record.cylinder_type.raw_value" class="flex-shrink-0">
+                                    <field name="cylinder_type" widget="badge" 
+                                            decoration-info="cylinder_type == 'hydraulic'" 
+                                            decoration-warning="cylinder_type == 'pneumatic'"/>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="text-muted d-flex align-items-center mb-1 text-truncate" title="Cliente">
+                                    <i class="fa fa-building-o me-2 text-primary" title="Cliente"/>
+                                    <field name="partner_id" class="text-truncate"/>
+                                </div>
+                                
+                                <div class="text-muted d-flex justify-content-between align-items-center mb-1 text-truncate" title="Tipo de Cilindro Base">
+    
+                                    <div>
+                                        <i class="fa fa-cogs me-2" title="Cilindro Base"/>
+                                        <field name="cylinder_to" class="fw-bold text-dark text-truncate"/>
+                                    </div>
+                                    
+                                    <div>
+                                        <span t-attf-class="fw-bold text-truncate #{record.allocated_qty.raw_value == record.cylinder_qty.raw_value ? 'text-success' : 'text-danger'}">
+                                            <field name="allocated_qty"/>
+                                        </span>
+                                        
+                                        <span class="fw-bold mx-1 text-muted">/</span>
+                                        
+                                        <field name="cylinder_qty" class="fw-bold text-dark text-truncate"/>
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
+                                
+                                <div class="d-flex align-items-center">
+                                    <field name="activity_ids" widget="kanban_activity" class="me-2"/>
+                                    <span class="text-muted small">
+                                        <span class="text-muted small d-inline-flex align-items-center">
+                                            <i class="fa fa-calendar-o me-1" title="Fecha"></i>
+                                            <field name="date" widget="date" options="{'numeric': true}"/>
+                                        </span>
+                                    </span>
+                                </div>
+                                
+                                <div class="flex-shrink-0">
+                                    <field name="partner_id" widget="many2one_avatar" options="{'size': [24, 24]}"/>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_impsa_cylinder_survey_graph" model="ir.ui.view">
+        <field name="name">impsa.cylinder.survey.graph</field>
+        <field name="model">impsa.cylinder.survey</field>
+        <field name="arch" type="xml">
+            <graph string="Análisis de Levantamientos" type="bar" sample="1">
+                <field name="state"/>
+                <field name="date" interval="month"/>
+                <field name="cylinder_qty" type="measure"/>
+                <field name="barrel_inner_diameter" invisible="1"/>
+                <field name="barrel_outer_diameter" invisible="1"/>
+                <field name="barrel_length" invisible="1"/>
+                <field name="diameter_rod" invisible="1"/>
+                <field name="rod_length" invisible="1"/>
+                <field name="diameter_rod2" invisible="1"/>
+                <field name="rod_length2" invisible="1"/>
+                <field name="piston_diameter" invisible="1"/>
+                <field name="piston_length" invisible="1"/>
+                <field name="head_diameter" invisible="1"/>
+                <field name="head_length" invisible="1"/>
+                <field name="head_diameter2" invisible="1"/>
+                <field name="head_length2" invisible="1"/>
+                <field name="stroke_length" invisible="1"/>
+                <field name="num_section" invisible="1"/>
+                <field name="allocated_qty" invisible="1"/>
+            </graph>
+        </field>
+    </record>
+    <record id="view_impsa_cylinder_survey_tree" model="ir.ui.view">
+        <field name="name">impsa.cylinder.survey.tree</field>
+        <field name="model">impsa.cylinder.survey</field>
+        <field name="arch" type="xml">
+            <list string="Levantamientos" 
+                multi_edit="1" 
+                sample="1" 
+                default_order="date desc, id desc" 
+                decoration-muted="state == 'cancel'">
+                
+                <field name="name" decoration-bf="1" readonly="1" />
+                <field name="date" options="{'numeric': true}" readonly="1" />
+                <field name="partner_id" widget="many2one_avatar" readonly="1" />
+                
+                <field name="cylinder_to" optional="show" string="Cilindro Base" readonly="1"/>
+                <field name="cylinder_type" optional="show" />
+                <field name="is_standardized" optional="hide" widget="boolean_toggle" readonly="1"/>
+                
+                <field name="total_groups" optional="hide" sum="Total Grupos" decoration-bf="1" width="95px"/>
+                <field name="total_packings" optional="hide" sum="Total Empaques" decoration-bf="1" width="110px"/>
+                <field name="total_tasks" optional="hide" sum="Total Tareas" decoration-bf="1" width="100px"/>
+
+                <field name="description" optional="hide" />
+                <field name="activity_ids" string="Actividades" widget="list_activity" optional="show" />
+                
+                <field name="state" widget="badge" 
+                    decoration-info="state == 'draft'" 
+                    decoration-primary="state == 'apu'" 
+                    decoration-warning="state == 'quoted'" 
+                    decoration-success="state == 'confirmed'" 
+                    decoration-danger="state == 'cancel'" 
+                    column_invisible="context.get('hide_state', False)"
+                    readonly="1" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_impsa_cylinder_survey_form" model="ir.ui.view">
+        <field name="name">impsa.cylinder.survey.form</field>
+        <field name="model">impsa.cylinder.survey</field>
+        <field name="arch" type="xml">
+            <form string="Levantamiento de Cilindro">
+                <header>
+                    <button name="action_create_purchase_order" string="Crear Orden de Compra" type="object" class="btn-primary" invisible="state != 'confirmed' or purchase_order_create == True" groups="purchase.group_purchase_user"/>
+
+                    <button name="action_to_apu" string="Enviar a APU" type="object" class="oe_highlight" invisible="state != 'draft'" />
+
+                    <button name="action_quoted" string="Confirmar Cotización" type="object" class="oe_highlight" invisible="state != 'apu'" groups="impsa_cylinder_survey.group_apu_user" />
+
+                    <button name="action_confirm" string="Confirmar Levantamiento" type="object" class="oe_highlight" invisible="state != 'quoted'" />
+
+                    <button name="action_cancel" string="Cancelar" type="object" invisible="state not in ['draft', 'apu', 'quoted']" confirm="¿Está seguro de que desea cancelar este registro?" />
+
+                    <button name="action_set_draft" string="Volver a Levantamiento" type="object" invisible="state != 'cancel'" />
+
+                    <field name="state" widget="statusbar" statusbar_visible="draft,apu,quoted,confirmed" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" placeholder="Referencia" />
+                        </h1>
+                    </div>
+
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_purchase_orders" type="object" class="oe_stat_button" icon="fa-credit-card" invisible="not purchase_order_ids" groups="purchase.group_purchase_user">
+                            <field name="purchase_order_count" widget="statinfo" string="Compras"/>
+                        </button>
+                        <button name="action_view_lead" type="object" class="oe_stat_button" icon="fa-star" invisible="not lead_id" groups="sales_team.group_sale_salesman">
+                            <field name="lead_count" widget="statinfo" string="Oportunidad"/>
+                        </button>
+                        <button name="action_view_apus" type="object" class="oe_stat_button" icon="fa-calculator" invisible="not has_apu" groups="impsa_cylinder_survey.group_apu_user">
+                            <field name="apu_count" widget="statinfo" string="APUs"/>
+                        </button>
+                        <button name="action_view_sale_orders" type="object" class="oe_stat_button" icon="fa-usd" invisible="sale_order_count == 0" groups="sales_team.group_sale_salesman">
+                            <field name="sale_order_count" widget="statinfo" string="Cotizaciones"/>
+                        </button>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 col-md-6 border-end">
+                            <group>
+                                <field name="partner_id" widget="res_partner_many2one"/>
+                                <field name="partner_email" widget="email" string="" colspan="2" invisible="not partner_email"/>
+                                <field name="date" options="{'numeric': true}"/>
+                                <label for="cylinder_qty" string="Cilindros"/>
+
+                                <div class="d-flex align-items-center">
+                                    <field name="allocated_qty"
+                                        nolabel="1"
+                                        readonly="1"
+                                        class="fw-bold fs-5 me-1 flex-grow-0 w-auto"
+                                        decoration-danger="allocated_qty != cylinder_qty"
+                                        decoration-success="allocated_qty == cylinder_qty"/>
+
+                                    <span class="mx-1 mb-2 fs-5 text-muted">/</span>
+
+                                    <field name="cylinder_qty"
+                                        nolabel="1"
+                                        class="flex-grow-0 fs-5 ms-1 w-auto"
+                                        width="60px;"/>
+                                </div>
+                                <field name="is_standardized" widget="boolean_toggle"/>
+                                <field name="cylinder_type" widget="selection_badge"/>
+                            </group>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="row g-2 mb-3 ms-md-2">
+                                <div class="col-4">
+                                    <div class="card shadow-sm border-0 text-center p-2 h-100" style="background-color: #f8f9fa;">
+                                        <div class="small fw-bold text-uppercase" style="color: #6c757d; font-size: 0.65rem;">Tareas</div>
+                                        <div class="h4 mb-0 fw-bolder" style="color: #495057;">
+                                            <field name="total_tasks" readonly="1" nolabel="1" />
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-4">
+                                    <div class="card shadow-sm border-0 text-center p-2 h-100" style="background-color: #cfe2ff;">
+                                        <div class="small fw-bold text-uppercase" style="color: #4b6a9b; font-size: 0.65rem;">Grupos</div>
+                                        <div class="h4 mb-0 fw-bolder" style="color: #084298;">
+                                            <field name="total_groups" readonly="1" nolabel="1" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="card shadow-sm border-0 text-center p-2 h-100" style="background-color: #fff3cd;">
+                                        <div class="small fw-bold text-uppercase" style="color: #856404; font-size: 0.65rem;">Empaques</div>
+                                        <div class="h4 mb-0 fw-bolder" style="color: #664d03;">
+                                            <field name="total_packings" readonly="1" nolabel="1" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <group>
+                                <field name="cylinder_to" string="Cilindro de" options="{'no_open': True}" readonly="id != False"/>
+                                <field name="cylinder_to_code" invisible="1"/>
+                                <field name="num_section" invisible="cylinder_to_code != 'CE-T'" readonly="id != False and cylinder_to_code == 'CE-T'"/>
+                                <field name="purchase_order_create" invisible="1"/>
+                                <field name="description" rows="3" placeholder="Cilindro Hidráulico" />
+                            </group>
+                        </div>
+                    </div>
+                    <group string="Resumen Técnico" col="3" invisible="cylinder_to_code == 'CE-OT'">
+                        <div class="py-1" role="status" colspan="3">
+                            <div class="alert alert-info text-center fw-bold mx-2" role="status">
+                                <i class="fa fa-info-circle me-1" title="Info"/> Todas las medidas técnicas se expresan en milímetros (mm).
+                            </div>
+                        </div>
+                        
+                        <div class="py-1" role="status" colspan="3">    
+                            <div class="alert alert-warning fw-bold mx-2 text-center"
+                                 colspan="3"
+                                 invisible="not has_apu"
+                                 role="alert">
+                                <i class="fa fa-info-circle me-1" title="Info"/>
+                                Las medidas técnicas están bloqueadas porque ya existe un APU generado.
+                            </div>
+                        </div>
+
+                        <group string="Camisa" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
+                            <field name="barrel_inner_diameter" readonly="has_apu"/>
+                            <field name="barrel_outer_diameter" readonly="has_apu"/>
+                            <field name="barrel_length" readonly="has_apu"/>
+                        </group>
+
+                        <group string="Vástago 1" invisible="cylinder_to_code in ('CE-T', 'CE-OT', 'CE-NC')">
+                            <field name="diameter_rod" readonly="has_apu"/>
+                            <field name="rod_length" string="Longitud" readonly="has_apu"/>
+                        </group>
+
+                        <group string="Vástago 2" invisible="cylinder_to_code != 'CE-DV'">
+                            <field name="diameter_rod2" readonly="has_apu"/>
+                            <field name="rod_length2" string="Longitud" readonly="has_apu"/>
+                        </group>
+
+                        <group string="Émbolo" invisible="cylinder_to_code in ('CE-T', 'CE-OT')">
+                            <field name="piston_diameter" readonly="has_apu"/>
+                            <field name="piston_length" string="Longitud" readonly="has_apu"/>
+                        </group>
+
+                        <group string="Tapas" invisible="cylinder_to_code != 'CE-NC'">
+                            <field name="cap_diameter" readonly="has_apu"/>
+                            <field name="cap_length" string="Longitud" readonly="has_apu"/>
+                        </group>
+
+                        <group string="Cabeza 1" invisible="cylinder_to_code in ('CE-T', 'CE-OT', 'CE-NC')">
+                            <field name="head_diameter" readonly="has_apu"/>
+                            <field name="head_length" string="Longitud" readonly="has_apu"/>
+                        </group>
+
+                        <group string="Cabeza 2" invisible="cylinder_to_code != 'CE-DV'">
+                            <field name="head_diameter2" readonly="has_apu"/>
+                            <field name="head_length2" string="Longitud" readonly="has_apu"/>
+                        </group>
+
+                        <field name="section_ids" nolabel="1" colspan="3" invisible="cylinder_to_code != 'CE-T'">
+                            <list editable="bottom" create="0" delete="0">
+                                <field name="sequence" column_invisible="True"/>
+                                <field name="section_type" column_invisible="True"/>
+                                
+                                <field name="name" readonly="1" force_save="1" decoration-bf="1" width="200px"/>
+                                
+                                <field name="inner_diameter"
+                                    readonly="has_apu"
+                                    force_save="1"
+                                    decoration-danger="inner_diameter &lt;= 0 and section_type in ('main', 'intermediate')"
+                                    string="Ø Interior"/>
+                                    
+                                <field name="outer_diameter"
+                                    readonly="has_apu" 
+                                    force_save="1" 
+                                    string="Ø Vástago (Ext)" 
+                                    decoration-danger="outer_diameter &lt;= 0"
+                                    decoration-bf="1"/>
+                                
+                                <field name="length" 
+                                    string="Longitud" 
+                                    force_save="1"
+                                    readonly="has_apu"
+                                    decoration-danger="length &lt;= 0"/>
+                                
+                                <field name="piston_diameter" 
+                                    force_save="1"
+                                    readonly="section_type == 'main' or has_apu" 
+                                    decoration-danger="piston_diameter &lt;= 0 and section_type in ('intermediate', 'last')"
+                                    decoration-muted="section_type == 'main'"/>
+                                    
+                                <field name="piston_length" 
+                                    string="Long. Émbolo"
+                                    readonly="section_type == 'main' or has_apu"
+                                    force_save="1"
+                                    decoration-danger="piston_length &lt;= 0 and section_type in ('intermediate', 'last')"
+                                    decoration-muted="section_type == 'main'"/>
+                                
+                                <field name="head_diameter" 
+                                    readonly="section_type in ('last') or has_apu" 
+                                    force_save="1"
+                                    decoration-danger="head_diameter &lt;= 0 and section_type in ('intermediate', 'main')"
+                                    decoration-muted="section_type in ('last')"/>
+                                    
+                                <field name="head_length" 
+                                    string="Long. Cabeza"
+                                    force_save="1"
+                                    readonly="section_type in ('last', 'main') or has_apu" 
+                                    decoration-danger="head_length &lt;= 0 and section_type == 'intermediate'"
+                                    decoration-muted="section_type in ('last', 'main')"/>
+                            </list>
+                        </field>
+
+                        <group string="Carrera" invisible="cylinder_to_code in ('CE-OT', 'CE-NC')">
+                            <field name="stroke_length" string="Longitud Total" readonly="has_apu"/>
+                        </group>
+                    
+
+                        <group>
+                            
+                        </group>
+
+                    </group>
+
+                    <group string="Configuración de Accesorios / Características" invisible="cylinder_to_code != 'CE-OT'">
+                        <field name="accessory_line_ids" nolabel="1" colspan="2">
+                            <list editable="bottom">
+                                <field name="accessory_type_id" 
+                                    options="{'no_create_edit': True, 'no_open': True}" 
+                                    width="200px"/>
+                                                                
+                                <field name="tech_details" 
+                                    widget="text"
+                                    placeholder="Ej: Ø Int 2 pulg, Rosca M30x2..." 
+                                    width="350px"/>
+                                
+                                <field name="observations" 
+                                    optional="show" 
+                                    placeholder="Notas de montaje o ensamble..."/>
+
+                                <field name="quantity" width="80px"/>
+                            </list>
+                        </field>
+                    </group>
+
+                    <div class="alert alert-warning text-center fw-bold" 
+                        role="alert" 
+                        invisible="cylinder_to_code and id">
+                        <i class="fa fa-exclamation-triangle me-2" title="Atención"/>
+                        <strong>¡Atención!</strong> Para registrar grupos e imágenes en un cilindro, asegúrate de guardar el registro antes.
+                    </div>
+
+                    <notebook>
+                        <page string="Grupos y Operaciones" invisible="not id or not cylinder_to_code" name="groups">
+                            <field name="group_ids" readonly="state not in ('draft')">
+                                <list string="Grupos de Cilindros">
+                                    <field name="name"/>
+                                    <field name="quantity" string="Total de cilindros" width="220"/>
+                                    
+                                    <field name="apu_id" 
+                                        string="Doc. APU" 
+                                        widget="badge" 
+                                        decoration-info="True" 
+                                        column_invisible="not parent.has_apu"/>
+                                        
+                                    <field name="apu_state" 
+                                        string="Estado APU" 
+                                        widget="badge" 
+                                        column_invisible="not parent.has_apu"
+                                        decoration-warning="apu_state == 'draft'"
+                                        decoration-success="apu_state == 'confirmed'"
+                                        decoration-danger="apu_state == 'cancel'"/>
+                                        
+                                    <button name="action_open_apu" 
+                                            column_invisible="not parent.has_apu"
+                                            invisible="not apu_id"
+                                            type="object"
+                                            class="oe_link"
+                                            icon="fa-external-link"
+                                            string="Ver APU"
+                                            groups="impsa_cylinder_survey.group_apu_user">
+                                    </button>
+                                </list>
+
+                                <form string="Detalle del Grupo">
+                                    <sheet>
+                                        <group col="4">
+                                            <field name="name" placeholder="Ej. 3 Cilindros Idénticos del frente..."/>
+                                            <field name="quantity"/>
+                                        </group>
+                                        <notebook>
+                                            <page string="Operaciones del Grupo">
+                                                <field name="operational_record_ids">
+                                                    <list editable="bottom">
+                                                        <field name="sequence" widget="handle"/>
+                                                        <field name="action_id" required="1" options="{'no_create': True, 'no_open': True}"/>
+                                                        <field name="obs" optional="show"/>
+                                                    </list>
+                                                </field>
+                                            </page>
+                                            
+                                            <page string="Fotografías por Cilindro" name="group_images">
+                                                <field name="image_ids" mode="kanban" context="{
+                                                    'default_group_id': id,
+                                                    'default_survey_id': survey_id,
+                                                    'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
+                                                    'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared',
+                                                    'default_group_name':name,
+                                                }"/>
+                                            </page>
+                                        </notebook>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
+
+                        <page string="Resumen de Operaciones" name="all_operations_summary" invisible="not group_ids">
+                            <field name="all_operational_record_ids" readonly="state != 'draft'">
+                                <list editable="bottom" default_order="group_id, sequence">
+                                    <field name="group_id" string="Grupo" options="{'no_create': True, 'no_open': True}" domain="[('survey_id', '=', parent.id)]" decoration-bf="1"/>
+                                    <field name="action_id" options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="obs" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Galería Fotográfica Total" invisible="not image_ids" name="gallery">
+                            <p class="text-muted mt-2 mb-2">
+                                <i class="fa fa-info-circle me-1" title="Información"></i>
+                                <em>Vista consolidada de todas las fotos de todos los grupos. Para agregar o modificar fotos, ingresa a la pestaña "Grupos y Operaciones".</em>
+                            </p>
+                            <field name="image_ids" mode="kanban" readonly="1" context="{
+                                'kanban_view_ref': 'impsa_cylinder_survey.view_cylinder_image_kanban_shared', 
+                                'form_view_ref': 'impsa_cylinder_survey.view_cylinder_image_form_shared'
+                            }"/>
+                        </page>
+
+                        <page string="Requisición de Empaques" name="packing_list">
+                            <field name="cylinder_survey_line_ids">
+                                <list editable="bottom">
+                                    <field name="product_id" optional="show" options="{'no_create': True}" placeholder="Buscar en catálogo..."/>
+                                    <field name="description_label" optional="show" />
+                                    <field name="code_label" optional="show" />
+                                    <field name="dimensions" optional="show" />
+                                    <field name="material_drop" optional="show" />
+                                    <field name="type_piece" widget="radio" options="{'horizontal': True}" optional="show" width="220" />
+                                    <field name="unit_quantity" optional="show" />
+                                    <field name="unit_total" optional="show" />
+                                </list>
+                            </field>
+                            <group string="Proveedores">
+                                <field name="date_delivery" string="Fecha de Entrega" />
+                            </group>
+                        </page>
+
+                        <page string="Notas Internas" name="notes">
+                            <field name="internal_notes" placeholder="Escribe tus notas aquí..." nolabel="1" />
+                        </page>
+
+                    </notebook>
+                </sheet>
+                <chatter>
+                    <field name="message_follower_ids" />
+                    <field name="activity_ids" />
+                    <field name="message_ids" />
+                </chatter>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_impsa_cylinder_survey_search" model="ir.ui.view">
+        <field name="name">impsa.cylinder.survey.search</field>
+        <field name="model">impsa.cylinder.survey</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Levantamiento">
+                <field name="name" 
+                    string="Referencia / Descripción" 
+                    filter_domain="['|', ('name', 'ilike', self), ('description', 'ilike', self)]" />
+                
+                <field name="partner_id" operator="child_of"/>
+                <field name="cylinder_to" string="Cilindro Base"/>
+                
+                <separator/>
+
+                <filter string="Mis Levantamientos" name="my_surveys" domain="[('create_uid', '=', uid)]" />
+                <separator/>
+                
+                <filter string="En Levantamiento" name="filter_draft" domain="[('state', '=', 'draft')]" />
+                <filter string="En APU" name="filter_apu" domain="[('state', '=', 'apu')]" />
+                <filter string="Cotizado" name="filter_quoted" domain="[('state', '=', 'quoted')]" />
+                <filter string="Orden de Trabajo" name="filter_confirmed" domain="[('state', '=', 'confirmed')]" />
+                <separator/>
+                
+                <filter string="Hidráulicos" name="filter_hydraulic" domain="[('cylinder_type', '=', 'hydraulic')]" />
+                <filter string="Neumáticos" name="filter_pneumatic" domain="[('cylinder_type', '=', 'pneumatic')]" />
+                <separator/>
+                
+                <filter string="Fecha de creación" name="date" date="date" />
+
+                <group>
+                    <filter string="Cliente" name="group_partner" context="{'group_by': 'partner_id'}" />
+                    <filter string="Estado" name="group_state" context="{'group_by': 'state'}" />
+                    <filter string="Tipo de Cilindro" name="group_cylinder_to" context="{'group_by': 'cylinder_to'}" />
+                    <filter string="Tipo de Sistema" name="group_cylinderType_to" context="{'group_by': 'cylinder_type'}" />
+                    <filter string="Fecha" name="group_date" context="{'group_by': 'date'}" />
+                </group>
+
+                <searchpanel>
+                    <field name="state" enable_counters="1" icon="fa-tasks" select="multi"/>
+                    <field name="cylinder_to" enable_counters="1" icon="fa-cogs" select="multi"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_impsa_cylinder_survey_all" model="ir.actions.act_window">
+        <field name="name">Todos los Registros</field>
+        <field name="res_model">impsa.cylinder.survey</field>
+        <field name="view_mode">list,kanban,graph,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear nuevo levantamiento (F-05-01)
+            </p>
+            <p>
+                Aquí verás el histórico completo del taller. Registra un nuevo cilindro 
+                para comenzar su evaluación, dimensionamiento y lista de materiales.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_impsa_cylinder_survey_draft" model="ir.actions.act_window">
+        <field name="name">Levantamientos Pendientes</field>
+        <field name="res_model">impsa.cylinder.survey</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'draft')]</field>
+        <field name="context">{'hide_state': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay levantamientos pendientes. ¡Buen trabajo!
+            </p>
+            <p>
+                Los cilindros que acaban de ingresar al taller y están en proceso 
+                de desarme y toma de medidas aparecerán aquí.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_impsa_cylinder_survey_apu" model="ir.actions.act_window">
+        <field name="name">APUS Activas</field>
+        <field name="res_model">impsa.cylinder.survey</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'apu')]</field>
+        <field name="context">{'hide_state': True}</field> 
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay APUS en este momento.
+            </p>
+            <p>
+                Los levantamientos aparecerán aquí automáticamente cuando el equipo 
+                técnico los envíe a costeo (Análisis de Precios Unitarios).
+            </p>
+        </field>
+    </record>
+    
+    <record id="action_impsa_cylinder_survey_quoted" model="ir.actions.act_window">
+        <field name="name">Cotizaciones Activas</field>
+        <field name="res_model">impsa.cylinder.survey</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'quoted')]</field>
+        <field name="context">{'hide_state': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay cotizaciones pendientes de aprobación.
+            </p>
+            <p>
+                Aquí se mostrarán los trabajos que ya fueron costeados y enviados 
+                al cliente, a la espera de su orden de compra o autorización.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_impsa_cylinder_survey_confirmed" model="ir.actions.act_window">
+        <field name="name">Órdenes de Trabajo Activas</field>
+        <field name="res_model">impsa.cylinder.survey</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'confirmed')]</field>
+        <field name="context">{'hide_state': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay órdenes de trabajo activas en este momento.
+            </p>
+            <p>
+                Cuando el cliente apruebe la cotización y confirmes el trabajo, 
+                el registro se moverá a esta vista para que planta inicie la reparación.
+            </p>
+        </field>
+    </record>
+
+</odoo>
