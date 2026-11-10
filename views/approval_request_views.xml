@@ -1,0 +1,51 @@
+<odoo>
+    <data>
+        <record id="approval_request_view_form_inherit_purchase" model="ir.ui.view">
+            <field name="name">approval.request.view.form.inherit.purchase</field>
+            <field name="model">approval.request</field>
+            <field name="inherit_id" ref="approvals.approval_request_view_form"/>
+            <field name="arch" type="xml">
+
+                <!-- Inserta o crea la caja de botones inteligentes al inicio del sheet -->
+                <xpath expr="//sheet" position="inside">
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_purchase_order"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-credit-card"
+                                invisible="purchase_order_count == 0">
+                            <field name="purchase_order_count" widget="statinfo" string="Compras"/>
+                        </button>
+                    </div>
+                </xpath>
+
+                <!-- Botones NATIVOS (Aprobar, Rechazar, Anular, Cancelar): también los ve
+                     el administrador, sin botones duplicados -->
+                <xpath expr="//header" position="inside">
+                    <field name="show_approve_refuse" invisible="1"/>
+                    <field name="show_withdraw" invisible="1"/>
+                    <field name="show_cancel" invisible="1"/>
+                </xpath>
+                <xpath expr="//header/button[@name='action_approve']" position="attributes">
+                    <attribute name="invisible">not show_approve_refuse</attribute>
+                </xpath>
+                <xpath expr="//header/button[@name='action_refuse']" position="attributes">
+                    <attribute name="invisible">not show_approve_refuse</attribute>
+                </xpath>
+                <xpath expr="//header/button[@name='action_withdraw']" position="attributes">
+                    <attribute name="invisible">not show_withdraw</attribute>
+                </xpath>
+                <xpath expr="//header/button[@name='action_cancel']" position="attributes">
+                    <attribute name="invisible">not show_cancel</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
+        <!-- "Mis solicitudes": cada usuario ve lo que creó y lo que le toca aprobar
+             (o ya aprobó/rechazó), con los botones Aprobar / Rechazar en la tarjeta. -->
+        <record id="approvals.approval_request_action" model="ir.actions.act_window">
+            <field name="domain">['|', ('request_owner_id', '=', uid), ('approver_ids', 'any', [('user_id', '=', uid), ('status', 'in', ['pending', 'approved', 'refused'])])]</field>
+        </record>
+    </data>
+</odoo>

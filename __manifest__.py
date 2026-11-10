@@ -31,14 +31,16 @@ Integración con procesos:
     'category': 'Manufacturing/Operations',
     'version': '19.0.1.0.0',
 
-    'depends': ['base', "crm", "mail", 'purchase', 'sale_crm', 'sale_management','mrp','hr'],
+    'depends': ['base', "crm", "mail", 'purchase', 'sale_crm', 'sale_management','mrp','hr', 'approvals'],
 
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
         "data/ir_sequence_data.xml",
         'data/cylinder_data.xml',
-        
+        'data/approval_data.xml', 
+        'data/employee_data.xml',
+          
         # 'data/paper_format.xml',
         'reports/report_actions.xml',
         # 'reports/cylinder_survey_report.xml',
@@ -49,6 +51,7 @@ Integración con procesos:
         "views/accessory_type_views.xml",
         "views/crm_adition.xml",
         "views/purchase_views.xml",
+        "views/approval_request_views.xml",          
         "reports/report_proforma.xml",
         "views/apu_survey_views.xml",
         "views/integration_menu.xml",
@@ -63,9 +66,9 @@ Integración con procesos:
         "views/res_partner_bank_views.xml",
     ],
     
-    'assets': {
-        'web.assets_backend': [
-            'impsa_cylinder_survey/static/src/css/crm_hide_send.css',
+   'assets': {
+      'web.assets_backend': [
+           'impsa_cylinder_survey/static/src/css/crm_hide_send.css',
         ],
     },
 
