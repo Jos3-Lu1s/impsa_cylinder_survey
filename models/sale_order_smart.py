@@ -242,39 +242,136 @@ class SaleOrderSmart(models.Model):
     def action_confirm(self):
         return super().action_confirm()
 
-
-
-
-
-    # ════════════════════════════════════════════════════════════════
     # ══ NUEVO: BLOQUEO DE FACTURA (Material de línea) ═══════════════
-    # Solo oculta el botón "Crear factura" si la oportunidad es
-    # "Material de línea" y la entrega no está validada.
-    # ════════════════════════════════════════════════════════════════
 
     x_bloquear_factura = fields.Boolean(
-        string='Factura bloqueada',
-        compute='_compute_x_bloquear_factura',
+        string="Factura bloqueada",
+        compute="_compute_x_bloquear_factura",
     )
 
     @api.model
     def _campo_material_linea(self):
-        
-        Lead = self.env['crm.lead']
+        Lead = self.env["crm.lead"]
         for nombre, campo in Lead._fields.items():
-            if campo.type != 'selection':
+            if campo.type != "selection":
                 continue
             for clave, etiqueta in campo._description_selection(self.env):
-                if 'material de l' in (etiqueta or '').lower():
+                if "material de l" in (etiqueta or "").lower():
                     return nombre, clave
         return False, False
 
-    @api.depends('opportunity_id', 'picking_ids.state')
+    def _es_material_linea(self):
+        """True si la oportunidad tiene seleccionado 'Material de línea'."""
+        self.ensure_one()
+        campo, clave = self._campo_material_linea()
+        lead = self.opportunity_id
+        return bool(lead and campo) and lead[campo] == clave
+
+    @api.depends("opportunity_id", "picking_ids.state")
     def _compute_x_bloquear_factura(self):
         campo, clave = self._campo_material_linea()
         for order in self:
             lead = order.opportunity_id
             es_material_linea = bool(lead and campo) and lead[campo] == clave
-            entregas = order.picking_ids.filtered(lambda p: p.state != 'cancel')
-            entrega_pendiente = not entregas or any(p.state != 'done' for p in entregas)
+            entregas = order.picking_ids.filtered(lambda p: p.state != "cancel")
+            entrega_pendiente = not entregas or any(p.state != "done" for p in entregas)
             order.x_bloquear_factura = es_material_linea and entrega_pendiente
+
+
+# ══ NUEVO: FOLIO ORDV EN LA ENTREGA ═════════════════════════════════
+
+
+class StockPicking(models.Model):
+    _inherit = "stock.picking"
+
+    _PREFIJO_FOLIO = "CORTE-"
+    _CANDADO_FOLIO = 7710001
+
+    # 🆕 ── INTERRUPTOR ────────────────────────────────────────────────
+    # False = OPCIÓN 1: al actualizar el módulo CONTINÚA con el último folio
+    # True  = OPCIÓN 2: al actualizar el módulo el folio se REINICIA en 1
+    _REINICIAR_AL_ACTUALIZAR = True
+
+    x_folio = fields.Char(string="Folio", readonly=True, copy=False, index=True)
+    x_folio_num = fields.Integer(
+        string="Número de folio", readonly=True, copy=False, index=True
+    )
+    # 🆕 Fecha en que se asignó el folio (la usa la OPCIÓN 2)
+    x_folio_fecha = fields.Datetime(string="Fecha del folio", readonly=True, copy=False)
+
+    _x_folio_unico = models.Constraint("UNIQUE(x_folio)", "Ese folio ya existe.")
+
+    # 🆕 Se ejecuta cada vez que se actualiza el módulo
+    def init(self):
+        super().init()
+        if self._REINICIAR_AL_ACTUALIZAR:
+            self.env["ir.config_parameter"].sudo().set_param(
+                "impsa.folio_reinicio",
+                fields.Datetime.to_string(fields.Datetime.now()),
+            )
+
+    # 🆕 Arma el texto del folio: CORTE-00001
+    def _formatear_folio(self, numero):
+        return f"{self._PREFIJO_FOLIO}{numero:05d}"
+
+    def _siguiente_folio(self):
+        self.env.cr.execute("SELECT pg_advisory_xact_lock(%s)", (self._CANDADO_FOLIO,))
+        self.flush_model(["x_folio_num", "x_folio", "x_folio_fecha"])
+
+        reinicio = (
+            self.env["ir.config_parameter"].sudo().get_param("impsa.folio_reinicio")
+        )
+
+        if self._REINICIAR_AL_ACTUALIZAR and reinicio:
+            # OPCIÓN 2: cuenta solo los folios desde la última actualización
+            self.env.cr.execute(
+                "SELECT COALESCE(MAX(x_folio_num), 0) FROM stock_picking "
+                "WHERE x_folio IS NOT NULL AND x_folio_fecha >= %s",
+                (reinicio,),
+            )
+        else:
+            # OPCIÓN 1: continúa desde el último folio que existe
+            self.env.cr.execute(
+                "SELECT COALESCE(MAX(x_folio_num), 0) FROM stock_picking"
+            )
+
+        numero = self.env.cr.fetchone()[0] + 1
+
+        # Si ese folio ya existe (de antes de reiniciar), brinca al siguiente libre
+        while self.search_count([("x_folio", "=", self._formatear_folio(numero))]):
+            numero += 1
+        return numero
+
+    def _asignar_folio(self):
+        for picking in self:
+            if picking.x_folio or picking.picking_type_code != "outgoing":
+                continue
+            venta = picking.move_ids.sale_line_id.order_id[:1]
+            if not (venta and venta._es_material_linea()):
+                continue
+            numero = picking._siguiente_folio()
+            picking.write(
+                {
+                    "x_folio_num": numero,
+                    "x_folio": picking._formatear_folio(numero),
+                    "x_folio_fecha": fields.Datetime.now(),
+                }
+            )
+
+    @api.ondelete(at_uninstall=False)
+    def _no_eliminar_con_folio(self):
+        con_folio = self.filtered("x_folio")
+        if con_folio:
+            raise ValidationError(
+                f"No se puede eliminar {', '.join(con_folio.mapped('x_folio'))} "
+                "porque ya tiene folio. Solo se puede cancelar."
+            )
+
+
+class StockMove(models.Model):
+    _inherit = "stock.move"
+
+    def _assign_picking(self):
+        res = super()._assign_picking()
+        self.picking_id._asignar_folio()
+        return res

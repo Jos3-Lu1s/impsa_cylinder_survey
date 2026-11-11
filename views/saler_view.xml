@@ -41,10 +41,8 @@
                 </xpath>
 
 
-
-                <!-- ══════════════════════════════════════════════════════ -->
                 <!-- ══ NUEVO: BLOQUEO DE FACTURA (Material de línea) ════ -->
-                <!-- ══════════════════════════════════════════════════════ -->
+
 
                 <xpath expr="//button[@id='create_invoice']" position="attributes">
                     <attribute name="invisible" separator=" or " add="x_bloquear_factura"/>
@@ -56,9 +54,28 @@
                     <field name="x_bloquear_factura" invisible="1"/>
                 </xpath>
 
-
             </field>
         </record>
+
+
+
+        <!-- ══ NUEVO: FOLIO ORDV EN LA ENTREGA ═══════════════════ -->
+        <record id="view_picking_form_folio" model="ir.ui.view">
+            <field name="name">stock.picking.form.folio</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='location_id'][@groups='stock.group_stock_multi_locations']" position="after">
+                    <field name="x_folio" invisible="not x_folio"/>
+                </xpath>
+
+                <xpath expr="//header/button[@name='action_assign']" position="attributes">
+                    <attribute name="invisible" separator=" or " add="x_folio"/>
+                </xpath>
+            </field>
+        </record>
+
+
 
         <record id="sale.email_template_edi_sale" model="mail.template">
             <field name="report_template_ids" eval="[(6, 0, [ref('impsa_cylinder_survey.action_report_proforma_custom')])]"/>
