@@ -53,6 +53,7 @@ Integración con procesos:
         "views/purchase_views.xml",
         "views/approval_request_views.xml",          
         "reports/report_proforma.xml",
+        "reports/report_cut_order.xml",
         "views/apu_survey_views.xml",
         "views/integration_menu.xml",
         "views/saler_view.xml",

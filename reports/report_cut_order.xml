@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_cut_order_sale">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <div class="page" style="font-size: 14px;">
+                        <div class="row" style="margin-bottom: 10px;">
+                            <div class="col-3">
+                                <strong style="font-size: 18px;">IMPSA</strong>
+                            </div>
+                            <div class="col-6 text-center">
+                                <h2 style="margin: 0;">Formato de corte</h2>
+                            </div>
+                            <div class="col-3 text-end">
+                                <span t-field="o.date_order" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 8px;">
+                            <strong>Cliente:</strong>
+                            <span t-field="o.partner_id.name"/>
+                        </div>
+
+                        <table class="table table-bordered" style="border: 1px solid #000;">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Folio</th>
+                                    <th class="text-end">Metros vendidos</th>
+                                    <th class="text-center">Metros que tiene el tubo</th>
+                                    <th class="text-center">Metros restantes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.order_line.filtered(lambda l: not l.display_type and l.product_id and l.product_id.type == 'consu')" t-as="line">
+                                    <tr>
+                                        <td><span t-field="line.product_id.display_name"/></td>
+                                        <td>
+                                            <!-- Folio asignado a la entrega (CORTE-00001) -->
+                                            <t t-set="folios" t-value="line.move_ids.picking_id.filtered(lambda p: p.state != 'cancel' and p.x_folio).mapped('x_folio')"/>
+                                            <span t-esc="', '.join(folios)"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-field="line.product_uom_qty" t-options="{'widget': 'float', 'precision': 2}"/>
+                                            <span t-field="line.product_uom_id.name"/>
+                                        </td>
+                                        <td style="height: 45px; min-width: 110px;"></td>
+                                        <td style="height: 45px; min-width: 110px;"></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
