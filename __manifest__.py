@@ -31,7 +31,7 @@ Integración con procesos:
     'category': 'Manufacturing/Operations',
     'version': '19.0.1.0.0',
 
-    'depends': ['base', "crm", "mail", 'purchase', 'sale_crm', 'sale_management','mrp','hr', 'approvals'],
+    'depends': ['base', 'crm', 'mail', 'purchase', 'sale_crm', 'sale_management', 'sale_stock', 'mrp', 'hr', 'approvals'],
 
     "data": [
         "security/security.xml",
