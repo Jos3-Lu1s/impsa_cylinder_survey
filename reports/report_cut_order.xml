@@ -25,9 +25,10 @@
                         <table class="table table-bordered" style="border: 1px solid #000;">
                             <thead>
                                 <tr>
-                                    <th>Producto</th>
-                                    <th>Folio</th>
-                                    <th class="text-end">Metros vendidos</th>
+                                    <th class="text-center">Producto</th>
+                                    <th class="text-center">Folio cotización</th>
+                                    <th class="text-center">Metros vendidos</th>
+                                    <th class="text-center">Folio tubo</th>
                                     <th class="text-center">Metros que tiene el tubo</th>
                                     <th class="text-center">Metros restantes</th>
                                 </tr>
@@ -37,7 +38,6 @@
                                     <tr>
                                         <td><span t-field="line.product_id.display_name"/></td>
                                         <td>
-                                            <!-- Folio asignado a la entrega (CORTE-00001) -->
                                             <t t-set="folios" t-value="line.move_ids.picking_id.filtered(lambda p: p.state != 'cancel' and p.x_folio).mapped('x_folio')"/>
                                             <span t-esc="', '.join(folios)"/>
                                         </td>
@@ -45,6 +45,7 @@
                                             <span t-field="line.product_uom_qty" t-options="{'widget': 'float', 'precision': 2}"/>
                                             <span t-field="line.product_uom_id.name"/>
                                         </td>
+                                        <td style="height: 45px; min-width: 110px;"></td>
                                         <td style="height: 45px; min-width: 110px;"></td>
                                         <td style="height: 45px; min-width: 110px;"></td>
                                     </tr>
