@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 from odoo import models, fields, api, Command, _
 from odoo.exceptions import ValidationError, UserError
 
+=======
+from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
+>>>>>>> 1a391fe80b61aba2c9b6270a7d8b0625aac85b09
 
 class PurchaseCylinder(models.Model):
     _inherit = "purchase.order"
@@ -18,6 +23,7 @@ class PurchaseCylinder(models.Model):
         string="Levantamientos",
         compute="_compute_cylinder_survey_count",
         compute_sudo=True
+<<<<<<< HEAD
     )
 
     approval_request_id = fields.Many2one(
@@ -43,10 +49,14 @@ class PurchaseCylinder(models.Model):
                     ))
         return super().create(vals_list)
 
+=======
+    )    
+>>>>>>> 1a391fe80b61aba2c9b6270a7d8b0625aac85b09
     @api.depends('survey_id')
     def _compute_cylinder_survey_count(self):
         for record in self:
             record.cylinder_survey_count = 1 if record.sudo().survey_id else 0
+<<<<<<< HEAD
 
     @api.depends('state', 'approval_request_id')
     @api.depends_context('uid')
@@ -63,6 +73,12 @@ class PurchaseCylinder(models.Model):
 
     def action_view_survey(self):
         self.ensure_one()
+=======
+            
+    def action_view_survey(self):
+        self.ensure_one()
+
+>>>>>>> 1a391fe80b61aba2c9b6270a7d8b0625aac85b09
         return {
             'type': 'ir.actions.act_window',
             'name': 'Levantamiento',
@@ -70,6 +86,7 @@ class PurchaseCylinder(models.Model):
             'view_mode': 'form',
             'res_id': self.survey_id.id,
         }
+<<<<<<< HEAD
 
     def action_view_approval_request(self):
         """Acción nativa del Smart Button hacia Aprobaciones."""
@@ -274,3 +291,24 @@ class PurchaseCylinder(models.Model):
                     "Faltan algunos campos obligatorios. No puedes enviar una solicitud de cotización sin productos."
                 ))
         return super(PurchaseCylinder, self).action_rfq_send()
+=======
+        
+    def button_confirm(self):
+        for order in self:
+            products_without_code = order.order_line.filtered(
+                lambda l: not l.product_id.default_code
+            )
+
+            if products_without_code:
+                product_names = ", ".join(
+                    products_without_code.mapped('product_id.display_name')
+                )
+
+                raise ValidationError(_(
+                    "No puedes confirmar la Orden de Compra porque los siguientes productos no tienen código interno (default_code):\n%s"
+                ) % product_names)
+
+        return super().button_confirm()
+        
+    
+>>>>>>> 1a391fe80b61aba2c9b6270a7d8b0625aac85b09

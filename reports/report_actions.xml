@@ -24,6 +24,7 @@
         <field name="binding_type">report</field>
         <field name="print_report_name">'%s' % (object.name)</field>
     </record>
+<<<<<<< HEAD
 
     <!-- Formato de papel del formato de corte: márgenes pequeños para que el contenido
          empiece arriba de la hoja (el A4 de la compañía deja 52 mm libres arriba). -->
@@ -52,4 +53,6 @@
         <field name="binding_model_id" ref="sale.model_sale_order"/>
         <field name="binding_type">report</field>
     </record>
+=======
+>>>>>>> 1a391fe80b61aba2c9b6270a7d8b0625aac85b09
 </odoo>

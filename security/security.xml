@@ -16,7 +16,11 @@
         <!-- GRUPOS -->
         <record id="group_cylinder_survey_user" model="res.groups">
             <field name="name">Usuario de Taller de Cilindros</field>
+<<<<<<< HEAD
             <field name="privilege_id" ref="privilege_cylinder_survey"/>
+=======
+            <field name="privilege_id" ref="impsa_cylinder_survey.privilege_cylinder_survey"/>
+>>>>>>> 1a391fe80b61aba2c9b6270a7d8b0625aac85b09
 
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
             <field name="comment">
@@ -26,8 +30,13 @@
 
         <record id="group_cylinder_survey_manager" model="res.groups">
             <field name="name">Administrador de Taller de Cilindros</field>
+<<<<<<< HEAD
             <field name="privilege_id" ref="privilege_cylinder_survey"/>
             <field name="implied_ids" eval="[(4, ref('group_cylinder_survey_user'))]"/>
+=======
+            <field name="privilege_id" ref="impsa_cylinder_survey.privilege_cylinder_survey"/>
+            <field name="implied_ids" eval="[(4, ref('impsa_cylinder_survey.group_cylinder_survey_user'))]"/>
+>>>>>>> 1a391fe80b61aba2c9b6270a7d8b0625aac85b09
             <field name="comment">
                 Acceso total a la configuración del taller, materiales y tipos de accesorios.
             </field>
@@ -35,7 +44,11 @@
 
         <record id="group_apu_user" model="res.groups">
             <field name="name">Usuario de APU</field>
+<<<<<<< HEAD
             <field name="privilege_id" ref="privilege_apu"/>
+=======
+            <field name="privilege_id" ref="impsa_cylinder_survey.privilege_apu"/>
+>>>>>>> 1a391fe80b61aba2c9b6270a7d8b0625aac85b09
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
             <field name="comment">
                 Acceso básico para crear y consultar Análisis de Precios Unitarios.
@@ -44,8 +57,13 @@
 
         <record id="group_apu_manager" model="res.groups">
             <field name="name">Administrador de APU</field>
+<<<<<<< HEAD
             <field name="privilege_id" ref="privilege_apu"/>
             <field name="implied_ids" eval="[(4, ref('group_apu_user'))]"/>
+=======
+            <field name="privilege_id" ref="impsa_cylinder_survey.privilege_apu"/>
+            <field name="implied_ids" eval="[(4, ref('impsa_cylinder_survey.group_apu_user'))]"/>
+>>>>>>> 1a391fe80b61aba2c9b6270a7d8b0625aac85b09
             <field name="comment">
                 Acceso total a la configuración de APUs, acciones y márgenes de utilidad.
             </field>
