@@ -20,9 +20,5 @@ from . import sale_order_line_inherit
 from . import apu_survey_margins
 from . import apu_survey_passw_wizard
 from . import mail_compose_message
-<<<<<<< HEAD
 from . import res_partner_bank
 from . import approval_request
-=======
-from . import res_partner_bank
->>>>>>> 1a391fe80b61aba2c9b6270a7d8b0625aac85b09
