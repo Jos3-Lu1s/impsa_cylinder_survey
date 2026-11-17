@@ -31,15 +31,16 @@ Integración con procesos:
     'category': 'Manufacturing/Operations',
     'version': '19.0.1.0.0',
 
-    'depends': ['base', 'crm', 'mail', 'purchase', 'sale_crm', 'sale_management', 'sale_stock', 'mrp', 'hr', 'approvals'],
+    'depends': ['base', 'crm', 'mail', 'purchase', 'sale_crm', 'sale_management', 'sale_stock', 'mrp', 'hr',  #'approvals'
+                ],
 
     "data": [
         "security/security.xml",
         "security/ir.model.access.csv",
         "data/ir_sequence_data.xml",
         'data/cylinder_data.xml',
-        'data/approval_data.xml', 
-        'data/employee_data.xml',
+        #'data/approval_data.xml', 
+        #'data/employee_data.xml',
           
         # 'data/paper_format.xml',
         'reports/report_actions.xml',
@@ -51,7 +52,7 @@ Integración con procesos:
         "views/accessory_type_views.xml",
         "views/crm_adition.xml",
         "views/purchase_views.xml",
-        "views/approval_request_views.xml",          
+        #"views/approval_request_views.xml",          
         "reports/report_proforma.xml",
         "reports/report_cut_order.xml",
         "views/apu_survey_views.xml",
