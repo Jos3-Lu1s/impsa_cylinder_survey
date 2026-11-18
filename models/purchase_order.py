@@ -50,3 +50,5 @@ class PurchaseCylinder(models.Model):
                 ) % product_names)
 
         return super().button_confirm()
+        
+    
