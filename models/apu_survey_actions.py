@@ -29,3 +29,4 @@ class ApuSurveyActions(models.Model):
         for vals in vals_list:
             if not vals.get('action_code') or vals.get('action_code') == _('Nuevo'):
                 vals['action_code'] = self.env['ir.sequence'].next_by_code('impsa.apu.survey.actions') or '00000'
+        return super().create(vals_list)
